@@ -30,13 +30,13 @@ $null = $acl.RemoveAccessRule($rule)
 $null = $k.SetAccessControl($acl)
 
 # Скрыть окно
-Start-Process cleanmgr.exe
+Start-Process notepad.exe
 $WindowCode = '[DllImport("user32.dll")] public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);'
 $AsyncWindow = Add-Type -MemberDefinition $WindowCode -Name Win32ShowWindowAsync -namespace Win32Functions -PassThru
-$hwnd0 = (Get-Process -Name cleanmgr)[0].MainWindowHandle
+$hwnd0 = (Get-Process -Name notepad)[0].MainWindowHandle
 $null = $AsyncWindow::ShowWindowAsync($hwnd0, 0)
 
-# Всплывающее окошко с сообщение о перезагрузке
+# Всплывающее окошко с сообщением о перезагрузке
 $action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument @"
 -WindowStyle Hidden `
 Add-Type -AssemblyName System.Windows.Forms
