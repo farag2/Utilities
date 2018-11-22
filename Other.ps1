@@ -197,7 +197,13 @@ Register-ScheduledTask @Params -Force
 (Get-Disk | Where-Object BusType -ne USB | Where-Object IsBoot -ne True | Get-Partition).DriveLetter | ForEach-Object {$_ + ':'} | Join-Path -ChildPath $_ -Resolve -ErrorAction SilentlyContinue
 # Найти первый диск, подключенный через USB
 (Get-Disk | Where-Object BusType -eq USB | Get-Partition).DriveLetter | ForEach-Object {$_ + ':\'} | Join-Path -ChildPath $_ -Resolve -ErrorAction SilentlyContinue | Select-Object -First 1
-
-#
-Get-WinEvent -LogName system | Where-Object {$_.eventID -eq 1074} | Select-Object -Property *
-Get-WinEvent -LogName system | Where-Object {$_.eventid -like '1001' -and $_.source -like 'bugcheck'} | Select-Object -Property *
+# Добавление доменов в hosts
+$hostfile = "$env:SystemRoot\System32\drivers\etc\hosts"
+$domains = @("site.com","site2.com")
+Foreach ($hostentry in $domains)  
+{
+    IF (!(Get-Content $hostfile | Select-String "0.0.0.0 `t $hostentry"))
+    {
+        Add-content -path $hostfile -value "0.0.0.0 `t $hostentry"
+    }
+}
