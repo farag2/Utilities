@@ -30,13 +30,13 @@ $null = $acl.RemoveAccessRule($rule)
 $null = $k.SetAccessControl($acl)
 
 # Скрыть окно
-Start-Process notepad.exe
+Start-Process cleanmgr.exe
 $WindowCode = '[DllImport("user32.dll")] public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);'
 $AsyncWindow = Add-Type -MemberDefinition $WindowCode -Name Win32ShowWindowAsync -namespace Win32Functions -PassThru
-$hwnd0 = (Get-Process -Name notepad)[0].MainWindowHandle
+$hwnd0 = (Get-Process -Name cleanmgr)[0].MainWindowHandle
 $null = $AsyncWindow::ShowWindowAsync($hwnd0, 0)
 
-# Всплывающее окошко с сообщением о перезагрузке
+# Всплывающее окошко с сообщение о перезагрузке
 $action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument @"
 -WindowStyle Hidden `
 Add-Type -AssemblyName System.Windows.Forms
@@ -197,6 +197,7 @@ Register-ScheduledTask @Params -Force
 (Get-Disk | Where-Object BusType -ne USB | Where-Object IsBoot -ne True | Get-Partition).DriveLetter | ForEach-Object {$_ + ':'} | Join-Path -ChildPath $_ -Resolve -ErrorAction SilentlyContinue
 # Найти первый диск, подключенный через USB
 (Get-Disk | Where-Object BusType -eq USB | Get-Partition).DriveLetter | ForEach-Object {$_ + ':\'} | Join-Path -ChildPath $_ -Resolve -ErrorAction SilentlyContinue | Select-Object -First 1
+
 # Добавление доменов в hosts
 $hostfile = "$env:SystemRoot\System32\drivers\etc\hosts"
 $domains = @("site.com","site2.com")
@@ -207,3 +208,8 @@ Foreach ($hostentry in $domains)
         Add-content -path $hostfile -value "0.0.0.0 `t $hostentry"
     }
 }
+
+# Отделить путь от названия
+Split-Path file.ext -Leaf
+Split-Path file.ext -Parent
+Get-Item file.ext | Split-Path -Parent | Split-Path -Leaf
