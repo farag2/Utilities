@@ -30,10 +30,10 @@ $null = $acl.RemoveAccessRule($rule)
 $null = $k.SetAccessControl($acl)
 
 # Скрыть окно
-Start-Process cleanmgr.exe
+Start-Process notepad.exe
 $WindowCode = '[DllImport("user32.dll")] public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);'
 $AsyncWindow = Add-Type -MemberDefinition $WindowCode -Name Win32ShowWindowAsync -namespace Win32Functions -PassThru
-$hwnd0 = (Get-Process -Name cleanmgr)[0].MainWindowHandle
+$hwnd0 = (Get-Process -Name notepad)[0].MainWindowHandle
 $null = $AsyncWindow::ShowWindowAsync($hwnd0, 0)
 
 # Всплывающее окошко с сообщение о перезагрузке
@@ -150,9 +150,7 @@ function TakeownRegistry($key)
     $acl.SetAccessRule($rule)
     $key.SetAccessControl($acl)
 }
-
 do {} until (ElevatePrivileges SeTakeOwnershipPrivilege)
-
 TakeownRegistry ("HKLM\SOFTWARE\Microsoft\Windows Defender\Spynet")
 
 # Включение в Планировщике задач удаление устаревших обновлений Office, кроме Office 2019
@@ -201,7 +199,7 @@ Register-ScheduledTask @Params -Force
 # Добавление доменов в hosts
 $hostfile = "$env:SystemRoot\System32\drivers\etc\hosts"
 $domains = @("site.com","site2.com")
-Foreach ($hostentry in $domains)  
+Foreach ($hostentry in $domains)
 {
     IF (!(Get-Content $hostfile | Select-String "0.0.0.0 `t $hostentry"))
     {
@@ -209,7 +207,9 @@ Foreach ($hostentry in $domains)
     }
 }
 
-# Отделить путь от названия
+# Отделить название от пути
 Split-Path file.ext -Leaf
+# Отделить путь от названия
 Split-Path file.ext -Parent
-Get-Item file.ext | Split-Path -Parent | Split-Path -Leaf
+# Отделить от пути название последней папки
+Get-Item file.ext | Split-Path -Parent | Split-Path -Parent | Split-Path -Leaf
