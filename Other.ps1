@@ -36,33 +36,6 @@ $AsyncWindow = Add-Type -MemberDefinition $WindowCode -Name Win32ShowWindowAsync
 $hwnd0 = (Get-Process -Name notepad)[0].MainWindowHandle
 $null = $AsyncWindow::ShowWindowAsync($hwnd0, 0)
 
-# Всплывающее окошко с сообщение о перезагрузке
-$action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument @"
--WindowStyle Hidden `
-Add-Type -AssemblyName System.Windows.Forms
-`$global:balmsg = New-Object System.Windows.Forms.NotifyIcon
-`$path = (Get-Process -Id `$pid).Path
-`$balmsg.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon(`$path)
-`$balmsg.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Warning
-`$balmsg.BalloonTipText = 'ПК перезагрузится через 1 минуту'
-`$balmsg.BalloonTipTitle = 'Внимание'
-`$balmsg.Visible = `$true
-`$balmsg.ShowBalloonTip(60000)
-Start-Sleep -s 60
-Restart-Computer
-"@
-$trigger = New-ScheduledTaskTrigger -Weekly -At 10am -DaysOfWeek Thursday -WeeksInterval 4
-$settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
-$principal = New-ScheduledTaskPrincipal -UserID $env:USERNAME -RunLevel Highest
-$params = @{
-"TaskName"	= "Reboot"
-"Action"	= $action
-"Trigger"	= $trigger
-"Settings"	= $settings
-"Principal"	= $principal
-}
-Register-ScheduledTask @Params -Force
-
 # Стать владельцем ключа в Реестре
 function ElevatePrivileges
 {
@@ -189,13 +162,46 @@ $params = @{
 }
 Register-ScheduledTask @Params -Force
 
-# Найти  диск, не подключенный через USB и не являющийся загрузочным (не исключаются внешние жесткие диски)
-(Get-Disk | Where-Object BusType -ne USB | Where-Object IsBoot -ne True | Get-Partition).DriveLetter | ForEach-Object {$_ + ':'} | Join-Path -ChildPath $_ -Resolve -ErrorAction SilentlyContinue
-# Найти диск, подключенный через USB и не являющийся загрузочным (исключаются внешние жесткие диск)
-(Get-Disk | Where-Object BusType -ne USB | Where-Object IsBoot -ne True | Get-Partition).DriveLetter | ForEach-Object {$_ + ':'} | Join-Path -ChildPath $_ -Resolve -ErrorAction SilentlyContinue
-# Найти первый диск, подключенный через USB
-(Get-Disk | Where-Object BusType -eq USB | Get-Partition).DriveLetter | ForEach-Object {$_ + ':\'} | Join-Path -ChildPath $_ -Resolve -ErrorAction SilentlyContinue | Select-Object -First 1
+# Включение в Планировщике задач всплывающего окошка с сообщением о перезагрузке
+$action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument @"
+-WindowStyle Hidden `
+Add-Type -AssemblyName System.Windows.Forms
+`$global:balmsg = New-Object System.Windows.Forms.NotifyIcon
+`$path = (Get-Process -Id `$pid).Path
+`$balmsg.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon(`$path)
+`$balmsg.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Warning
+`$balmsg.BalloonTipText = 'ПК перезагрузится через 1 минуту'
+`$balmsg.BalloonTipTitle = 'Внимание'
+`$balmsg.Visible = `$true
+`$balmsg.ShowBalloonTip(60000)
+Start-Sleep -s 60
+Restart-Computer
+"@
+$trigger = New-ScheduledTaskTrigger -Weekly -At 10am -DaysOfWeek Thursday -WeeksInterval 4
+$settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
+$principal = New-ScheduledTaskPrincipal -UserID $env:USERNAME -RunLevel Highest
+$params = @{
+"TaskName"	= "Reboot"
+"Action"	= $action
+"Trigger"	= $trigger
+"Settings"	= $settings
+"Principal"	= $principal
+}
+Register-ScheduledTask @Params -Force
 
+# Найти  диск, не подключенный через USB и не являющийся загрузочным (исключаются внешние жесткие диски)
+(Get-Disk | Where-Object {$_.BusType -ne "USB" -and $_.IsBoot -eq $false} | Get-Partition | Get-Volume).DriveLetter | ForEach-Object {$_ + ':\'}
+# Найти диск, не являющийся загрузочным (не исключаются внешние жесткие диски)
+(Get-Disk | Where-Object {$_.IsBoot -eq $false} | Get-Partition | Get-Volume).DriveLetter | ForEach-Object {$_ + ':\'}
+# Найти первый диск, подключенный через USB
+(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume).DriveLetter | ForEach-Object {$_ + ':\'} | Select-Object -First 1
+
+# Возвратить путь с 'Программы\Прочее\reg\Start.reg' на диске, подключенным через USB
+filter Get-FirstResolvedPath
+{
+	(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume).DriveLetter | ForEach-Object {$_ + ':\'} | Join-Path -ChildPath $_ -Resolve -ErrorAction SilentlyContinue | Select-Object -First 1
+}
+'Программы\Прочее\reg\Start.reg' | Get-FirstResolvedPath
 # Добавление доменов в hosts
 $hostfile = "$env:SystemRoot\System32\drivers\etc\hosts"
 $domains = @("site.com","site2.com")
@@ -213,3 +219,19 @@ Split-Path file.ext -Leaf
 Split-Path file.ext -Parent
 # Отделить от пути название последней папки
 Get-Item file.ext | Split-Path -Parent | Split-Path -Parent | Split-Path -Leaf
+
+# Список сетевых дисков
+Get-SmbMapping | Select-Object LocalPath, RemotePath
+
+# Включить Управляемый доступ к папкам
+Set-MpPreference -EnableControlledFolderAccess Enabled
+# Добавить защищенную папку
+$drives = Get-Disk | Where-Object {$_.BusType -ne "USB" -and $_.IsBoot -eq $false}
+IF ($drives)
+{
+	$drives = ($drives | Get-Partition | Get-Volume).DriveLetter | ForEach-Object {$_ + ':\'}
+	Foreach ($drive In $drives)
+	{
+		Add-MpPreference -ControlledFolderAccessProtectedFolders $drive
+	}
+}
