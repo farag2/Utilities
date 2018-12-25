@@ -91,7 +91,7 @@ function TakeownRegistry($key)
 			$reg = [Microsoft.Win32.Registry]::ClassesRoot
 			$key = $key.substring(18)
 		}
-        "HKCU"
+		"HKCU"
 		{
 			$reg = [Microsoft.Win32.Registry]::CurrentUser
 			$key = $key.substring(18)
