@@ -202,6 +202,7 @@ filter Get-FirstResolvedPath
 	(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume).DriveLetter | ForEach-Object {$_ + ':\'} | Join-Path -ChildPath $_ -Resolve -ErrorAction SilentlyContinue | Select-Object -First 1
 }
 'Программы\Прочее\reg\Start.reg' | Get-FirstResolvedPath
+
 # Добавление доменов в hosts
 $hostfile = "$env:SystemRoot\System32\drivers\etc\hosts"
 $domains = @("site.com","site2.com")
@@ -235,3 +236,6 @@ IF ($drives)
 		Add-MpPreference -ControlledFolderAccessProtectedFolders $drive
 	}
 }
+
+# Включить встроенную виртуализацию на виртуальной машине
+Set-VMProcessor -VMName 10 -ExposeVirtualizationExtensions $true
