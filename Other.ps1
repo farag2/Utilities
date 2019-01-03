@@ -41,9 +41,9 @@ function ElevatePrivileges
 {
 	param($Privilege)
 	$Definition = @"
-    using System;
-    using System.Runtime.InteropServices;
-    public class AdjPriv
+	using System;
+	using System.Runtime.InteropServices;
+	public class AdjPriv
 	{
 		[DllImport("advapi32.dll", ExactSpelling = true, SetLastError = true)]
 		internal static extern bool AdjustTokenPrivileges(IntPtr htok, bool disall, ref TokPriv1Luid newst, int len, IntPtr prev, IntPtr rele);
