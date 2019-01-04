@@ -236,6 +236,3 @@ IF ($drives)
 		Add-MpPreference -ControlledFolderAccessProtectedFolders $drive
 	}
 }
-
-# Включить встроенную виртуализацию на виртуальной машине
-Set-VMProcessor -VMName 10 -ExposeVirtualizationExtensions $true
