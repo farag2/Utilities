@@ -21,7 +21,7 @@ Add-AppxPackage -Path "D:\Microsoft.LanguageExperiencePackru-ru_17134.5.13.0_neu
 # Стать владельцем ключа в Реестре
 $ParentACL = Get-Acl -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.txt"
 $k = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.txt\UserChoice",'ReadWriteSubTree','TakeOwnership')
-$acl  = $k.GetAccessControl()
+$acl = $k.GetAccessControl()
 $null = $acl.SetAccessRuleProtection($false,$true)
 $rule = New-Object System.Security.AccessControl.RegistryAccessRule ($ParentACL.Owner,'FullControl','Allow')
 $null = $acl.SetAccessRule($rule)
@@ -112,16 +112,16 @@ function TakeownRegistry($key)
 			$key = $key.substring(21)
 		}
 	}
-    $admins = New-Object System.Security.Principal.SecurityIdentifier("S-1-5-32-544")
-    $admins = $admins.Translate([System.Security.Principal.NTAccount])
-    $key = $reg.OpenSubKey($key, "ReadWriteSubTree", "TakeOwnership")
-    $acl = $key.GetAccessControl()
-    $acl.SetOwner($admins)
-    $key.SetAccessControl($acl)
-    $acl = $key.GetAccessControl()
-    $rule = New-Object System.Security.AccessControl.RegistryAccessRule($admins, "FullControl", "Allow")
-    $acl.SetAccessRule($rule)
-    $key.SetAccessControl($acl)
+	$admins = New-Object System.Security.Principal.SecurityIdentifier("S-1-5-32-544")
+	$admins = $admins.Translate([System.Security.Principal.NTAccount])
+	$key = $reg.OpenSubKey($key, "ReadWriteSubTree", "TakeOwnership")
+	$acl = $key.GetAccessControl()
+	$acl.SetOwner($admins)
+	$key.SetAccessControl($acl)
+	$acl = $key.GetAccessControl()
+	$rule = New-Object System.Security.AccessControl.RegistryAccessRule($admins, "FullControl", "Allow")
+	$acl.SetAccessRule($rule)
+	$key.SetAccessControl($acl)
 }
 do {} until (ElevatePrivileges SeTakeOwnershipPrivilege)
 TakeownRegistry ("HKLM\SOFTWARE\Microsoft\Windows Defender\Spynet")
@@ -189,17 +189,17 @@ $params = @{
 }
 Register-ScheduledTask @Params -Force
 
-# Найти  диск, не подключенный через USB и не являющийся загрузочным (исключаются внешние жесткие диски)
-(Get-Disk | Where-Object {$_.BusType -ne "USB" -and $_.IsBoot -eq $false} | Get-Partition | Get-Volume).DriveLetter | ForEach-Object {$_ + ':\'}
-# Найти диск, не являющийся загрузочным (не исключаются внешние жесткие диски)
-(Get-Disk | Where-Object {$_.IsBoot -eq $false} | Get-Partition | Get-Volume).DriveLetter | ForEach-Object {$_ + ':\'}
-# Найти первый диск, подключенный через USB
-(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume).DriveLetter | ForEach-Object {$_ + ':\'} | Select-Object -First 1
+# Найти диски, не подключенные через USB и не являющиеся загрузочными, исключая диски с пустыми буквами (исключаются внешние жесткие диски)
+(Get-Disk | Where-Object {$_.BusType -ne "USB" -and $_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object {$_.DriveLetter -ne $null}).DriveLetter | ForEach-Object {$_ + ':\'}
+# Найти диски, не являющиеся загрузочными, исключая диски с пустыми буквами (не исключаются внешние жесткие диски)
+(Get-Disk | Where-Object {$_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object {$_.DriveLetter -ne $null}).DriveLetter | ForEach-Object {$_ + ':\'}
+# Найти первый диск, подключенный через USB, исключая диски с пустыми буквами
+(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object {$_.DriveLetter -ne $null}).DriveLetter | ForEach-Object {$_ + ':\'} | Select-Object -First 1
 
-# Возвратить путь с 'Программы\Прочее\reg\Start.reg' на диске, подключенным через USB
+# Возвратить полный путь с 'Программы\Прочее\reg\Start.reg' на диске, подключенным через USB
 filter Get-FirstResolvedPath
 {
-	(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume).DriveLetter | ForEach-Object {$_ + ':\'} | Join-Path -ChildPath $_ -Resolve -ErrorAction SilentlyContinue | Select-Object -First 1
+	(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object {$_.DriveLetter -ne $null}).DriveLetter | ForEach-Object {$_ + ':\'} | Join-Path -ChildPath $_ -Resolve -ErrorAction SilentlyContinue
 }
 'Программы\Прочее\reg\Start.reg' | Get-FirstResolvedPath
 
@@ -208,10 +208,10 @@ $hostfile = "$env:SystemRoot\System32\drivers\etc\hosts"
 $domains = @("site.com","site2.com")
 Foreach ($hostentry in $domains)
 {
-    IF (!(Get-Content $hostfile | Select-String "0.0.0.0 `t $hostentry"))
-    {
-        Add-content -path $hostfile -value "0.0.0.0 `t $hostentry"
-    }
+	IF (!(Get-Content $hostfile | Select-String "0.0.0.0 `t $hostentry"))
+	{
+		Add-content -path $hostfile -value "0.0.0.0 `t $hostentry"
+	}
 }
 
 # Отделить название от пути
@@ -230,9 +230,16 @@ Set-MpPreference -EnableControlledFolderAccess Enabled
 $drives = Get-Disk | Where-Object {$_.BusType -ne "USB" -and $_.IsBoot -eq $false}
 IF ($drives)
 {
-	$drives = ($drives | Get-Partition | Get-Volume).DriveLetter | ForEach-Object {$_ + ':\'}
+	$drives = ($drives | Get-Partition | Get-Volume | Where-Object {$_.DriveLetter -ne $null}).DriveLetter | ForEach-Object {$_ + ':\'}
 	Foreach ($drive In $drives)
 	{
 		Add-MpPreference -ControlledFolderAccessProtectedFolders $drive
 	}
 }
+
+# Версия ОС
+$RegPath = 'HKLM:\SOFTWARE\Microsoft\Windows nt\CurrentVersion'
+Get-ItemProperty -Path $RegPath | Select-Object -Property ProductName, EditionID, ReleaseID,
+@{Name = "Build"; Expression = {"$($_.CurrentBuild).$($_.UBR)"}},
+@{Name = "InstalledUTC"; Expression = {([datetime]"1/1/1601").AddTicks($_.InstallTime)}},
+@{Name = "Computername"; Expression = {$env:COMPUTERNAME}}
