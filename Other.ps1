@@ -251,7 +251,7 @@ IF ((Get-Service -ServiceName $services).StartType -ne "Disabled")
 }
 
 # Получить события из журналов событий и файлов журналов отслеживания событий
-<# 
+<#
 LogAlways 0
 Critical 1
 Error 2
