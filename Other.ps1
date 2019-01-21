@@ -1,11 +1,11 @@
 # PSScriptAnalyzer
 Install-PackageProvider -Name NuGet -Force
-Remove-Item $env:APPDATA\NuGet -Recurse -Force
+Remove-Item -Path $env:APPDATA\NuGet -Recurse -Force
 Save-Module -Name PSScriptAnalyzer -Path D:\
-Invoke-ScriptAnalyzer "D:\Программы\Прочее\ps1\Win 10.ps1"
+Invoke-ScriptAnalyzer -Path "D:\Программы\Прочее\ps1\Win 10.ps1"
 
 # Перерегистрация всех UWP-приложений
-((Get-ChildItem HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\InboxApplications) | Get-ItemProperty).Path | Add-AppxPackage -Register -DisableDevelopmentMode
+((Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\InboxApplications) | Get-ItemProperty).Path | Add-AppxPackage -Register -DisableDevelopmentMode
 
 # Домен
 New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters -Name AllowSingleLabelDnsDomain -Value 1 -Force
@@ -30,7 +30,7 @@ $null = $acl.RemoveAccessRule($rule)
 $null = $k.SetAccessControl($acl)
 
 # Скрыть окно
-Start-Process notepad.exe
+Start-Process -FilePath notepad.exe
 $WindowCode = '[DllImport("user32.dll")] public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);'
 $AsyncWindow = Add-Type -MemberDefinition $WindowCode -Name Win32ShowWindowAsync -namespace Win32Functions -PassThru
 $hwnd0 = (Get-Process -Name notepad)[0].MainWindowHandle
@@ -208,18 +208,18 @@ $hostfile = "$env:SystemRoot\System32\drivers\etc\hosts"
 $domains = @("site.com","site2.com")
 Foreach ($hostentry in $domains)
 {
-	IF (!(Get-Content $hostfile | Select-String "0.0.0.0 `t $hostentry"))
+	IF (!(Get-Content -Path $hostfile | Select-String "0.0.0.0 `t $hostentry"))
 	{
-		Add-content -path $hostfile -value "0.0.0.0 `t $hostentry"
+		Add-content -Path $hostfile -Value "0.0.0.0 `t $hostentry"
 	}
 }
 
 # Отделить название от пути
-Split-Path file.ext -Leaf
+Split-Path -Path file.ext -Leaf
 # Отделить путь от названия
-Split-Path file.ext -Parent
+Split-Path -Path file.ext -Parent
 # Отделить от пути название последней папки
-Get-Item file.ext | Split-Path -Parent | Split-Path -Parent | Split-Path -Leaf
+Get-Item -Path file.ext | Split-Path -Parent | Split-Path -Parent | Split-Path -Leaf
 
 # Список сетевых дисков
 Get-SmbMapping | Select-Object LocalPath, RemotePath
@@ -238,8 +238,37 @@ IF ($drives)
 }
 
 # Версия ОС
-$RegPath = 'HKLM:\SOFTWARE\Microsoft\Windows nt\CurrentVersion'
-Get-ItemProperty -Path $RegPath | Select-Object -Property ProductName, EditionID, ReleaseID,
+Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows nt\CurrentVersion" | Select-Object -Property ProductName, EditionID, ReleaseID,
 @{Name = "Build"; Expression = {"$($_.CurrentBuild).$($_.UBR)"}},
 @{Name = "InstalledUTC"; Expression = {([datetime]"1/1/1601").AddTicks($_.InstallTime)}},
 @{Name = "Computername"; Expression = {$env:COMPUTERNAME}}
+
+# Проверить тип запуска службы
+IF ((Get-Service -ServiceName $services).StartType -ne "Disabled")
+{
+	Stop-Service -ServiceName $services -Force
+	Set-Service -ServiceName $services -StartupType Disabled
+}
+
+# Получить события из журналов событий и файлов журналов отслеживания событий
+<# 
+LogAlways 0
+Critical 1
+Error 2
+Warning 3
+Informational 4
+Verbose 5
+#>
+Get-WinEvent -LogName system | Where-Object {$_.ID -eq 50106} | Select-Object -Property *
+Get-WinEvent -LogName system | Where-Object {$_.ID -like '1001' -and $_.source -like 'bugcheck'} | Select-Object -Property *
+
+Get-WinEvent -FilterHashtable @{LogName="System";level="1"}
+Get-WinEvent -FilterHashtable @{LogName="System"} | Where-Object -FilterScript {($_.Level -eq 2) -or ($_.Level -eq 3)}
+
+Get-WinEvent -LogName Application | Where-Object {$_.ProviderName -match 'Windows Error*'} | Select-Object TimeCreated, Message | Format-Table -AutoSize -Wrap
+Get-WinEvent -LogName System | Where-Object {$_.LevelDisplayName -match 'Критическая' -or $_.LevelDisplayName -match 'Ошибка'} | Select-Object TimeCreated, ID, LevelDisplayName, Message | Sort-Object TimeCreated -Descending | Select-Object -First 10 | Format-Table -AutoSize -Wrap
+
+# Настройка и проверка исключений Защитника Windows
+Add-MpPreference -ExclusionProcess D:\folder\file.ext
+Add-MpPreference -ExclusionPath D:\folder
+Add-MpPreference -ExclusionExtension .ext
