@@ -190,16 +190,16 @@ $params = @{
 Register-ScheduledTask @Params -Force
 
 # Найти диски, не подключенные через USB и не являющиеся загрузочными, исключая диски с пустыми буквами (исключаются внешние жесткие диски)
-(Get-Disk | Where-Object {$_.BusType -ne "USB" -and $_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object {$_.DriveLetter -ne $null}).DriveLetter | ForEach-Object {$_ + ':\'}
+(Get-Disk | Where-Object {$_.BusType -ne "USB" -and $_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object {$_.DriveLetter -ne $null}).DriveLetter + ':\'
 # Найти диски, не являющиеся загрузочными, исключая диски с пустыми буквами (не исключаются внешние жесткие диски)
-(Get-Disk | Where-Object {$_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object {$_.DriveLetter -ne $null}).DriveLetter | ForEach-Object {$_ + ':\'}
+(Get-Disk | Where-Object {$_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object {$_.DriveLetter -ne $null}).DriveLetter + ':\'
 # Найти первый диск, подключенный через USB, исключая диски с пустыми буквами
-(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object {$_.DriveLetter -ne $null}).DriveLetter | ForEach-Object {$_ + ':\'} | Select-Object -First 1
+(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object {$_.DriveLetter -ne $null}).DriveLetter + ':\' | Select-Object -First 1
 
 # Возвратить полный путь с 'Программы\Прочее\reg\Start.reg' на диске, подключенным через USB
 filter Get-FirstResolvedPath
 {
-	(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object {$_.DriveLetter -ne $null}).DriveLetter | ForEach-Object {$_ + ':\'} | Join-Path -ChildPath $_ -Resolve -ErrorAction SilentlyContinue
+	(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object {$_.DriveLetter -ne $null}).DriveLetter + ':\' | Join-Path -ChildPath $_ -Resolve -ErrorAction SilentlyContinue
 }
 'Программы\Прочее\reg\Start.reg' | Get-FirstResolvedPath
 
@@ -226,16 +226,6 @@ Get-SmbMapping | Select-Object LocalPath, RemotePath
 
 # Включить Управляемый доступ к папкам
 Set-MpPreference -EnableControlledFolderAccess Enabled
-# Добавить защищенную папку
-$drives = Get-Disk | Where-Object {$_.BusType -ne "USB" -and $_.IsBoot -eq $false}
-IF ($drives)
-{
-	$drives = ($drives | Get-Partition | Get-Volume | Where-Object {$_.DriveLetter -ne $null}).DriveLetter | ForEach-Object {$_ + ':\'}
-	Foreach ($drive In $drives)
-	{
-		Add-MpPreference -ControlledFolderAccessProtectedFolders $drive
-	}
-}
 
 # Версия ОС
 Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows nt\CurrentVersion" | Select-Object -Property ProductName, EditionID, ReleaseID,
@@ -272,3 +262,95 @@ Get-WinEvent -LogName System | Where-Object {$_.LevelDisplayName -match 'Кри�
 Add-MpPreference -ExclusionProcess D:\folder\file.ext
 Add-MpPreference -ExclusionPath D:\folder
 Add-MpPreference -ExclusionExtension .ext
+
+# Создание ярлыка
+enum WindowStyle
+{
+	# стандартный размер окна
+	Normal	= 4
+	# развернутый вид (максимизировано)
+	Maximized	= 3
+	# свернутое окно (минимизировано)
+	Minimized	= 7
+}
+
+function New-Shortcut
+{
+	[CmdletBinding()]
+	param
+	(
+		# Аргументы командной строки объекта, для которого создаётся ярлык
+		[Parameter(ValueFromPipelineByPropertyName)]
+		[string]
+		$Arguments,
+ 
+		# Описание объекта
+		[Parameter(ValueFromPipelineByPropertyName)]
+		[string]
+		$Description,
+ 
+		# Горячие клавиши для запуска ярлыка
+		[Parameter(ValueFromPipelineByPropertyName)]
+		[string]
+		$Hotkey,
+ 
+		# Полное имя иконки для ярлыка
+		[Parameter(ValueFromPipelineByPropertyName)]
+		[ValidateScript( {Test-Path $_} )]
+		[string]
+		$IconLocation,
+ 
+		# Полный путь объекта для которого создаётся ярлык
+		[Parameter(Mandatory, ValueFromPipelineByPropertyName)]
+		[ValidateScript( {Test-Path $_} )]
+		[string]
+		$TargetPath,
+ 
+		# Путь создаваемого ярлыка
+		[Parameter(Mandatory, ValueFromPipelineByPropertyName)]
+		[string]
+		$ShortcutPath,
+ 
+		# Стиль окна объекта запускаемого ярлыком
+		[Parameter(ValueFromPipelineByPropertyName)]
+		[WindowStyle]
+		$WindowStyle,
+ 
+		# Рабочая директория для объекта запускаемого ярлыком
+		[Parameter(ValueFromPipelineByPropertyName)]
+		[ValidateScript( {Test-Path $_} )]
+		[string]
+		$WorkingDirectory
+	)
+
+	begin
+	{
+		$shell = New-Object -comObject Wscript.Shell
+	}
+ 
+	process
+	{
+		$shortcut = $shell.CreateShortcut($ShortcutPath)
+ 
+		$shortcut.Arguments		= $Arguments
+		$shortcut.Description      = $Description
+		$shortcut.Hotkey		   = $Hotkey
+		$shortcut.TargetPath       = $TargetPath
+		$shortcut.WorkingDirectory = $WorkingDirectory
+ 
+		IF ($WindowStyle) {$shortcut.WindowStyle = $WindowStyle}
+		IF ($IconLocation) {$shortcut.IconLocation = $IconLocation}
+
+		$shortcut.Save()
+	}
+}
+
+<# Пример
+$shortcut = [PSCustomObject]@{
+	TargetPath   = "C:\Windows\System32\cmd.exe"
+	ShortcutPath = ".\dir.lnk"
+	Arguments    = "/k dir /b"
+	WindowStyle  = "Maximized"
+}
+$shortcut | New-Shortcut
+#>
