@@ -224,9 +224,6 @@ Get-Item -Path file.ext | Split-Path -Parent | Split-Path -Parent | Split-Path -
 # Список сетевых дисков
 Get-SmbMapping | Select-Object LocalPath, RemotePath
 
-# Включить Управляемый доступ к папкам
-Set-MpPreference -EnableControlledFolderAccess Enabled
-
 # Версия ОС
 Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows nt\CurrentVersion" | Select-Object -Property ProductName, EditionID, ReleaseID,
 @{Name = "Build"; Expression = {"$($_.CurrentBuild).$($_.UBR)"}},
@@ -354,3 +351,16 @@ $shortcut = [PSCustomObject]@{
 }
 $shortcut | New-Shortcut
 #>
+
+# Скачать скрипт с GitHub
+$url = "https://gist.githubusercontent.com/farag2/ff22d41b1e25821a61f9f6e09a520b6b/raw/1dcc19a3990ea2bd5ad48fe2112c2f32139db711/user.js"
+$output = "$env:SystemDrive\user.js"
+(New-Object System.Net.WebClient).DownloadFile($url, $output)
+
+Import-Module BitsTransfer
+Start-BitsTransfer -Source $url -Destination $output
+# Start-BitsTransfer -Source $url -Destination $output -Asynchronous
+
+# Подсчет времени
+$start_time = Get-Date
+Write-Output "Time taken: $((Get-Date).Subtract($start_time).Milliseconds) second(s)"
