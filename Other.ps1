@@ -199,7 +199,7 @@ Register-ScheduledTask @Params -Force
 # Возвратить полный путь с 'Программы\Прочее\reg\Start.reg' на диске, подключенным через USB
 filter Get-FirstResolvedPath
 {
-	(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object {$_.DriveLetter -ne $null}).DriveLetter + ':\' | Join-Path -ChildPath $_ -Resolve -ErrorAction SilentlyContinue
+	(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object {$null -ne $_.DriveLetter}).DriveLetter + ':\' | Join-Path -ChildPath $_ -Resolve -ErrorAction SilentlyContinue
 }
 'Программы\Прочее\reg\Start.reg' | Get-FirstResolvedPath
 
@@ -274,7 +274,7 @@ enum WindowStyle
 	Minimized	= 7
 }
 
-function New-Shortcut
+function Shortcut
 {
 	[CmdletBinding()]
 	param
@@ -283,39 +283,39 @@ function New-Shortcut
 		[Parameter(ValueFromPipelineByPropertyName)]
 		[string]
 		$Arguments,
- 
+
 		# Описание объекта
 		[Parameter(ValueFromPipelineByPropertyName)]
 		[string]
 		$Description,
- 
+
 		# Горячие клавиши для запуска ярлыка
 		[Parameter(ValueFromPipelineByPropertyName)]
 		[string]
 		$Hotkey,
- 
+
 		# Полное имя иконки для ярлыка
 		[Parameter(ValueFromPipelineByPropertyName)]
 		[ValidateScript( {Test-Path $_} )]
 		[string]
 		$IconLocation,
- 
+
 		# Полный путь объекта для которого создаётся ярлык
 		[Parameter(Mandatory, ValueFromPipelineByPropertyName)]
 		[ValidateScript( {Test-Path $_} )]
 		[string]
 		$TargetPath,
- 
+
 		# Путь создаваемого ярлыка
 		[Parameter(Mandatory, ValueFromPipelineByPropertyName)]
 		[string]
 		$ShortcutPath,
- 
+
 		# Стиль окна объекта запускаемого ярлыком
 		[Parameter(ValueFromPipelineByPropertyName)]
 		[WindowStyle]
 		$WindowStyle,
- 
+
 		# Рабочая директория для объекта запускаемого ярлыком
 		[Parameter(ValueFromPipelineByPropertyName)]
 		[ValidateScript( {Test-Path $_} )]
@@ -327,17 +327,17 @@ function New-Shortcut
 	{
 		$shell = New-Object -comObject Wscript.Shell
 	}
- 
+
 	process
 	{
 		$shortcut = $shell.CreateShortcut($ShortcutPath)
- 
+
 		$shortcut.Arguments		= $Arguments
 		$shortcut.Description      = $Description
 		$shortcut.Hotkey		   = $Hotkey
 		$shortcut.TargetPath       = $TargetPath
 		$shortcut.WorkingDirectory = $WorkingDirectory
- 
+
 		IF ($WindowStyle) {$shortcut.WindowStyle = $WindowStyle}
 		IF ($IconLocation) {$shortcut.IconLocation = $IconLocation}
 
