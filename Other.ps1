@@ -330,10 +330,10 @@ function Shortcut
 		$shortcut = $shell.CreateShortcut($ShortcutPath)
 
 		$shortcut.Arguments		= $Arguments
-		$shortcut.Description      = $Description
-		$shortcut.Hotkey		   = $Hotkey
-		$shortcut.TargetPath       = $TargetPath
-		$shortcut.WorkingDirectory = $WorkingDirectory
+		$shortcut.Description	= $Description
+		$shortcut.Hotkey		= $Hotkey
+		$shortcut.TargetPath	= $TargetPath
+		$shortcut.WorkingDirectory	= $WorkingDirectory
 
 		IF ($WindowStyle) {$shortcut.WindowStyle = $WindowStyle}
 		IF ($IconLocation) {$shortcut.IconLocation = $IconLocation}
@@ -352,14 +352,19 @@ $shortcut = [PSCustomObject]@{
 $shortcut | New-Shortcut
 #>
 
-# Скачать скрипт с GitHub
-$url = "https://gist.githubusercontent.com/farag2/ff22d41b1e25821a61f9f6e09a520b6b/raw/1dcc19a3990ea2bd5ad48fe2112c2f32139db711/user.js"
-$output = "$env:SystemDrive\user.js"
-(New-Object System.Net.WebClient).DownloadFile($url, $output)
+# Скачать файл с помощью
+Invoke-WebRequest -Uri "https://site.com/1.js" -OutFile D:\1.js
 
-Import-Module BitsTransfer
+# Передача больших файлов по медленным и нестабильным сетям
+Import-Module BitsTransfer # Нагружает диск
 Start-BitsTransfer -Source $url -Destination $output
 # Start-BitsTransfer -Source $url -Destination $output -Asynchronous
+
+# Скачать и отобразить текстовый файл
+(Invoke-WebRequest -Uri "https://site.com/1.js" -OutFile D:\1.js -PassThru).Content
+
+# Прочитать содержимое текстового файла
+(Invoke-WebRequest -Uri "https://site.com/1.js").Content
 
 # Подсчет времени
 $start_time = Get-Date
