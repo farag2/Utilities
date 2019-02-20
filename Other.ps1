@@ -385,7 +385,7 @@ Write-Output "Time taken: $((Get-Date).Subtract($start_time).Milliseconds) secon
 
 # Разархивировать архив
 $HT = @{
-	Path = "D:\Загрузки\12.This Is My Life (bonus track).zip"
+	Path = "D:\1.zip"
 	DestinationPath = "D:\1"
 	Force = [switch]::Present
 	Verbose = [switch]::Present
