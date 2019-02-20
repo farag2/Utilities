@@ -391,3 +391,21 @@ $HT = @{
 	Verbose = [switch]::Present
 }
 Expand-Archive @HT
+
+# Обновить переменные среды
+IF (!("Win32.NativeMethods" -as [Type]))
+{
+	Add-Type -Namespace Win32 -Name NativeMethods -MemberDefinition @"
+	[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+	public static extern IntPtr SendMessageTimeout(
+		IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam,
+		uint fuFlags, uint uTimeout, out UIntPtr lpdwResult
+	);
+"@
+}
+$HWND_BROADCAST = [IntPtr] 0xffff;
+$WM_SETTINGCHANGE = 0x1a;
+$SMTO_ABORTIFHUNG = 0x2
+$result = [UIntPtr]::Zero
+
+[Win32.Nativemethods]::SendMessageTimeout($HWND_BROADCAST, $WM_SETTINGCHANGE, [UIntPtr]::Zero, "Environment", $SMTO_ABORTIFHUNG, 5000, [ref] $result);
