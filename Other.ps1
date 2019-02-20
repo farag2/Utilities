@@ -335,8 +335,14 @@ function Shortcut
 		$shortcut.TargetPath	= $TargetPath
 		$shortcut.WorkingDirectory	= $WorkingDirectory
 
-		IF ($WindowStyle) {$shortcut.WindowStyle = $WindowStyle}
-		IF ($IconLocation) {$shortcut.IconLocation = $IconLocation}
+		IF ($WindowStyle)
+		{
+			$shortcut.WindowStyle = $WindowStyle
+		}
+		IF ($IconLocation)
+		{
+			$shortcut.IconLocation = $IconLocation
+		}
 
 		$shortcut.Save()
 	}
@@ -352,8 +358,15 @@ $shortcut = [PSCustomObject]@{
 $shortcut | New-Shortcut
 #>
 
-# Скачать файл с помощью
-Invoke-WebRequest -Uri "https://site.com/1.js" -OutFile D:\1.js
+# Скачать файл
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$HT = @{
+	Uri = "https://site.com/1.js"
+	OutFile = "D:\1.js"
+	UseBasicParsing = [switch]::Present
+	Verbose = [switch]::Present
+}
+Invoke-WebRequest @HT
 
 # Передача больших файлов по медленным и нестабильным сетям
 Import-Module BitsTransfer # Нагружает диск
@@ -369,3 +382,12 @@ Start-BitsTransfer -Source $url -Destination $output
 # Подсчет времени
 $start_time = Get-Date
 Write-Output "Time taken: $((Get-Date).Subtract($start_time).Milliseconds) second(s)"
+
+# Разархивировать архив
+$HT = @{
+	Path = "D:\Загрузки\12.This Is My Life (bonus track).zip"
+	DestinationPath = "D:\1"
+	Force = [switch]::Present
+	Verbose = [switch]::Present
+}
+Expand-Archive @HT
