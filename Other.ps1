@@ -405,3 +405,13 @@ $result = [UIntPtr]::Zero
 
 # Конвертировать в кодировку UTF8 с BOM
 (Get-Content -Path "D:\1.ps1" -Encoding UTF8) | Set-Content -Encoding UTF8 -Path "D:\1.ps1"
+
+# Output Field Separator
+$a = "1","2","3","4"
+$OFS = ","
+[string]$a
+
+$a = 1,2,3
+$b = 2,3,4
+$OFS = '|'
+$a | Where-Object {$_ -notmatch $b}
