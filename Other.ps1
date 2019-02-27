@@ -406,12 +406,54 @@ $result = [UIntPtr]::Zero
 # Конвертировать в кодировку UTF8 с BOM
 (Get-Content -Path "D:\1.ps1" -Encoding UTF8) | Set-Content -Encoding UTF8 -Path "D:\1.ps1"
 
-# Output Field Separator
-$a = "1","2","3","4"
-$OFS = ","
-[string]$a
+# Вычленить букву диска
+Split-Path -Path "D:\Загрузки\12.This Is My Life (bonus track).mp3" -Qualifier
 
-$a = 1,2,3
-$b = 2,3,4
-$OFS = '|'
-$a | Where-Object {$_ -notmatch $b}
+# Печать
+Add-Type -AssemblyName System.Windows.Forms | Out-Null
+$OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
+$OpenFileDialog.InitialDirectory = "D:\Программы\Прочее\xml"
+$OpenFileDialog.Multiselect = $true
+$OpenFileDialog.Filter = "XML-файлы (*.xml)|*.xml|Все файлы (*.*)|*.*"
+$OpenFileDialog.ShowHelp = $true
+$OpenFileDialog.ShowDialog()
+$SelectedFiles = $OpenFileDialog.FileNames
+# Если ничего не выбрано, завершаем работу
+If (!($SelectedFiles))
+{
+	Break
+}
+# На основании полного имени выбранного файла определяем выбранную папку
+$SelectedDir = (Split-Path -Parent $OpenFileDialog.FileName)
+# Получаем список всех файлов в выбранной папке
+$FilesToPrint = Get-ChildItem -Path $SelectedDir -Force | Where-Object {$_.FullName -in $OpenFileDialog.FileNames} | Sort-Object -Property LastWriteTime
+ForEach ($File in $FilesToPrint)
+{
+	$FullFileName = $File.FullName
+	Write-Output "Печать файла `"$FullFileName`""
+	Start-Process -FilePath notepad -ArgumentList ("/P `"$FullFileName`"") -Wait
+}
+
+# try/catch
+$FolderToPrint = @(
+	"\\server1\share\Folder1",
+	"\\server1\share\Folder2",
+	"\\server1\share\Folder3")
+Try
+{
+	$FolderToPrint | Get-ChildItem -File -Filter "*.xml" | Sort-Object Name | ForEach-Object {
+		Write-Output ("Печать файла `"" + $_.FullName + "`"")
+		Start-Process -FilePath notepad -ArgumentList ("/P `"" + $_.FullName + "`"") -Wait
+	}
+}
+Catch
+{
+	Write-Output "При выполнении операции возникла ошибка:"
+	Write-Output $Error[0] -ForegroundColor Red
+	Read-Host "Нажмите ENTER для завершения"
+}
+
+# Получение контрольной суммы файла (MD2 MD4 MD5 SHA1 SHA256 SHA384 SHA512)
+certutil -hashfile C:\file.txt SHA1
+# Преобразование кодов ошибок в текстовое сообщение
+certutil -error 0xc0000409
