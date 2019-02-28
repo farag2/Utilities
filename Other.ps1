@@ -448,12 +448,34 @@ Try
 }
 Catch
 {
-	Write-Output "При выполнении операции возникла ошибка:"
-	Write-Output $Error[0] -ForegroundColor Red
-	Read-Host "Нажмите ENTER для завершения"
+	$ErrorMsg = $_.Exception.Message
+	Write-Verbose $ErrorMsg
 }
 
 # Получение контрольной суммы файла (MD2 MD4 MD5 SHA1 SHA256 SHA384 SHA512)
 certutil -hashfile C:\file.txt SHA1
 # Преобразование кодов ошибок в текстовое сообщение
 certutil -error 0xc0000409
+
+# Вычислить значение хеш-суммы строки
+Function Get-StringHash
+{
+	param
+	(
+		[Parameter(Mandatory = $true)]
+		[string]$String,
+
+		[Parameter(Mandatory = $true)]
+		[ValidateSet("MACTripleDES", "MD5", "RIPEMD160", "SHA1", "SHA256", "SHA384", "SHA512")]
+		[String] $HashName
+	)
+	$StringBuilder = New-Object System.Text.StringBuilder
+	[System.Security.Cryptography.HashAlgorithm]::Create($HashName).ComputeHash([System.Text.Encoding]::UTF8.GetBytes($String))| ForEach-Object {
+		[Void]$StringBuilder.Append($_.ToString("x2"))
+	}
+	$StringBuilder.ToString()
+}
+# Get-StringHash 2 sha1
+
+# Вычислить значение хеш-суммы файла
+Get-FileHash D:\1.txt -Algorithm MD5
