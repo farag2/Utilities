@@ -336,17 +336,16 @@ function Shortcut
 		{
 			$shortcut.IconLocation = $IconLocation
 		}
-
 		$shortcut.Save()
 	}
 }
 
 <# Пример
 $shortcut = [PSCustomObject]@{
-	TargetPath   = "C:\Windows\System32\cmd.exe"
-	ShortcutPath = ".\dir.lnk"
-	Arguments    = "/k dir /b"
-	WindowStyle  = "Maximized"
+	TargetPath	= "C:\Windows\System32\cmd.exe"
+	ShortcutPath	= ".\dir.lnk"
+	Arguments	= "/k dir /b"
+	WindowStyle	= "Maximized"
 }
 $shortcut | New-Shortcut
 #>
@@ -448,11 +447,10 @@ Try
 }
 Catch
 {
-	$ErrorMsg = $_.Exception.Message
-	Write-Verbose $ErrorMsg
+	Write-Warning $_.Exception.Message
 }
 
-# Получение контрольной суммы файла (MD2 MD4 MD5 SHA1 SHA256 SHA384 SHA512)
+# Получение контрольной суммы файла (MD2, MD4, MD5, SHA1, SHA256, SHA384, SHA512)
 certutil -hashfile C:\file.txt SHA1
 # Преобразование кодов ошибок в текстовое сообщение
 certutil -error 0xc0000409
@@ -475,7 +473,15 @@ Function Get-StringHash
 	}
 	$StringBuilder.ToString()
 }
-# Get-StringHash 2 sha1
+Get-StringHash 2 sha1
 
 # Вычислить значение хеш-суммы файла
 Get-FileHash D:\1.txt -Algorithm MD5
+
+# Получить список установленных приложений
+$keys = @("HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+"HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall")
+foreach ($key in $keys)
+{
+	(Get-ItemProperty $key\* | Where-Object {$_.DisplayName -ne $null}).DisplayName
+}
