@@ -1,6 +1,6 @@
 # PSScriptAnalyzer
 Install-PackageProvider -Name NuGet -Force
-Remove-Item -Path $env:APPDATA\NuGet -Recurse -Force
+Install-Module -Name PSScriptAnalyzer -Force
 Save-Module -Name PSScriptAnalyzer -Path D:\
 Invoke-ScriptAnalyzer -Path "D:\Программы\Прочее\ps1\Win 10.ps1"
 
@@ -134,7 +134,7 @@ Start-Process -FilePath D:\Программы\Прочее\Office_task.bat
 "@
 $trigger = New-ScheduledTaskTrigger -Weekly -At 9am -DaysOfWeek Thursday -WeeksInterval 4
 $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
-$principal = New-ScheduledTaskPrincipal -UserID System -RunLevel Highest
+$principal = New-ScheduledTaskPrincipal -UserId System -RunLevel Highest
 $params = @{
 "TaskName"	= "Office"
 "Action"	= $action
@@ -152,7 +152,7 @@ Get-ChildItem -Path $env:SystemRoot\SoftwareDistribution\Download -Recurse -Forc
 "@
 $trigger = New-ScheduledTaskTrigger -Weekly -At 9am -DaysOfWeek Thursday -WeeksInterval 4
 $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
-$principal = New-ScheduledTaskPrincipal -UserID System -RunLevel Highest
+$principal = New-ScheduledTaskPrincipal -UserId System -RunLevel Highest
 $params = @{
 "TaskName"	= "SoftwareDistribution"
 "Action"	= $action
@@ -179,7 +179,7 @@ Restart-Computer
 "@
 $trigger = New-ScheduledTaskTrigger -Weekly -At 10am -DaysOfWeek Thursday -WeeksInterval 4
 $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
-$principal = New-ScheduledTaskPrincipal -UserID $env:USERNAME -RunLevel Highest
+$principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -RunLevel Highest
 $params = @{
 "TaskName"	= "Reboot"
 "Action"	= $action
@@ -224,10 +224,10 @@ Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows nt\CurrentVersion" | Se
 @{Name = "Computername"; Expression = {$env:COMPUTERNAME}}
 
 # Проверить тип запуска службы
-IF ((Get-Service -ServiceName $services).StartType -ne "Disabled")
+IF ((Get-Service -ServiceName wuauserv).StartType -eq "Disabled")
 {
-	Stop-Service -ServiceName $services -Force
-	Set-Service -ServiceName $services -StartupType Disabled
+	Start-Service -ServiceName wuauserv -Force
+	Set-Service -ServiceName wuauserv -StartupType Automatic
 }
 
 # Получить события из журналов событий и файлов журналов отслеживания событий
