@@ -31,9 +31,11 @@ $null = $k.SetAccessControl($acl)
 
 # Скрыть окно
 Start-Process -FilePath notepad.exe
-$WindowCode = '[DllImport("user32.dll")] public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);'
-$AsyncWindow = Add-Type -MemberDefinition $WindowCode -Name Win32ShowWindowAsync -namespace Win32Functions -PassThru
-$hwnd0 = (Get-Process -Name notepad)[0].MainWindowHandle
+$AsyncWindow = Add-Type –MemberDefinition @"
+	[DllImport("user32.dll")]
+	public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+"@ -name "Win32ShowWindowAsync" -namespace Win32Functions –PassThru
+$hwnd0 = (Get-Process -Name notepad).MainWindowHandle
 $null = $AsyncWindow::ShowWindowAsync($hwnd0, 0)
 
 # Стать владельцем ключа в Реестре
@@ -86,30 +88,20 @@ function TakeownRegistry($key)
 {
 	switch ($key.split('\')[0])
 	{
-		"HKCR"
+		"HKEY_CLASSES_ROOT"
 		{
 			$reg = [Microsoft.Win32.Registry]::ClassesRoot
 			$key = $key.substring(18)
 		}
-		"HKCU"
+		"HKEY_CURRENT_USER"
 		{
 			$reg = [Microsoft.Win32.Registry]::CurrentUser
 			$key = $key.substring(18)
 		}
-		"HKLM"
+		"HKEY_LOCAL_MACHINE"
 		{
 			$reg = [Microsoft.Win32.Registry]::LocalMachine
 			$key = $key.substring(19)
-		}
-		"HKU"
-		{
-			$reg = [Microsoft.Win32.Registry]::Users
-			$key = $key.substring(20)
-		}
-		"HKCC"
-		{
-			$reg = [Microsoft.Win32.Registry]::CurrentConfig
-			$key = $key.substring(21)
 		}
 	}
 	$admins = New-Object System.Security.Principal.SecurityIdentifier("S-1-5-32-544")
@@ -123,8 +115,9 @@ function TakeownRegistry($key)
 	$acl.SetAccessRule($rule)
 	$key.SetAccessControl($acl)
 }
+
 do {} until (ElevatePrivileges SeTakeOwnershipPrivilege)
-TakeownRegistry ("HKLM\SOFTWARE\Microsoft\Windows Defender\Spynet")
+TakeownRegistry ("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WinDefend")
 
 # Включение в Планировщике задач удаление устаревших обновлений Office, кроме Office 2019
 $action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument @"
@@ -134,7 +127,7 @@ Start-Process -FilePath D:\Программы\Прочее\Office_task.bat
 "@
 $trigger = New-ScheduledTaskTrigger -Weekly -At 9am -DaysOfWeek Thursday -WeeksInterval 4
 $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
-$principal = New-ScheduledTaskPrincipal -UserId System -RunLevel Highest
+$principal = New-ScheduledTaskPrincipal -UserID System -RunLevel Highest
 $params = @{
 "TaskName"	= "Office"
 "Action"	= $action
@@ -148,11 +141,11 @@ Register-ScheduledTask @Params -Force
 $action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument @"
 `$getservice = Get-Service -Name wuauserv
 `$getservice.WaitForStatus('Stopped', '01:00:00')
-Get-ChildItem -Path $env:SystemRoot\SoftwareDistribution\Download -Recurse -Force | Remove-Item -Recurse -Force
+Get-ChildItem -Path `$env:SystemRoot\SoftwareDistribution\Download -Recurse -Force | Remove-Item -Recurse -Force
 "@
 $trigger = New-ScheduledTaskTrigger -Weekly -At 9am -DaysOfWeek Thursday -WeeksInterval 4
 $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
-$principal = New-ScheduledTaskPrincipal -UserId System -RunLevel Highest
+$principal = New-ScheduledTaskPrincipal -UserID System -RunLevel Highest
 $params = @{
 "TaskName"	= "SoftwareDistribution"
 "Action"	= $action
@@ -170,7 +163,7 @@ Add-Type -AssemblyName System.Windows.Forms
 `$path = (Get-Process -Id `$pid).Path
 `$balmsg.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon(`$path)
 `$balmsg.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Warning
-`$balmsg.BalloonTipText = 'ПК перезагрузится через 1 минуту'
+`$balmsg.BalloonTipText = 'Перезагрузка через 1 мин.'
 `$balmsg.BalloonTipTitle = 'Внимание'
 `$balmsg.Visible = `$true
 `$balmsg.ShowBalloonTip(60000)
@@ -179,7 +172,7 @@ Restart-Computer
 "@
 $trigger = New-ScheduledTaskTrigger -Weekly -At 10am -DaysOfWeek Thursday -WeeksInterval 4
 $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
-$principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -RunLevel Highest
+$principal = New-ScheduledTaskPrincipal -UserID $env:USERNAME -RunLevel Highest
 $params = @{
 "TaskName"	= "Reboot"
 "Action"	= $action
@@ -201,7 +194,7 @@ $hostfile = "$env:SystemRoot\System32\drivers\etc\hosts"
 $domains = @("site.com","site2.com")
 Foreach ($hostentry in $domains)
 {
-	IF (!(Get-Content -Path $hostfile | Select-String "0.0.0.0 `t $hostentry"))
+	IF (-not (Get-Content -Path $hostfile | Select-String "0.0.0.0 `t $hostentry"))
 	{
 		Add-content -Path $hostfile -Value "0.0.0.0 `t $hostentry"
 	}
@@ -385,28 +378,33 @@ $HT = @{
 Expand-Archive @HT
 
 # Обновить переменные среды
-IF (!("Win32.NativeMethods" -as [Type]))
+IF (-not ("Win32.NativeMethods" -as [Type]))
 {
 	Add-Type -Namespace Win32 -Name NativeMethods -MemberDefinition @"
-	[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-	public static extern IntPtr SendMessageTimeout(
-		IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam,
-		uint fuFlags, uint uTimeout, out UIntPtr lpdwResult
-	);
+		using System;
+		using System.Runtime.InteropServices;
+
+		public class NativeMethods
+		{
+			[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+			public static extern IntPtr SendMessageTimeout(
+				IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam,
+				uint fuFlags, uint uTimeout, out UIntPtr lpdwResult
+			);
+		}
 "@
 }
-$HWND_BROADCAST = [IntPtr] 0xffff;
-$WM_SETTINGCHANGE = 0x1a;
+$HWND_BROADCAST = [IntPtr] 0xffff
+$WM_SETTINGCHANGE = 0x1a
 $SMTO_ABORTIFHUNG = 0x2
 $result = [UIntPtr]::Zero
-
 [Win32.Nativemethods]::SendMessageTimeout($HWND_BROADCAST, $WM_SETTINGCHANGE, [UIntPtr]::Zero, "Environment", $SMTO_ABORTIFHUNG, 5000, [ref] $result);
 
 # Конвертировать в кодировку UTF8 с BOM
 (Get-Content -Path "D:\1.ps1" -Encoding UTF8) | Set-Content -Encoding UTF8 -Path "D:\1.ps1"
 
 # Вычленить букву диска
-Split-Path -Path "D:\Загрузки\12.This Is My Life (bonus track).mp3" -Qualifier
+Split-Path -Path "D:\file.mp3" -Qualifier
 
 # Печать
 Add-Type -AssemblyName System.Windows.Forms | Out-Null
@@ -418,7 +416,7 @@ $OpenFileDialog.ShowHelp = $true
 $OpenFileDialog.ShowDialog()
 $SelectedFiles = $OpenFileDialog.FileNames
 # Если ничего не выбрано, завершаем работу
-If (!($SelectedFiles))
+If (-not ($SelectedFiles))
 {
 	Break
 }
@@ -485,3 +483,41 @@ foreach ($key in $keys)
 {
 	(Get-ItemProperty $key\* | Where-Object {$_.DisplayName -ne $null}).DisplayName
 }
+
+# Проверить, добавлен ли уже класс
+IF (-not (([System.Management.Automation.PSTypeName]"Win32Functions.Win32ShowWindowAsync").Type))
+{
+	code
+}
+#
+IF (-not ("Win32Functions.Win32ShowWindowAsync" -as [type]))
+{
+	code
+}
+
+# Развернуть окно с заголовком "Диспетчер задач", а остальные окна свернуть
+IF (-not ("Win32Functions.Win32ShowWindowAsync" -as [type]))
+{
+	$Win32ShowWindowAsync = Add-Type -MemberDefinition @"
+	[DllImport("user32.dll")]
+	public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+"@ -name "Win32ShowWindowAsync" -Namespace Win32Functions -PassThru
+}
+$title = "Диспетчер задач"
+Get-Process | Where-Object {$_.MainWindowHandle -ne 0} | ForEach-Object {
+	IF ($_.MainWindowTitle -eq $title)
+	{
+		$Win32ShowWindowAsync::ShowWindowAsync($_.MainWindowHandle, 3) | Out-Null
+	}
+	else
+	{
+		$Win32ShowWindowAsync::ShowWindowAsync($_.MainWindowHandle, 6) | Out-Null
+	}
+}
+
+# Do/Until
+Do
+{
+	$preferences = Get-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\TaskManager -Name Preferences -ErrorAction SilentlyContinue
+}
+Until ($preferences)
