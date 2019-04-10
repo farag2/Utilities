@@ -5,13 +5,14 @@ Save-Module -Name PSScriptAnalyzer -Path D:\
 Invoke-ScriptAnalyzer -Path "D:\Программы\Прочее\ps1\Win 10.ps1"
 
 # Перерегистрация всех UWP-приложений
+# https://forums.mydigitallife.net/threads/guide-add-store-to-windows-10-enterprises-sku-ltsb-ltsc.70741/page-30#post-1468779
 (Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\InboxApplications | Get-ItemProperty).Path | Add-AppxPackage -Register -DisableDevelopmentMode
 
 # Домен
 New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters -Name AllowSingleLabelDnsDomain -Value 1 -Force
 
 # Установка приложений из Магазина
-https://store.rg-adguard.net URL (link) и Retail
+https://store.rg-adguard.net
 https://www.microsoft.com/store/productId/9nmjcx77qkpx
 Add-AppxPackage -Path "D:\Microsoft.LanguageExperiencePackru-ru_17134.5.13.0_neutral__8wekyb3d8bbwe.Appx"
 
@@ -120,7 +121,7 @@ do {} until (ElevatePrivileges SeTakeOwnershipPrivilege)
 TakeownRegistry ("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WinDefend")
 
 # Включение в Планировщике задач удаление устаревших обновлений Office, кроме Office 2019
-$action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument @"
+$action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
 `$getservice = Get-Service -Name wuauserv
 `$getservice.WaitForStatus('Stopped', '01:00:00')
 Start-Process -FilePath D:\Программы\Прочее\Office_task.bat
@@ -138,7 +139,7 @@ $params = @{
 Register-ScheduledTask @Params -Force
 
 # Включение в Планировщике задач очистки папки %SYSTEMROOT%\SoftwareDistribution\Download
-$action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument @"
+$action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
 `$getservice = Get-Service -Name wuauserv
 `$getservice.WaitForStatus('Stopped', '01:00:00')
 Get-ChildItem -Path `$env:SystemRoot\SoftwareDistribution\Download -Recurse -Force | Remove-Item -Recurse -Force
@@ -156,7 +157,7 @@ $params = @{
 Register-ScheduledTask @Params -Force
 
 # Включение в Планировщике задач всплывающего окошка с сообщением о перезагрузке
-$action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument @"
+$action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
 -WindowStyle Hidden `
 Add-Type -AssemblyName System.Windows.Forms
 `$global:balmsg = New-Object System.Windows.Forms.NotifyIcon
@@ -211,10 +212,8 @@ Get-Item -Path file.ext | Split-Path -Parent | Split-Path -Parent | Split-Path -
 Get-SmbMapping | Select-Object LocalPath, RemotePath
 
 # Версия ОС
-Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows nt\CurrentVersion" | Select-Object -Property ProductName, EditionID, ReleaseID,
-@{Name = "Build"; Expression = {"$($_.CurrentBuild).$($_.UBR)"}},
-@{Name = "InstalledUTC"; Expression = {([datetime]"1/1/1601").AddTicks($_.InstallTime)}},
-@{Name = "Computername"; Expression = {$env:COMPUTERNAME}}
+Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows nt\CurrentVersion" | Select-Object -Property ProductName,
+@{Name = "Build"; Expression = {"$($_.ReleaseId).$($_.CurrentBuild).$($_.UBR)"}} | Format-List
 
 # Проверить тип запуска службы
 IF ((Get-Service -ServiceName wuauserv).StartType -eq "Disabled")
@@ -245,103 +244,6 @@ Get-WinEvent -LogName System | Where-Object {$_.LevelDisplayName -match 'Кри�
 Add-MpPreference -ExclusionProcess D:\folder\file.ext
 Add-MpPreference -ExclusionPath D:\folder
 Add-MpPreference -ExclusionExtension .ext
-
-# Создание ярлыка
-enum WindowStyle
-{
-	# стандартный размер окна
-	Normal	= 4
-	# развернутый вид (максимизировано)
-	Maximized	= 3
-	# свернутое окно (минимизировано)
-	Minimized	= 7
-}
-
-function Shortcut
-{
-	[CmdletBinding()]
-	param
-	(
-		# Аргументы командной строки объекта, для которого создаётся ярлык
-		[Parameter(ValueFromPipelineByPropertyName)]
-		[string]
-		$Arguments,
-
-		# Описание объекта
-		[Parameter(ValueFromPipelineByPropertyName)]
-		[string]
-		$Description,
-
-		# Горячие клавиши для запуска ярлыка
-		[Parameter(ValueFromPipelineByPropertyName)]
-		[string]
-		$Hotkey,
-
-		# Полное имя иконки для ярлыка
-		[Parameter(ValueFromPipelineByPropertyName)]
-		[ValidateScript( {Test-Path $_} )]
-		[string]
-		$IconLocation,
-
-		# Полный путь объекта для которого создаётся ярлык
-		[Parameter(Mandatory, ValueFromPipelineByPropertyName)]
-		[ValidateScript( {Test-Path $_} )]
-		[string]
-		$TargetPath,
-
-		# Путь создаваемого ярлыка
-		[Parameter(Mandatory, ValueFromPipelineByPropertyName)]
-		[string]
-		$ShortcutPath,
-
-		# Стиль окна объекта запускаемого ярлыком
-		[Parameter(ValueFromPipelineByPropertyName)]
-		[WindowStyle]
-		$WindowStyle,
-
-		# Рабочая директория для объекта запускаемого ярлыком
-		[Parameter(ValueFromPipelineByPropertyName)]
-		[ValidateScript( {Test-Path $_} )]
-		[string]
-		$WorkingDirectory
-	)
-
-	begin
-	{
-		$shell = New-Object -comObject Wscript.Shell
-	}
-
-	process
-	{
-		$shortcut = $shell.CreateShortcut($ShortcutPath)
-
-		$shortcut.Arguments		= $Arguments
-		$shortcut.Description	= $Description
-		$shortcut.Hotkey		= $Hotkey
-		$shortcut.TargetPath	= $TargetPath
-		$shortcut.WorkingDirectory	= $WorkingDirectory
-
-		IF ($WindowStyle)
-		{
-			$shortcut.WindowStyle = $WindowStyle
-		}
-		IF ($IconLocation)
-		{
-			$shortcut.IconLocation = $IconLocation
-		}
-		$shortcut.Save()
-	}
-}
-
-<# Пример
-$shortcut = [PSCustomObject]@{
-	TargetPath	= "C:\Windows\System32\cmd.exe"
-	ShortcutPath	= ".\dir.lnk"
-	Arguments	= "/k dir /b"
-	WindowStyle	= "Maximized"
-}
-$shortcut | New-Shortcut
-#>
 
 # Скачать файл
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -415,14 +317,12 @@ $OpenFileDialog.Filter = "XML-файлы (*.xml)|*.xml|Все файлы (*.*)|*
 $OpenFileDialog.ShowHelp = $true
 $OpenFileDialog.ShowDialog()
 $SelectedFiles = $OpenFileDialog.FileNames
-# Если ничего не выбрано, завершаем работу
 If (-not ($SelectedFiles))
 {
 	Break
 }
 # На основании полного имени выбранного файла определяем выбранную папку
 $SelectedDir = (Split-Path -Parent $OpenFileDialog.FileName)
-# Получаем список всех файлов в выбранной папке
 $FilesToPrint = Get-ChildItem -Path $SelectedDir -Force | Where-Object {$_.FullName -in $OpenFileDialog.FileNames} | Sort-Object -Property LastWriteTime
 ForEach ($File in $FilesToPrint)
 {
@@ -521,3 +421,50 @@ Do
 	$preferences = Get-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\TaskManager -Name Preferences -ErrorAction SilentlyContinue
 }
 Until ($preferences)
+
+# Закрепить ярлык на начальном экране
+$shell = New-Object -ComObject "Shell.Application"
+$shortcut = (Get-Childitem -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\file.lnk").Directory
+$folder = $shell.Namespace("$shortcut\")
+$file = $folder.Parsename("file.lnk")
+$verb = $file.Verbs() | Where-Object {($_.Name.replace('&','')).ToUpper() -like "*Закрепить*"}
+$verb.DoIt()
+
+# Установить состояние показа окна
+function WindowState
+{
+	param(
+		[Parameter( ValueFromPipeline = $true, Mandatory = $true, Position = 0 )]
+		[ValidateScript({$_ -ne 0 })]
+		[System.IntPtr] $MainWindowHandle,
+		[ValidateSet('FORCEMINIMIZE', 'HIDE', 'MAXIMIZE', 'MINIMIZE', 'RESTORE',
+				'SHOW', 'SHOWDEFAULT', 'SHOWMAXIMIZED', 'SHOWMINIMIZED',
+				'SHOWMINNOACTIVE', 'SHOWNA', 'SHOWNOACTIVATE', 'SHOWNORMAL')]
+		[String] $State = 'SHOW'
+	)
+	$WindowStates = @{
+		'FORCEMINIMIZE'   = 11
+		'HIDE'            = 0
+		'MAXIMIZE'        = 3
+		'MINIMIZE'        = 6
+		'RESTORE'         = 9
+		'SHOW'            = 5
+		'SHOWDEFAULT'     = 10
+		'SHOWMAXIMIZED'   = 3
+		'SHOWMINIMIZED'   = 2
+		'SHOWMINNOACTIVE' = 7
+		'SHOWNA'          = 8
+		'SHOWNOACTIVATE'  = 4
+		'SHOWNORMAL'      = 1
+	}
+	IF (-not ( "Win32Functions.Win32ShowWindowAsync" -as [Type]))
+	{
+		Add-Type -MemberDefinition @"
+		[DllImport("user32.dll")]
+		public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+"@ -Namespace 'Win32Functions' -Name 'Win32ShowWindowAsync'
+	}
+	[Win32Functions.Win32ShowWindowAsync]::ShowWindowAsync($MainWindowHandle , $WindowStates[$State])
+}
+$MainWindowHandle = (Get-Process -Name notepad | Where-Object {$_.MainWindowHandle -ne 0}).MainWindowHandle
+$MainWindowHandle | WindowState -State HIDE
