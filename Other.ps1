@@ -184,11 +184,11 @@ $params = @{
 Register-ScheduledTask @Params -Force
 
 # Найти диски, не подключенные через USB и не являющиеся загрузочными, исключая диски с пустыми буквами (исключаются внешние жесткие диски)
-(Get-Disk | Where-Object {$_.BusType -ne "USB" -and $_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object {$null -ne $_.DriveLetter}).DriveLetter + ':\'
+(Get-Disk | Where-Object {$_.BusType -ne "USB" -and $_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object {Join-Path ($_ + ":") $Path}
 # Найти диски, не являющиеся загрузочными, исключая диски с пустыми буквами (не исключаются внешние жесткие диски)
-(Get-Disk | Where-Object {$_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object {$null -ne $_.DriveLetter}).DriveLetter + ':\'
+(Get-Disk | Where-Object {$_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object {Join-Path ($_ + ":") $Path}
 # Найти первый диск, подключенный через USB, исключая диски с пустыми буквами
-(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object {$null -ne $_.DriveLetter}).DriveLetter + ':\' | Select-Object -First 1
+(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object {Join-Path ($_ + ":") $Path} | Select-Object -First 1
 
 # Добавление доменов в hosts
 $hostfile = "$env:SystemRoot\System32\drivers\etc\hosts"
@@ -209,11 +209,18 @@ Split-Path -Path file.ext -Parent
 Get-Item -Path file.ext | Split-Path -Parent | Split-Path -Parent | Split-Path -Leaf
 
 # Список сетевых дисков
-Get-SmbMapping | Select-Object LocalPath, RemotePath
+Get-SmbMapping | Select-Object -Property LocalPath, RemotePath
 
 # Версия ОС
-Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows nt\CurrentVersion" | Select-Object -Property ProductName,
-@{Name = "Build"; Expression = {"$($_.ReleaseId).$($_.CurrentBuild).$($_.UBR)"}} | Format-List
+$ProductName = @{
+	Name = "ProductName"
+	Expression = {"$($_.ProductName) $($_.ReleaseId)"}
+}
+$Build = @{
+	Name = "Build"
+	Expression = {"$($_.CurrentMajorVersionNumber).$($_.CurrentMinorVersionNumber).$($_.CurrentBuild).$($_.UBR)"}
+}
+Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows nt\CurrentVersion" | Select-Object -Property $ProductName, $Build | Format-List
 
 # Проверить тип запуска службы
 IF ((Get-Service -ServiceName wuauserv).StartType -eq "Disabled")
@@ -237,8 +244,8 @@ Get-WinEvent -LogName system | Where-Object {$_.ID -like '1001' -and $_.source -
 Get-WinEvent -FilterHashtable @{LogName="System";level="1"}
 Get-WinEvent -FilterHashtable @{LogName="System"} | Where-Object -FilterScript {($_.Level -eq 2) -or ($_.Level -eq 3)}
 
-Get-WinEvent -LogName Application | Where-Object {$_.ProviderName -match 'Windows Error*'} | Select-Object TimeCreated, Message | Format-Table -AutoSize -Wrap
-Get-WinEvent -LogName System | Where-Object {$_.LevelDisplayName -match 'Критическая' -or $_.LevelDisplayName -match 'Ошибка'} | Select-Object TimeCreated, ID, LevelDisplayName, Message | Sort-Object TimeCreated -Descending | Select-Object -First 10 | Format-Table -AutoSize -Wrap
+Get-WinEvent -LogName Application | Where-Object {$_.ProviderName -match 'Windows Error*'} | Select-Object -Property TimeCreated, Message | Format-Table -AutoSize -Wrap
+Get-WinEvent -LogName System | Where-Object {$_.LevelDisplayName -match 'Критическая' -or $_.LevelDisplayName -match 'Ошибка'} | Select-Object -Property TimeCreated, ID, LevelDisplayName, Message | Sort-Object TimeCreated -Descending | Select-Object -First 10 | Format-Table -AutoSize -Wrap
 
 # Настройка и проверка исключений Защитника Windows
 Add-MpPreference -ExclusionProcess D:\folder\file.ext
