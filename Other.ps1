@@ -130,11 +130,11 @@ $trigger = New-ScheduledTaskTrigger -Weekly -At 9am -DaysOfWeek Thursday -WeeksI
 $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
 $principal = New-ScheduledTaskPrincipal -UserID System -RunLevel Highest
 $params = @{
-"TaskName"	= "Office"
-"Action"	= $action
-"Trigger"	= $trigger
-"Settings"	= $settings
-"Principal"	= $principal
+	"TaskName"	= "Office"
+	"Action"	= $action
+	"Trigger"	= $trigger
+	"Settings"	= $settings
+	"Principal"	= $principal
 }
 Register-ScheduledTask @Params -Force
 
@@ -148,11 +148,11 @@ $trigger = New-ScheduledTaskTrigger -Weekly -At 9am -DaysOfWeek Thursday -WeeksI
 $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
 $principal = New-ScheduledTaskPrincipal -UserID System -RunLevel Highest
 $params = @{
-"TaskName"	= "SoftwareDistribution"
-"Action"	= $action
-"Trigger"	= $trigger
-"Settings"	= $settings
-"Principal"	= $principal
+	"TaskName"	= "SoftwareDistribution"
+	"Action"	= $action
+	"Trigger"	= $trigger
+	"Settings"	= $settings
+	"Principal"	= $principal
 }
 Register-ScheduledTask @Params -Force
 
@@ -175,11 +175,11 @@ $trigger = New-ScheduledTaskTrigger -Weekly -At 10am -DaysOfWeek Thursday -Weeks
 $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
 $principal = New-ScheduledTaskPrincipal -UserID $env:USERNAME -RunLevel Highest
 $params = @{
-"TaskName"	= "Reboot"
-"Action"	= $action
-"Trigger"	= $trigger
-"Settings"	= $settings
-"Principal"	= $principal
+	"TaskName"	= "Reboot"
+	"Action"	= $action
+	"Trigger"	= $trigger
+	"Settings"	= $settings
+	"Principal"	= $principal
 }
 Register-ScheduledTask @Params -Force
 
@@ -287,27 +287,36 @@ $HT = @{
 Expand-Archive @HT
 
 # Обновить переменные среды
-IF (-not ("Win32.NativeMethods" -as [Type]))
+IF (-not ([System.Management.Automation.PSTypeName]'WindowsDesktopTools.Explorer').Type)
 {
-	Add-Type -Namespace Win32 -Name NativeMethods -MemberDefinition @"
-		using System;
-		using System.Runtime.InteropServices;
-
-		public class NativeMethods
-		{
-			[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-			public static extern IntPtr SendMessageTimeout(
-				IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam,
-				uint fuFlags, uint uTimeout, out UIntPtr lpdwResult
-			);
-		}
-"@
+	$type = @{
+		Namespace = 'WindowsDesktopTools'
+		Name = 'Explorer'
+		Language = 'CSharp'
+		MemberDefinition = @'
+			private static readonly IntPtr HWND_BROADCAST = new IntPtr(0xffff);
+			private const int WM_SETTINGCHANGE = 0x1a;
+			private const int SMTO_ABORTIFHUNG = 0x0002;
+			[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = false)]
+			static extern bool SendNotifyMessage(IntPtr hWnd, uint Msg, IntPtr wParam, string lParam);
+			[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = false)]
+			private static extern IntPtr SendMessageTimeout(IntPtr hWnd, int Msg, IntPtr wParam, string lParam, int fuFlags, int uTimeout, IntPtr lpdwResult);
+			[DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = false)]
+			private static extern int SHChangeNotify(int eventId, int flags, IntPtr item1, IntPtr item2);
+			public static void Refresh()
+			{
+				// Update desktop icons
+				SHChangeNotify(0x8000000, 0x1000, IntPtr.Zero, IntPtr.Zero);
+				// Update environment variables
+				SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, IntPtr.Zero, null, SMTO_ABORTIFHUNG, 100, IntPtr.Zero);
+				// Update taskbar
+				SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, IntPtr.Zero, "TraySettings");
+			}
+'@
+	}
+	Add-Type @type
 }
-$HWND_BROADCAST = [IntPtr] 0xffff
-$WM_SETTINGCHANGE = 0x1a
-$SMTO_ABORTIFHUNG = 0x2
-$result = [UIntPtr]::Zero
-[Win32.Nativemethods]::SendMessageTimeout($HWND_BROADCAST, $WM_SETTINGCHANGE, [UIntPtr]::Zero, "Environment", $SMTO_ABORTIFHUNG, 5000, [ref] $result);
+[WindowsDesktopTools.Explorer]::Refresh()
 
 # Конвертировать в кодировку UTF8 с BOM
 (Get-Content -Path "D:\1.ps1" -Encoding UTF8) | Set-Content -Encoding UTF8 -Path "D:\1.ps1"
@@ -429,13 +438,43 @@ Do
 }
 Until ($preferences)
 
-# Закрепить ярлык на начальном экране
+# Закрепить на начальном экране ярлык
+$Target = "D:\folder\file.lnk"
+$Directory = (Get-Childitem -Path $Target).Directory
+$File = (Get-ChildItem -Path $Target).Name
 $shell = New-Object -ComObject "Shell.Application"
-$shortcut = (Get-Childitem -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\file.lnk").Directory
-$folder = $shell.Namespace("$shortcut\")
-$file = $folder.Parsename("file.lnk")
-$verb = $file.Verbs() | Where-Object {($_.Name.replace('&','')).ToUpper() -like "*Закрепить*"}
+$folder = $shell.Namespace("$Directory\")
+$file = $folder.Parsename("$File")
+$verb = $file.Verbs() | Where-Object {$_.Name -like "Закрепить на начальном &экране"}
 $verb.DoIt()
+
+# Закрепить на панели задач ярлык
+$Target = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\file.lnk"
+$Value = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\Windows.taskbarpin").ExplorerCommandHandler
+IF (-not (Test-Path -Path "HKCU:\Software\Classes\*\shell\pin"))
+{
+	New-Item -Path "HKCU:\Software\Classes\*\shell\pin" -Force
+}
+New-ItemProperty -LiteralPath "HKCU:\Software\Classes\*\shell\pin" -Name ExplorerCommandHandler -Type String -Value $Value -Force
+$Shell = New-Object -ComObject "Shell.Application"
+$Folder = $Shell.Namespace((Get-Item -Path $Target).DirectoryName)
+$Item = $Folder.ParseName((Get-Item -Path Target).Name)
+$Item.InvokeVerb("pin")
+Remove-Item -LiteralPath "HKCU:\Software\Classes\*\shell\pin" -Recurse
+
+# Открепить от панели задач ярлык
+$Target = "$env:APPDATA\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\file.lnk"
+$Value = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\Windows.taskbarpin").ExplorerCommandHandler
+IF (-not (Test-Path -Path "HKCU:\Software\Classes\*\shell\pin"))
+{
+	New-Item -Path "HKCU:\Software\Classes\*\shell\pin" -Force
+}
+New-ItemProperty -LiteralPath "HKCU:\Software\Classes\*\shell\pin" -Name ExplorerCommandHandler -Type String -Value $Value -Force
+$Shell = New-Object -ComObject "Shell.Application"
+$Folder = $Shell.Namespace((Get-Item -Path $Target).DirectoryName)
+$Item = $Folder.ParseName((Get-Item -Path $Target).Name)
+$Item.InvokeVerb("pin")
+Remove-Item -LiteralPath "HKCU:\Software\Classes\*\shell\pin" -Recurse
 
 # Установить состояние показа окна
 function WindowState
