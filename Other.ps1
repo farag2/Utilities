@@ -212,9 +212,10 @@ Get-Item -Path file.ext | Split-Path -Parent | Split-Path -Parent | Split-Path -
 Get-SmbMapping | Select-Object -Property LocalPath, RemotePath
 
 # Версия ОС
+$Channel = (Get-CimInstance -ClassName SoftwareLicensingProduct | Where-Object {$null -ne $_.PartialProductKey -and $_.ApplicationID -eq "55c92734-d682-4d71-983e-d6ec3f16059f"}).ProductKeyChannel
 $ProductName = @{
 	Name = "ProductName"
-	Expression = {"$($_.ProductName) $($_.ReleaseId)"}
+	Expression = {"$($_.ProductName) $($_.ReleaseId) $Channel"}
 }
 $Build = @{
 	Name = "Build"
@@ -324,44 +325,14 @@ IF (-not ([System.Management.Automation.PSTypeName]'WindowsDesktopTools.Explorer
 # Вычленить букву диска
 Split-Path -Path "D:\file.mp3" -Qualifier
 
-# Печать
-Add-Type -AssemblyName System.Windows.Forms | Out-Null
-$OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
-$OpenFileDialog.InitialDirectory = "D:\Программы\Прочее\xml"
-$OpenFileDialog.Multiselect = $true
-$OpenFileDialog.Filter = "XML-файлы (*.xml)|*.xml|Все файлы (*.*)|*.*"
-$OpenFileDialog.ShowHelp = $true
-$OpenFileDialog.ShowDialog()
-$SelectedFiles = $OpenFileDialog.FileNames
-If (-not ($SelectedFiles))
-{
-	Break
-}
-# На основании полного имени выбранного файла определяем выбранную папку
-$SelectedDir = (Split-Path -Parent $OpenFileDialog.FileName)
-$FilesToPrint = Get-ChildItem -Path $SelectedDir -Force | Where-Object {$_.FullName -in $OpenFileDialog.FileNames} | Sort-Object -Property LastWriteTime
-ForEach ($File in $FilesToPrint)
-{
-	$FullFileName = $File.FullName
-	Write-Output "Печать файла `"$FullFileName`""
-	Start-Process -FilePath notepad -ArgumentList ("/P `"$FullFileName`"") -Wait
-}
-
 # try/catch
-$FolderToPrint = @(
-	"\\server1\share\Folder1",
-	"\\server1\share\Folder2",
-	"\\server1\share\Folder3")
-Try
+try
 {
-	$FolderToPrint | Get-ChildItem -File -Filter "*.xml" | Sort-Object Name | ForEach-Object {
-		Write-Output ("Печать файла `"" + $_.FullName + "`"")
-		Start-Process -FilePath notepad -ArgumentList ("/P `"" + $_.FullName + "`"") -Wait
-	}
+	Do-Something
 }
-Catch
+catch
 {
-	Write-Warning $_.Exception.Message
+	Write-Output "Something threw an exception"
 }
 
 # Получение контрольной суммы файла (MD2, MD4, MD5, SHA1, SHA256, SHA384, SHA512)
@@ -514,3 +485,23 @@ function WindowState
 }
 $MainWindowHandle = (Get-Process -Name notepad | Where-Object {$_.MainWindowHandle -ne 0}).MainWindowHandle
 $MainWindowHandle | WindowState -State HIDE
+
+# Установить бронзовый курсор из Windows XP
+$cursor = 'Программы\Прочее\bronze.cur'
+function Get-ResolvedPath
+{
+	param ([Parameter(ValueFromPipeline = 1)]$Path)
+	(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object {Join-Path ($_ + ":") $Path -Resolve -ErrorAction SilentlyContinue}
+}
+$cursor | Get-ResolvedPath | Copy-Item -Destination $env:SystemRoot\Cursors -Force
+New-ItemProperty -Path "HKCU:\Control Panel\Cursors" -Name Arrow -Type ExpandString -Value "%SystemRoot%\cursors\bronze.cur" -Force
+$CSharpSig = @"
+[DllImport("user32.dll", EntryPoint = "SystemParametersInfo")]
+public static extern bool SystemParametersInfo(
+uint uiAction,
+uint uiParam,
+uint pvParam,
+uint fWinIni);
+"@
+$CursorRefresh = Add-Type -MemberDefinition $CSharpSig -Name WinAPICall -Namespace SystemParamInfo –PassThru
+$CursorRefresh::SystemParametersInfo(0x0057,0,$null,0)
