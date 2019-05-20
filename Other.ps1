@@ -17,7 +17,7 @@ https://www.microsoft.com/store/productId/9nmjcx77qkpx
 Add-AppxPackage -Path "D:\Microsoft.LanguageExperiencePackru-ru_17134.5.13.0_neutral__8wekyb3d8bbwe.Appx"
 
 # Показать сообщения о блокировке изменений папок приложениями посредством управляемого доступа
-(Get-WinEvent -LogName "Microsoft-Windows-Windows Defender/Operational" | Where-Object {$_.ID -eq "1123" -or $_.ID -eq "1124" -or $_.ID -eq "1127"}).Message
+(Get-WinEvent -LogName "Microsoft-Windows-Windows Defender/Operational" | Where-Object -FilterScript {$_.ID -eq "1123" -or $_.ID -eq "1124" -or $_.ID -eq "1127"}).Message
 
 # Стать владельцем ключа в Реестре
 $ParentACL = Get-Acl -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.txt"
@@ -122,9 +122,9 @@ TakeownRegistry ("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WinDefend
 
 # Включение в Планировщике задач удаление устаревших обновлений Office, кроме Office 2019
 $action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
-`$getservice = Get-Service -Name wuauserv
-`$getservice.WaitForStatus('Stopped', '01:00:00')
-Start-Process -FilePath D:\Программы\Прочее\Office_task.bat
+	`$getservice = Get-Service -Name wuauserv
+	`$getservice.WaitForStatus('Stopped', '01:00:00')
+	Start-Process -FilePath D:\Программы\Прочее\Office_task.bat
 "@
 $trigger = New-ScheduledTaskTrigger -Weekly -At 9am -DaysOfWeek Thursday -WeeksInterval 4
 $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
@@ -140,9 +140,9 @@ Register-ScheduledTask @Params -Force
 
 # Включение в Планировщике задач очистки папки %SYSTEMROOT%\SoftwareDistribution\Download
 $action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
-`$getservice = Get-Service -Name wuauserv
-`$getservice.WaitForStatus('Stopped', '01:00:00')
-Get-ChildItem -Path `$env:SystemRoot\SoftwareDistribution\Download -Recurse -Force | Remove-Item -Recurse -Force
+	`$getservice = Get-Service -Name wuauserv
+	`$getservice.WaitForStatus('Stopped', '01:00:00')
+	Get-ChildItem -Path `$env:SystemRoot\SoftwareDistribution\Download -Recurse -Force | Remove-Item -Recurse -Force
 "@
 $trigger = New-ScheduledTaskTrigger -Weekly -At 9am -DaysOfWeek Thursday -WeeksInterval 4
 $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
@@ -158,18 +158,18 @@ Register-ScheduledTask @Params -Force
 
 # Включение в Планировщике задач всплывающего окошка с сообщением о перезагрузке
 $action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
--WindowStyle Hidden `
-Add-Type -AssemblyName System.Windows.Forms
-`$global:balmsg = New-Object System.Windows.Forms.NotifyIcon
-`$path = (Get-Process -Id `$pid).Path
-`$balmsg.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon(`$path)
-`$balmsg.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Warning
-`$balmsg.BalloonTipText = 'Перезагрузка через 1 мин.'
-`$balmsg.BalloonTipTitle = 'Внимание'
-`$balmsg.Visible = `$true
-`$balmsg.ShowBalloonTip(60000)
-Start-Sleep -s 60
-Restart-Computer
+	-WindowStyle Hidden `
+	Add-Type -AssemblyName System.Windows.Forms
+	`$global:balmsg = New-Object System.Windows.Forms.NotifyIcon
+	`$path = (Get-Process -Id `$pid).Path
+	`$balmsg.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon(`$path)
+	`$balmsg.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Warning
+	`$balmsg.BalloonTipText = 'Перезагрузка через 1 мин.'
+	`$balmsg.BalloonTipTitle = 'Внимание'
+	`$balmsg.Visible = `$true
+	`$balmsg.ShowBalloonTip(60000)
+	Start-Sleep -s 60
+	Restart-Computer
 "@
 $trigger = New-ScheduledTaskTrigger -Weekly -At 10am -DaysOfWeek Thursday -WeeksInterval 4
 $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
@@ -184,11 +184,11 @@ $params = @{
 Register-ScheduledTask @Params -Force
 
 # Найти диски, не подключенные через USB и не являющиеся загрузочными, исключая диски с пустыми буквами (исключаются внешние жесткие диски)
-(Get-Disk | Where-Object {$_.BusType -ne "USB" -and $_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object {Join-Path ($_ + ":") $Path}
+(Get-Disk | Where-Object -FilterScript {$_.BusType -ne "USB" -and $_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object {Join-Path ($_ + ":") $Path}
 # Найти диски, не являющиеся загрузочными, исключая диски с пустыми буквами (не исключаются внешние жесткие диски)
-(Get-Disk | Where-Object {$_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object {Join-Path ($_ + ":") $Path}
+(Get-Disk | Where-Object -FilterScript {$_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object {Join-Path ($_ + ":") $Path}
 # Найти первый диск, подключенный через USB, исключая диски с пустыми буквами
-(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object {Join-Path ($_ + ":") $Path} | Select-Object -First 1
+(Get-Disk | Where-Object -FilterScript {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object {Join-Path ($_ + ":") $Path} | Select-Object -First 1
 
 # Добавление доменов в hosts
 $hostfile = "$env:SystemRoot\System32\drivers\etc\hosts"
@@ -212,7 +212,11 @@ Get-Item -Path file.ext | Split-Path -Parent | Split-Path -Parent | Split-Path -
 Get-SmbMapping | Select-Object -Property LocalPath, RemotePath
 
 # Версия ОС
-$Channel = (Get-CimInstance -ClassName SoftwareLicensingProduct | Where-Object {$null -ne $_.PartialProductKey -and $_.ApplicationID -eq "55c92734-d682-4d71-983e-d6ec3f16059f"}).ProductKeyChannel
+$Channel = (Get-CimInstance -ClassName SoftwareLicensingProduct | Where-Object -FilterScript {$null -ne $_.PartialProductKey -and $_.ApplicationID -eq "55c92734-d682-4d71-983e-d6ec3f16059f"}).ProductKeyChannel
+IF ($Channel -like "*Volume*")
+{
+	$Channel = "VL"
+}
 $ProductName = @{
 	Name = "ProductName"
 	Expression = {"$($_.ProductName) $($_.ReleaseId) $Channel"}
@@ -239,14 +243,14 @@ Warning 3
 Informational 4
 Verbose 5
 #>
-Get-WinEvent -LogName system | Where-Object {$_.ID -eq 50106} | Select-Object -Property *
-Get-WinEvent -LogName system | Where-Object {$_.ID -like '1001' -and $_.source -like 'bugcheck'} | Select-Object -Property *
+Get-WinEvent -LogName system | Where-Object -FilterScript {$_.ID -eq 50106} | Select-Object -Property *
+Get-WinEvent -LogName system | Where-Object -FilterScript {$_.ID -like '1001' -and $_.source -like 'bugcheck'} | Select-Object -Property *
 
 Get-WinEvent -FilterHashtable @{LogName="System";level="1"}
 Get-WinEvent -FilterHashtable @{LogName="System"} | Where-Object -FilterScript {($_.Level -eq 2) -or ($_.Level -eq 3)}
 
-Get-WinEvent -LogName Application | Where-Object {$_.ProviderName -match 'Windows Error*'} | Select-Object -Property TimeCreated, Message | Format-Table -AutoSize -Wrap
-Get-WinEvent -LogName System | Where-Object {$_.LevelDisplayName -match 'Критическая' -or $_.LevelDisplayName -match 'Ошибка'} | Select-Object -Property TimeCreated, ID, LevelDisplayName, Message | Sort-Object TimeCreated -Descending | Select-Object -First 10 | Format-Table -AutoSize -Wrap
+Get-WinEvent -LogName Application | Where-Object -FilterScript {$_.ProviderName -match 'Windows Error*'} | Select-Object -Property TimeCreated, Message | Format-Table -AutoSize -Wrap
+Get-WinEvent -LogName System | Where-Object -FilterScript {$_.LevelDisplayName -match 'Критическая' -or $_.LevelDisplayName -match 'Ошибка'} | Select-Object -Property TimeCreated, ID, LevelDisplayName, Message | Sort-Object TimeCreated -Descending | Select-Object -First 10 | Format-Table -AutoSize -Wrap
 
 # Настройка и проверка исключений Защитника Windows
 Add-MpPreference -ExclusionProcess D:\folder\file.ext
@@ -368,7 +372,7 @@ $keys = @("HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
 "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall")
 foreach ($key in $keys)
 {
-	(Get-ItemProperty $key\* | Where-Object {$_.DisplayName -ne $null}).DisplayName
+	(Get-ItemProperty $key\* | Where-Object -FilterScript {$_.DisplayName -ne $null}).DisplayName
 }
 
 # Проверить, добавлен ли уже класс
@@ -391,7 +395,7 @@ IF (-not ("Win32Functions.Win32ShowWindowAsync" -as [type]))
 "@ -name "Win32ShowWindowAsync" -Namespace Win32Functions -PassThru
 }
 $title = "Диспетчер задач"
-Get-Process | Where-Object {$_.MainWindowHandle -ne 0} | ForEach-Object {
+Get-Process | Where-Object -FilterScript {$_.MainWindowHandle -ne 0} | ForEach-Object {
 	IF ($_.MainWindowTitle -eq $title)
 	{
 		$Win32ShowWindowAsync::ShowWindowAsync($_.MainWindowHandle, 3) | Out-Null
@@ -416,7 +420,7 @@ $File = (Get-ChildItem -Path $Target).Name
 $shell = New-Object -ComObject "Shell.Application"
 $folder = $shell.Namespace("$Directory\")
 $file = $folder.Parsename("$File")
-$verb = $file.Verbs() | Where-Object {$_.Name -like "Закрепить на начальном &экране"}
+$verb = $file.Verbs() | Where-Object -FilterScript {$_.Name -like "Закрепить на начальном &экране"}
 $verb.DoIt()
 
 # Закрепить на панели задач ярлык
@@ -483,7 +487,7 @@ function WindowState
 	}
 	[Win32Functions.Win32ShowWindowAsync]::ShowWindowAsync($MainWindowHandle , $WindowStates[$State])
 }
-$MainWindowHandle = (Get-Process -Name notepad | Where-Object {$_.MainWindowHandle -ne 0}).MainWindowHandle
+$MainWindowHandle = (Get-Process -Name notepad | Where-Object -FilterScript {$_.MainWindowHandle -ne 0}).MainWindowHandle
 $MainWindowHandle | WindowState -State HIDE
 
 # Установить бронзовый курсор из Windows XP
@@ -491,17 +495,52 @@ $cursor = 'Программы\Прочее\bronze.cur'
 function Get-ResolvedPath
 {
 	param ([Parameter(ValueFromPipeline = 1)]$Path)
-	(Get-Disk | Where-Object {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object {Join-Path ($_ + ":") $Path -Resolve -ErrorAction SilentlyContinue}
+	(Get-Disk | Where-Object -FilterScript {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object {Join-Path ($_ + ":") $Path -Resolve -ErrorAction SilentlyContinue}
 }
 $cursor | Get-ResolvedPath | Copy-Item -Destination $env:SystemRoot\Cursors -Force
 New-ItemProperty -Path "HKCU:\Control Panel\Cursors" -Name Arrow -Type ExpandString -Value "%SystemRoot%\cursors\bronze.cur" -Force
 $CSharpSig = @"
-[DllImport("user32.dll", EntryPoint = "SystemParametersInfo")]
-public static extern bool SystemParametersInfo(
-uint uiAction,
-uint uiParam,
-uint pvParam,
-uint fWinIni);
+	[DllImport("user32.dll", EntryPoint = "SystemParametersInfo")]
+	public static extern bool SystemParametersInfo(
+	uint uiAction,
+	uint uiParam,
+	uint pvParam,
+	uint fWinIni);
 "@
 $CursorRefresh = Add-Type -MemberDefinition $CSharpSig -Name WinAPICall -Namespace SystemParamInfo –PassThru
 $CursorRefresh::SystemParametersInfo(0x0057,0,$null,0)
+
+cls
+# Информация о ПК
+Write-Output User
+"$env:COMPUTERNAME\$env:USERDOMAIN\$env:USERNAME"
+Write-Output ""
+Write-Output OS
+(Get-CimInstance -ClassName Win32_OperatingSystem).Version
+Write-Output ""
+Write-Output BIOS
+Get-CimInstance -ClassName Win32_BIOS | Select-Object Manufacturer, Name | Format-Table
+Write-Output Motherboard
+Get-CimInstance -ClassName Win32_BaseBoard | Select-Object Manufacturer, Product | Format-Table
+Write-Output CPU
+Get-CimInstance -ClassName Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors | Format-Table
+Write-Output RAM
+$Capacity = @{
+	Name = "Capacity"
+	Expression = {$_.Capacity / 1GB}
+}
+Get-CimInstance -ClassName Win32_PhysicalMemory | Select-Object Manufacturer, Configuredclockspeed, $Capacity | Format-Table
+Write-Output "Physical disks"
+$Size = @{
+	Name = "Size"
+	Expression = {[math]::round($_.Size/1GB, 2)}
+}
+Get-CimInstance -ClassName Win32_DiskDrive | Select-Object Model, $Size | Format-Table
+Write-Output "Logical disks"
+$Size = @{
+	Name = "Size"
+	Expression = {[math]::round($_.Size/1GB, 2)}
+}
+Get-CimInstance -ClassName Win32_LogicalDisk | Select-Object DeviceID, ProviderName, $Size | Format-Table
+Write-Output "Video сontrollers"
+(Get-CimInstance -ClassName Win32_VideoController).Caption
