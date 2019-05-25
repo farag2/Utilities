@@ -236,21 +236,19 @@ IF ((Get-Service -ServiceName wuauserv).StartType -eq "Disabled")
 
 # Получить события из журналов событий и файлов журналов отслеживания событий
 <#
-LogAlways 0
-Critical 1
-Error 2
-Warning 3
-Informational 4
-Verbose 5
+	LogAlways 0
+	Critical 1
+	Error 2
+	Warning 3
+	Informational 4
+	Verbose 5
 #>
-Get-WinEvent -LogName system | Where-Object -FilterScript {$_.ID -eq 50106} | Select-Object -Property *
-Get-WinEvent -LogName system | Where-Object -FilterScript {$_.ID -like '1001' -and $_.source -like 'bugcheck'} | Select-Object -Property *
-
-Get-WinEvent -FilterHashtable @{LogName="System";level="1"}
-Get-WinEvent -FilterHashtable @{LogName="System"} | Where-Object -FilterScript {($_.Level -eq 2) -or ($_.Level -eq 3)}
-
-Get-WinEvent -LogName Application | Where-Object -FilterScript {$_.ProviderName -match 'Windows Error*'} | Select-Object -Property TimeCreated, Message | Format-Table -AutoSize -Wrap
-Get-WinEvent -LogName System | Where-Object -FilterScript {$_.LevelDisplayName -match 'Критическая' -or $_.LevelDisplayName -match 'Ошибка'} | Select-Object -Property TimeCreated, ID, LevelDisplayName, Message | Sort-Object TimeCreated -Descending | Select-Object -First 10 | Format-Table -AutoSize -Wrap
+Get-WinEvent -LogName Security | Where-Object -FilterScript {$_.ID -eq 5157}
+Get-WinEvent -LogName System | Where-Object -FilterScript {$_.ID -like '1001' -and $_.Source -like 'bugcheck'}
+Get-WinEvent -LogName System | Where-Object -FilterScript {$_.LevelDisplayName -match 'Критическая' -or $_.LevelDisplayName -match 'Ошибка'}
+Get-WinEvent -FilterHashtable @{LogName = "System"; level="1"}
+Get-WinEvent -FilterHashtable @{LogName = "System"} | Where-Object -FilterScript {($_.Level -eq 2) -or ($_.Level -eq 3)}
+Get-WinEvent -LogName Application | Where-Object -FilterScript {$_.ProviderName -match 'Windows Error*'}
 
 # Настройка и проверка исключений Защитника Windows
 Add-MpPreference -ExclusionProcess D:\folder\file.ext
@@ -464,19 +462,19 @@ function WindowState
 		[String] $State = 'SHOW'
 	)
 	$WindowStates = @{
-		'FORCEMINIMIZE'   = 11
-		'HIDE'            = 0
-		'MAXIMIZE'        = 3
-		'MINIMIZE'        = 6
-		'RESTORE'         = 9
-		'SHOW'            = 5
-		'SHOWDEFAULT'     = 10
-		'SHOWMAXIMIZED'   = 3
-		'SHOWMINIMIZED'   = 2
-		'SHOWMINNOACTIVE' = 7
-		'SHOWNA'          = 8
-		'SHOWNOACTIVATE'  = 4
-		'SHOWNORMAL'      = 1
+		'FORCEMINIMIZE'		=	11
+		'HIDE'				=	0
+		'MAXIMIZE'			=	3
+		'MINIMIZE'			=	6
+		'RESTORE'			=	9
+		'SHOW'				=	5
+		'SHOWDEFAULT'		=	10
+		'SHOWMAXIMIZED'		=	3
+		'SHOWMINIMIZED'		=	2
+		'SHOWMINNOACTIVE'	=	7
+		'SHOWNA'			=	8
+		'SHOWNOACTIVATE'	=	4
+		'SHOWNORMAL'		=	1
 	}
 	IF (-not ( "Win32Functions.Win32ShowWindowAsync" -as [Type]))
 	{
@@ -510,37 +508,126 @@ $CSharpSig = @"
 $CursorRefresh = Add-Type -MemberDefinition $CSharpSig -Name WinAPICall -Namespace SystemParamInfo –PassThru
 $CursorRefresh::SystemParametersInfo(0x0057,0,$null,0)
 
-cls
 # Информация о ПК
 Write-Output User
-"$env:COMPUTERNAME\$env:USERDOMAIN\$env:USERNAME"
+$PCName = @{
+	Name = "Computer name"
+	Expression={$_.Name}
+}
+$Domain = @{
+	Name = "Domain"
+	Expression={$_.Domain}
+}
+$UserName = @{
+	Name = "User Name"
+	Expression={$_.PrimaryOwnerName}
+}
+(Get-CimInstance –ClassName CIM_ComputerSystem | Select-Object $PCName, $Domain, $UserName | Format-Table | Out-String).Trim()
 Write-Output ""
-Write-Output OS
-(Get-CimInstance -ClassName Win32_OperatingSystem).Version
+Write-Host "Operating System"
+$OS = @{
+	Name = "Name"
+	Expression={$_.Caption}
+}
+$InstallDate = @{
+	Name = "Install Date"
+	Expression={$_.InstallDate}
+}
+$Version = @{
+	Name = "Version"
+	Expression = {$_.Version}
+}
+$Arch = @{
+	Name = "Architecture"
+	Expression = {$_.OSArchitecture}
+}
+(Get-CimInstance -ClassName CIM_OperatingSystem | Select-Object $OS, $InstallDate, $Version, $Arch | Format-Table | Out-String).Trim()
 Write-Output ""
 Write-Output BIOS
-Get-CimInstance -ClassName Win32_BIOS | Select-Object Manufacturer, Name | Format-Table
+$Version = @{
+	Name = "Version"
+	Expression = {$_.Name}
+}
+(Get-CimInstance -ClassName CIM_BIOSElement | Select-Object Manufacturer, $Version | Format-Table | Out-String).Trim()
+Write-Output ""
 Write-Output Motherboard
-Get-CimInstance -ClassName Win32_BaseBoard | Select-Object Manufacturer, Product | Format-Table
+(Get-CimInstance -ClassName Win32_BaseBoard | Select-Object Manufacturer, Product | Format-Table | Out-String).Trim()
+Write-Output ""
 Write-Output CPU
-Get-CimInstance -ClassName Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors | Format-Table
+$Cores = @{
+	Name = "Cores"
+	Expression = {$_.NumberOfCores}
+}
+$L3CacheSize = @{
+	Name = "L3, MB"
+	Expression = {$_.L3CacheSize / 1024}
+}
+$Threads = @{
+	Name = "Threads"
+	Expression = {$_.NumberOfLogicalProcessors}
+}
+(Get-CimInstance -ClassName CIM_Processor | Select-Object Name, $Cores, $L3CacheSize, $Threads | Format-Table | Out-String).Trim()
+Write-Output ""
 Write-Output RAM
+$Speed = @{
+	Name = "Speed, MHz"
+	Expression = {$_.Configuredclockspeed}
+}
 $Capacity = @{
-	Name = "Capacity"
+	Name = "Capacity, GB"
 	Expression = {$_.Capacity / 1GB}
 }
-Get-CimInstance -ClassName Win32_PhysicalMemory | Select-Object Manufacturer, Configuredclockspeed, $Capacity | Format-Table
+(Get-CimInstance -ClassName CIM_PhysicalMemory | Select-Object Manufacturer, PartNumber, $Speed, $Capacity | Format-Table | Out-String).Trim()
+Write-Output ""
 Write-Output "Physical disks"
+$Model = @{
+	Name = "Model"
+	Expression = {$_.FriendlyName}
+}
+$MediaType = @{
+	Name = "Drive type"
+	Expression = {$_.MediaType}
+}
 $Size = @{
-	Name = "Size"
+	Name = "Size, GB"
+	Expression = {[math]::round($_.Size / 1GB, 2)}
+}
+$BusType = @{
+	Name = "Bus type"
+	Expression = {$_.BusType}
+}
+(Get-PhysicalDisk | Select-Object $Model, $MediaType, $BusType, $Size | Format-Table | Out-String).Trim()
+Write-Output ""
+Write-Output "Logical and mapped disks"
+Enum DriveType {
+	RemovableDrive	=	2
+	HardDrive		=	3
+	NetworkDrive	=	4
+}
+$Name = @{
+	Name = "Name"
+	Expression = {$_.DeviceID}
+}
+$Type = @{
+	Name = "Drive Type"
+	Expression = {[enum]::GetName([DriveType],$_.DriveType)}
+}
+$Path = @{
+	Name = "Path"
+	Expression = {$_.ProviderName}
+}
+$Size = @{
+	Name = "Size, GB"
 	Expression = {[math]::round($_.Size/1GB, 2)}
 }
-Get-CimInstance -ClassName Win32_DiskDrive | Select-Object Model, $Size | Format-Table
-Write-Output "Logical disks"
-$Size = @{
-	Name = "Size"
-	Expression = {[math]::round($_.Size/1GB, 2)}
-}
-Get-CimInstance -ClassName Win32_LogicalDisk | Select-Object DeviceID, ProviderName, $Size | Format-Table
+(Get-CimInstance -ClassName CIM_LogicalDisk | Where-Object -FilterScript {$_.DriveType} | Select-Object $Name, $Type, $Path, VolumeName, $Size | Format-Table | Out-String).Trim()
+Write-Output ""
 Write-Output "Video сontrollers"
-(Get-CimInstance -ClassName Win32_VideoController).Caption
+(Get-CimInstance -ClassName CIM_VideoController).Caption
+
+# Стать владельцем файла
+takeown /F file
+icacls file /grant:r %username%:F
+# Стать владельцем папки
+takeown /F folder /R
+icacls folder /grant:r %username%:F /T
