@@ -498,7 +498,10 @@ $MainWindowHandle | WindowState -State HIDE
 $cursor = 'Программы\Прочее\bronze.cur'
 function Get-ResolvedPath
 {
-	param ([Parameter(ValueFromPipeline = 1)]$Path)
+	param (
+		[Parameter(ValueFromPipeline = 1)]
+		$Path
+	)
 	(Get-Disk | Where-Object -FilterScript {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object {Join-Path ($_ + ":") $Path -Resolve -ErrorAction SilentlyContinue}
 }
 $cursor | Get-ResolvedPath | Copy-Item -Destination $env:SystemRoot\Cursors -Force
@@ -605,7 +608,8 @@ $BusType = @{
 (Get-PhysicalDisk | Select-Object $Model, $MediaType, $BusType, $Size | Format-Table | Out-String).Trim()
 Write-Output ""
 Write-Output "Logical disks"
-Enum DriveType {
+Enum DriveType
+{
 	RemovableDrive	=	2
 	HardDrive		=	3
 	NetworkDrive	=	4
