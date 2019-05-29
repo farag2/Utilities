@@ -5,8 +5,14 @@ Save-Module -Name PSScriptAnalyzer -Path D:\
 Invoke-ScriptAnalyzer -Path "D:\Программы\Прочее\ps1\Win 10.ps1"
 
 # Перерегистрация всех UWP-приложений
-# https://forums.mydigitallife.net/threads/guide-add-store-to-windows-10-enterprises-sku-ltsb-ltsc.70741/page-30#post-1468779
 (Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\InboxApplications | Get-ItemProperty).Path | Add-AppxPackage -Register -DisableDevelopmentMode
+
+# Установка Microsoft Store из appxbundle
+https://store.rg-adguard.net
+CategoryID: 64293252-5926-453c-9494-2d4021f1c78d
+New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\Appx -Name AllowAllTrustedApps -Value 1 -Force
+Add-AppxProvisionedPackage -Online -PackagePath Store.appxbundle -LicensePath Store.xml
+New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\Appx -Name AllowAllTrustedApps -Value 0 -Force
 
 # Домен
 New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters -Name AllowSingleLabelDnsDomain -Value 1 -Force
@@ -520,7 +526,7 @@ $Domain = @{
 }
 $UserName = @{
 	Name = "User Name"
-	Expression={$_.PrimaryOwnerName}
+	Expression={$_.UserName}
 }
 (Get-CimInstance –ClassName CIM_ComputerSystem | Select-Object $PCName, $Domain, $UserName | Format-Table | Out-String).Trim()
 Write-Output ""
@@ -598,7 +604,7 @@ $BusType = @{
 }
 (Get-PhysicalDisk | Select-Object $Model, $MediaType, $BusType, $Size | Format-Table | Out-String).Trim()
 Write-Output ""
-Write-Output "Logical and mapped disks"
+Write-Output "Logical disks"
 Enum DriveType {
 	RemovableDrive	=	2
 	HardDrive		=	3
@@ -623,7 +629,15 @@ $Size = @{
 (Get-CimInstance -ClassName CIM_LogicalDisk | Where-Object -FilterScript {$_.DriveType} | Select-Object $Name, $Type, $Path, VolumeName, $Size | Format-Table | Out-String).Trim()
 Write-Output ""
 Write-Output "Video сontrollers"
-(Get-CimInstance -ClassName CIM_VideoController).Caption
+$Caption = @{
+	Name = "Model"
+	Expression = {$_.Caption}
+}
+$VRAM = @{
+	Name = "VRAM, GB"
+	Expression = {[math]::round($_.AdapterRAM/1GB)}
+}
+(Get-CimInstance -ClassName CIM_VideoController | Select-Object $Caption, $VRAM | Format-Table | Out-String).Trim()
 
 # Стать владельцем файла
 takeown /F file
