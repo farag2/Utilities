@@ -14,13 +14,8 @@ New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\Appx -Name Allo
 Add-AppxProvisionedPackage -Online -PackagePath Store.appxbundle -LicensePath Store.xml
 New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\Appx -Name AllowAllTrustedApps -Value 0 -Force
 
-# Домен
+# Разрешить подключаться одноуровневому домену
 New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters -Name AllowSingleLabelDnsDomain -Value 1 -Force
-
-# Установка приложений из Магазина
-https://store.rg-adguard.net
-https://www.microsoft.com/store/productId/9nmjcx77qkpx
-Add-AppxPackage -Path "D:\Microsoft.LanguageExperiencePackru-ru_17134.5.13.0_neutral__8wekyb3d8bbwe.Appx"
 
 # Стать владельцем ключа в Реестре
 $ParentACL = Get-Acl -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.txt"
