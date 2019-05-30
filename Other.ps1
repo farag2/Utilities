@@ -22,9 +22,6 @@ https://store.rg-adguard.net
 https://www.microsoft.com/store/productId/9nmjcx77qkpx
 Add-AppxPackage -Path "D:\Microsoft.LanguageExperiencePackru-ru_17134.5.13.0_neutral__8wekyb3d8bbwe.Appx"
 
-# Показать сообщения о блокировке изменений папок приложениями посредством управляемого доступа
-(Get-WinEvent -LogName "Microsoft-Windows-Windows Defender/Operational" | Where-Object -FilterScript {$_.ID -eq "1123" -or $_.ID -eq "1124" -or $_.ID -eq "1127"}).Message
-
 # Стать владельцем ключа в Реестре
 $ParentACL = Get-Acl -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.txt"
 $k = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.txt\UserChoice",'ReadWriteSubTree','TakeOwnership')
@@ -144,7 +141,7 @@ $params = @{
 }
 Register-ScheduledTask @Params -Force
 
-# Включение в Планировщике задач очистки папки %SYSTEMROOT%\SoftwareDistribution\Download
+# Создать в Планировщике задач задачу по очистки папки "$env:SystemRoot\SoftwareDistribution\Download"
 $action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
 	`$getservice = Get-Service -Name wuauserv
 	`$getservice.WaitForStatus('Stopped', '01:00:00')
@@ -162,7 +159,7 @@ $params = @{
 }
 Register-ScheduledTask @Params -Force
 
-# Включение в Планировщике задач всплывающего окошка с сообщением о перезагрузке
+# Создать в Планировщике задач задачу со всплывающим окошком с сообщением о перезагрузке
 $action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
 	-WindowStyle Hidden `
 	Add-Type -AssemblyName System.Windows.Forms
@@ -194,7 +191,7 @@ Register-ScheduledTask @Params -Force
 # Найти диски, не являющиеся загрузочными, исключая диски с пустыми буквами (не исключаются внешние жесткие диски)
 (Get-Disk | Where-Object -FilterScript {$_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object {Join-Path ($_ + ":") $Path}
 # Найти первый диск, подключенный через USB, исключая диски с пустыми буквами
-(Get-Disk | Where-Object -FilterScript {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object {Join-Path ($_ + ":") $Path} | Select-Object -First 1
+(Get-Disk | Where-Object -FilterScript {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object {Join-Path ($_ + ":") $Path} | Select-Object -Property -First 1
 
 # Добавление доменов в hosts
 $hostfile = "$env:SystemRoot\System32\drivers\etc\hosts"
@@ -213,9 +210,6 @@ Split-Path -Path file.ext -Leaf
 Split-Path -Path file.ext -Parent
 # Отделить от пути название последней папки
 Get-Item -Path file.ext | Split-Path -Parent | Split-Path -Parent | Split-Path -Leaf
-
-# Список сетевых дисков
-Get-SmbMapping | Select-Object -Property LocalPath, RemotePath
 
 # Версия ОС
 $Channel = (Get-CimInstance -ClassName SoftwareLicensingProduct | Where-Object -FilterScript {$null -ne $_.PartialProductKey -and $_.ApplicationID -eq "55c92734-d682-4d71-983e-d6ec3f16059f"}).ProductKeyChannel
@@ -531,7 +525,7 @@ $UserName = @{
 	Name = "User Name"
 	Expression={$_.UserName}
 }
-(Get-CimInstance –ClassName CIM_ComputerSystem | Select-Object $PCName, $Domain, $UserName | Format-Table | Out-String).Trim()
+(Get-CimInstance –ClassName CIM_ComputerSystem | Select-Object -Property $PCName, $Domain, $UserName | Format-Table | Out-String).Trim()
 Write-Output ""
 Write-Host "Operating System"
 $OS = @{
@@ -550,17 +544,17 @@ $Arch = @{
 	Name = "Architecture"
 	Expression = {$_.OSArchitecture}
 }
-(Get-CimInstance -ClassName CIM_OperatingSystem | Select-Object $OS, $InstallDate, $Version, $Arch | Format-Table | Out-String).Trim()
+(Get-CimInstance -ClassName CIM_OperatingSystem | Select-Object -Property $OS, $InstallDate, $Version, $Arch | Format-Table | Out-String).Trim()
 Write-Output ""
 Write-Output BIOS
 $Version = @{
 	Name = "Version"
 	Expression = {$_.Name}
 }
-(Get-CimInstance -ClassName CIM_BIOSElement | Select-Object Manufacturer, $Version | Format-Table | Out-String).Trim()
+(Get-CimInstance -ClassName CIM_BIOSElement | Select-Object -Property Manufacturer, $Version | Format-Table | Out-String).Trim()
 Write-Output ""
 Write-Output Motherboard
-(Get-CimInstance -ClassName Win32_BaseBoard | Select-Object Manufacturer, Product | Format-Table | Out-String).Trim()
+(Get-CimInstance -ClassName Win32_BaseBoard | Select-Object -Property Manufacturer, Product | Format-Table | Out-String).Trim()
 Write-Output ""
 Write-Output CPU
 $Cores = @{
@@ -575,7 +569,7 @@ $Threads = @{
 	Name = "Threads"
 	Expression = {$_.NumberOfLogicalProcessors}
 }
-(Get-CimInstance -ClassName CIM_Processor | Select-Object Name, $Cores, $L3CacheSize, $Threads | Format-Table | Out-String).Trim()
+(Get-CimInstance -ClassName CIM_Processor | Select-Object -Property Name, $Cores, $L3CacheSize, $Threads | Format-Table | Out-String).Trim()
 Write-Output ""
 Write-Output RAM
 $Speed = @{
@@ -586,7 +580,7 @@ $Capacity = @{
 	Name = "Capacity, GB"
 	Expression = {$_.Capacity / 1GB}
 }
-(Get-CimInstance -ClassName CIM_PhysicalMemory | Select-Object Manufacturer, PartNumber, $Speed, $Capacity | Format-Table | Out-String).Trim()
+(Get-CimInstance -ClassName CIM_PhysicalMemory | Select-Object -Property Manufacturer, PartNumber, $Speed, $Capacity | Format-Table | Out-String).Trim()
 Write-Output ""
 Write-Output "Physical disks"
 $Model = @{
@@ -605,14 +599,13 @@ $BusType = @{
 	Name = "Bus type"
 	Expression = {$_.BusType}
 }
-(Get-PhysicalDisk | Select-Object $Model, $MediaType, $BusType, $Size | Format-Table | Out-String).Trim()
+(Get-PhysicalDisk | Select-Object -Property $Model, $MediaType, $BusType, $Size | Format-Table | Out-String).Trim()
 Write-Output ""
 Write-Output "Logical disks"
 Enum DriveType
 {
 	RemovableDrive	=	2
 	HardDrive		=	3
-	NetworkDrive	=	4
 }
 $Name = @{
 	Name = "Name"
@@ -630,7 +623,10 @@ $Size = @{
 	Name = "Size, GB"
 	Expression = {[math]::round($_.Size/1GB, 2)}
 }
-(Get-CimInstance -ClassName CIM_LogicalDisk | Where-Object -FilterScript {$_.DriveType} | Select-Object $Name, $Type, $Path, VolumeName, $Size | Format-Table | Out-String).Trim()
+(Get-CimInstance -ClassName Win32_LogicalDisk | Where-Object -FilterScript {$_.DriveType -ne 4} | Select-Object -Property $Name, $Type, $Path, $Size | Format-Table | Out-String).Trim()
+Write-Output ""
+Write-Output "Mapped disks"
+(Get-SmbMapping | Select-Object -Property LocalPath, RemotePath | Format-Table | Out-String).Trim()
 Write-Output ""
 Write-Output "Video сontrollers"
 $Caption = @{
@@ -641,7 +637,7 @@ $VRAM = @{
 	Name = "VRAM, GB"
 	Expression = {[math]::round($_.AdapterRAM/1GB)}
 }
-(Get-CimInstance -ClassName CIM_VideoController | Select-Object $Caption, $VRAM | Format-Table | Out-String).Trim()
+(Get-CimInstance -ClassName CIM_VideoController | Select-Object -Property $Caption, $VRAM | Format-Table | Out-String).Trim()
 
 # Стать владельцем файла
 takeown /F file
@@ -649,3 +645,7 @@ icacls file /grant:r %username%:F
 # Стать владельцем папки
 takeown /F folder /R
 icacls folder /grant:r %username%:F /T
+
+# Найти файл на всех локальных дисках и вывести его полный путь
+$file = file.ext
+(Get-ChildItem -Path ([System.IO.DriveInfo]::GetDrives() | Where-Object {$_.DriveType -ne 'Network'}).Name -Recurse -ErrorAction SilentlyContinue | Where-Object -FilterScript {$_.Name -like "$file"}).FullName
