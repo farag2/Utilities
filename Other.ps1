@@ -121,7 +121,7 @@ TakeownRegistry ("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WinDefend
 # Включение в Планировщике задач удаление устаревших обновлений Office, кроме Office 2019
 $action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
 	`$getservice = Get-Service -Name wuauserv
-	`$getservice.WaitForStatus("Stopped", "01:00:00")
+	`$getservice.WaitForStatus("Stopped", '01:00:00')
 	Start-Process -FilePath D:\Программы\Прочее\Office_task.bat
 "@
 $trigger = New-ScheduledTaskTrigger -Weekly -At 9am -DaysOfWeek Thursday -WeeksInterval 4
@@ -162,12 +162,11 @@ $action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
 	`$path = (Get-Process -Id `$pid).Path
 	`$balmsg.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon(`$path)
 	`$balmsg.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Warning
-	`$balmsg.BalloonTipText = "Перезагрузка через 1 мин."
-	`$balmsg.BalloonTipTitle = "Внимание"
+	`$balmsg.BalloonTipText = 'Перезагрузка через 1 мин.'
+	`$balmsg.BalloonTipTitle = 'Внимание'
 	`$balmsg.Visible = `$true
 	`$balmsg.ShowBalloonTip(60000)
 	Start-Sleep -s 60
-	Restart-Computer
 "@
 $trigger = New-ScheduledTaskTrigger -Weekly -At 10am -DaysOfWeek Thursday -WeeksInterval 4
 $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
