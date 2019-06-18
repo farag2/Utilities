@@ -19,12 +19,12 @@ New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Paramete
 
 # Стать владельцем ключа в Реестре
 $ParentACL = Get-Acl -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.txt"
-$k = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.txt\UserChoice",'ReadWriteSubTree','TakeOwnership')
+$k = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.txt\UserChoice","ReadWriteSubTree","TakeOwnership")
 $acl = $k.GetAccessControl()
 $null = $acl.SetAccessRuleProtection($false,$true)
-$rule = New-Object System.Security.AccessControl.RegistryAccessRule ($ParentACL.Owner,'FullControl','Allow')
+$rule = New-Object System.Security.AccessControl.RegistryAccessRule ($ParentACL.Owner,"FullControl","Allow")
 $null = $acl.SetAccessRule($rule)
-$rule = New-Object System.Security.AccessControl.RegistryAccessRule ($ParentACL.Owner,'SetValue','Deny')
+$rule = New-Object System.Security.AccessControl.RegistryAccessRule ($ParentACL.Owner,"SetValue","Deny")
 $null = $acl.RemoveAccessRule($rule)
 $null = $k.SetAccessControl($acl)
 
@@ -33,7 +33,7 @@ Start-Process -FilePath notepad.exe
 $AsyncWindow = Add-Type –MemberDefinition @"
 	[DllImport("user32.dll")]
 	public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
-"@ -name "Win32ShowWindowAsync" -namespace Win32Functions –PassThru
+"@ -Name "Win32ShowWindowAsync" -Namespace Win32Functions -PassThru
 $hwnd0 = (Get-Process -Name notepad).MainWindowHandle
 $null = $AsyncWindow::ShowWindowAsync($hwnd0, 0)
 
@@ -85,7 +85,7 @@ function ElevatePrivileges
 
 function TakeownRegistry($key)
 {
-	switch ($key.split('\')[0])
+	switch ($key.split("\")[0])
 	{
 		"HKEY_CLASSES_ROOT"
 		{
@@ -121,7 +121,7 @@ TakeownRegistry ("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WinDefend
 # Включение в Планировщике задач удаление устаревших обновлений Office, кроме Office 2019
 $action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
 	`$getservice = Get-Service -Name wuauserv
-	`$getservice.WaitForStatus('Stopped', '01:00:00')
+	`$getservice.WaitForStatus("Stopped", "01:00:00")
 	Start-Process -FilePath D:\Программы\Прочее\Office_task.bat
 "@
 $trigger = New-ScheduledTaskTrigger -Weekly -At 9am -DaysOfWeek Thursday -WeeksInterval 4
@@ -139,7 +139,7 @@ Register-ScheduledTask @Params -Force
 # Создать в Планировщике задач задачу по очистки папки "$env:SystemRoot\SoftwareDistribution\Download"
 $action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
 	`$getservice = Get-Service -Name wuauserv
-	`$getservice.WaitForStatus('Stopped', '01:00:00')
+	`$getservice.WaitForStatus("Stopped", "01:00:00")
 	Get-ChildItem -Path `$env:SystemRoot\SoftwareDistribution\Download -Recurse -Force | Remove-Item -Recurse -Force
 "@
 $trigger = New-ScheduledTaskTrigger -Weekly -At 9am -DaysOfWeek Thursday -WeeksInterval 4
@@ -162,8 +162,8 @@ $action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
 	`$path = (Get-Process -Id `$pid).Path
 	`$balmsg.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon(`$path)
 	`$balmsg.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Warning
-	`$balmsg.BalloonTipText = 'Перезагрузка через 1 мин.'
-	`$balmsg.BalloonTipTitle = 'Внимание'
+	`$balmsg.BalloonTipText = "Перезагрузка через 1 мин."
+	`$balmsg.BalloonTipTitle = "Внимание"
 	`$balmsg.Visible = `$true
 	`$balmsg.ShowBalloonTip(60000)
 	Start-Sleep -s 60
@@ -206,22 +206,6 @@ Split-Path -Path file.ext -Parent
 # Отделить от пути название последней папки
 Get-Item -Path file.ext | Split-Path -Parent | Split-Path -Parent | Split-Path -Leaf
 
-# Версия ОС
-$Channel = (Get-CimInstance -ClassName SoftwareLicensingProduct | Where-Object -FilterScript {$null -ne $_.PartialProductKey -and $_.ApplicationID -eq "55c92734-d682-4d71-983e-d6ec3f16059f"}).ProductKeyChannel
-IF ($Channel -like "*Volume*")
-{
-	$Channel = "VL"
-}
-$ProductName = @{
-	Name = "ProductName"
-	Expression = {"$($_.ProductName) $($_.ReleaseId) $Channel"}
-}
-$Build = @{
-	Name = "Build"
-	Expression = {"$($_.CurrentMajorVersionNumber).$($_.CurrentMinorVersionNumber).$($_.CurrentBuild).$($_.UBR)"}
-}
-Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows nt\CurrentVersion" | Select-Object -Property $ProductName, $Build | Format-List
-
 # Проверить тип запуска службы
 IF ((Get-Service -ServiceName wuauserv).StartType -eq "Disabled")
 {
@@ -239,11 +223,11 @@ IF ((Get-Service -ServiceName wuauserv).StartType -eq "Disabled")
 	Verbose 5
 #>
 Get-WinEvent -LogName Security | Where-Object -FilterScript {$_.ID -eq 5157}
-Get-WinEvent -LogName System | Where-Object -FilterScript {$_.ID -like '1001' -and $_.Source -like 'bugcheck'}
-Get-WinEvent -LogName System | Where-Object -FilterScript {$_.LevelDisplayName -match 'Критическая' -or $_.LevelDisplayName -match 'Ошибка'}
+Get-WinEvent -LogName System | Where-Object -FilterScript {$_.ID -like "1001" -and $_.Source -like "bugcheck"}
+Get-WinEvent -LogName System | Where-Object -FilterScript {$_.LevelDisplayName -match "Критическая" -or $_.LevelDisplayName -match "Ошибка"}
 Get-WinEvent -FilterHashtable @{LogName = "System"; level="1"}
 Get-WinEvent -FilterHashtable @{LogName = "System"} | Where-Object -FilterScript {($_.Level -eq 2) -or ($_.Level -eq 3)}
-Get-WinEvent -LogName Application | Where-Object -FilterScript {$_.ProviderName -match 'Windows Error*'}
+Get-WinEvent -LogName Application | Where-Object -FilterScript {$_.ProviderName -match "Windows Error*"}
 
 # Настройка и проверка исключений Защитника Windows
 Add-MpPreference -ExclusionProcess D:\folder\file.ext
@@ -285,13 +269,13 @@ $HT = @{
 Expand-Archive @HT
 
 # Обновить переменные среды
-IF (-not ([System.Management.Automation.PSTypeName]'WindowsDesktopTools.Explorer').Type)
+IF (-not ([System.Management.Automation.PSTypeName]"WindowsDesktopTools.Explorer").Type)
 {
 	$type = @{
-		Namespace = 'WindowsDesktopTools'
-		Name = 'Explorer'
-		Language = 'CSharp'
-		MemberDefinition = @'
+		Namespace = "WindowsDesktopTools"
+		Name = "Explorer"
+		Language = "CSharp"
+		MemberDefinition = @"
 			private static readonly IntPtr HWND_BROADCAST = new IntPtr(0xffff);
 			private const int WM_SETTINGCHANGE = 0x1a;
 			private const int SMTO_ABORTIFHUNG = 0x0002;
@@ -310,7 +294,7 @@ IF (-not ([System.Management.Automation.PSTypeName]'WindowsDesktopTools.Explorer
 				// Update taskbar
 				SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, IntPtr.Zero, "TraySettings");
 			}
-'@
+"@
 	}
 	Add-Type @type
 }
@@ -361,12 +345,7 @@ Get-StringHash 2 sha1
 Get-FileHash D:\1.txt -Algorithm MD5
 
 # Получить список установленных приложений
-$keys = @("HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
-"HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall")
-foreach ($key in $keys)
-{
-	(Get-ItemProperty $key\* | Where-Object -FilterScript {$_.DisplayName -ne $null}).DisplayName
-}
+(Get-Itemproperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*, HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*).DisplayName
 
 # Проверить, добавлен ли уже класс
 IF (-not (([System.Management.Automation.PSTypeName]"Win32Functions.Win32ShowWindowAsync").Type))
@@ -451,32 +430,32 @@ function WindowState
 		[Parameter( ValueFromPipeline = $true, Mandatory = $true, Position = 0 )]
 		[ValidateScript({$_ -ne 0 })]
 		[System.IntPtr] $MainWindowHandle,
-		[ValidateSet('FORCEMINIMIZE', 'HIDE', 'MAXIMIZE', 'MINIMIZE', 'RESTORE',
-				'SHOW', 'SHOWDEFAULT', 'SHOWMAXIMIZED', 'SHOWMINIMIZED',
-				'SHOWMINNOACTIVE', 'SHOWNA', 'SHOWNOACTIVATE', 'SHOWNORMAL')]
-		[String] $State = 'SHOW'
+		[ValidateSet("FORCEMINIMIZE", "HIDE", "MAXIMIZE", "MINIMIZE", "RESTORE",
+				"SHOW", "SHOWDEFAULT", "SHOWMAXIMIZED", "SHOWMINIMIZED",
+				"SHOWMINNOACTIVE", "SHOWNA", "SHOWNOACTIVATE", "SHOWNORMAL")]
+		[String] $State = "SHOW"
 	)
 	$WindowStates = @{
-		'FORCEMINIMIZE'		=	11
-		'HIDE'				=	0
-		'MAXIMIZE'			=	3
-		'MINIMIZE'			=	6
-		'RESTORE'			=	9
-		'SHOW'				=	5
-		'SHOWDEFAULT'		=	10
-		'SHOWMAXIMIZED'		=	3
-		'SHOWMINIMIZED'		=	2
-		'SHOWMINNOACTIVE'	=	7
-		'SHOWNA'			=	8
-		'SHOWNOACTIVATE'	=	4
-		'SHOWNORMAL'		=	1
+		"FORCEMINIMIZE"		=	11
+		"HIDE"				=	0
+		"MAXIMIZE"			=	3
+		"MINIMIZE"			=	6
+		"RESTORE"			=	9
+		"SHOW"				=	5
+		"SHOWDEFAULT"		=	10
+		"SHOWMAXIMIZED"		=	3
+		"SHOWMINIMIZED"		=	2
+		"SHOWMINNOACTIVE"	=	7
+		"SHOWNA"			=	8
+		"SHOWNOACTIVATE"	=	4
+		"SHOWNORMAL"		=	1
 	}
 	IF (-not ( "Win32Functions.Win32ShowWindowAsync" -as [Type]))
 	{
 		Add-Type -MemberDefinition @"
 		[DllImport("user32.dll")]
 		public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
-"@ -Namespace 'Win32Functions' -Name 'Win32ShowWindowAsync'
+"@ -Namespace "Win32Functions" -Name "Win32ShowWindowAsync"
 	}
 	[Win32Functions.Win32ShowWindowAsync]::ShowWindowAsync($MainWindowHandle , $WindowStates[$State])
 }
@@ -484,7 +463,7 @@ $MainWindowHandle = (Get-Process -Name notepad | Where-Object -FilterScript {$_.
 $MainWindowHandle | WindowState -State HIDE
 
 # Установить бронзовый курсор из Windows XP
-$cursor = 'Программы\Прочее\bronze.cur'
+$cursor = "Программы\Прочее\bronze.cur"
 function Get-ResolvedPath
 {
 	param (
@@ -510,36 +489,73 @@ $CursorRefresh::SystemParametersInfo(0x0057,0,$null,0)
 Write-Output User
 $PCName = @{
 	Name = "Computer name"
-	Expression={$_.Name}
+	Expression = {$_.Name}
 }
 $Domain = @{
 	Name = "Domain"
-	Expression={$_.Domain}
+	Expression = {$_.Domain}
 }
 $UserName = @{
 	Name = "User Name"
-	Expression={$_.UserName}
+	Expression = {$_.UserName}
 }
 (Get-CimInstance –ClassName CIM_ComputerSystem | Select-Object -Property $PCName, $Domain, $UserName | Format-Table | Out-String).Trim()
 Write-Output ""
 Write-Output "Operating System"
-$OS = @{
-	Name = "Name"
-	Expression={$_.Caption}
+# $Channel = (Get-CimInstance -ClassName SoftwareLicensingProduct | Where-Object -FilterScript {$null -ne $_.PartialProductKey -and $_.ApplicationID -eq "55c92734-d682-4d71-983e-d6ec3f16059f"}).ProductKeyChannel
+IF ($Channel -like "*Volume*")
+{
+	$Channel = "VL"
 }
+$ProductName = @{
+	Name = "Product Name"
+	Expression = {"$($_.ProductName) $($_.ReleaseId) $Channel"}
+}
+$Build = @{
+	Name = "Build"
+	Expression = {"$($_.CurrentMajorVersionNumber).$($_.CurrentMinorVersionNumber).$($_.CurrentBuild).$($_.UBR)"}
+}
+$a = Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows nt\CurrentVersion" | Select-Object -Property $ProductName, $Build
 $InstallDate = @{
 	Name = "Install Date"
 	Expression={$_.InstallDate}
-}
-$Version = @{
-	Name = "Version"
-	Expression = {$_.Version}
 }
 $Arch = @{
 	Name = "Architecture"
 	Expression = {$_.OSArchitecture}
 }
-(Get-CimInstance -ClassName CIM_OperatingSystem | Select-Object -Property $OS, $InstallDate, $Version, $Arch | Format-Table | Out-String).Trim()
+$b = Get-CimInstance -ClassName CIM_OperatingSystem | Select-Object -Property $InstallDate, $Arch
+([PSCustomObject] @{
+	"Product Name" = $a."Product Name"
+	Build = $a.Build
+	"Install Date" = $b."Install Date"
+	Architecture = $b.Architecture
+} | Out-String).Trim()
+Write-Output ""
+Write-Output "Installed updates supplied by CBS"
+$HotFixID = @{
+	Name = "KB ID"
+	Expression = {$_.HotFixID}
+}
+$InstalledOn = @{
+	Name = "Installed on"
+	Expression = {$_.InstalledOn.Tostring().Split("")[0]}
+}
+(Get-HotFix | Select-Object -Property $HotFixID, $InstalledOn -Unique | Format-Table | Out-String).Trim()
+Write-Output ""
+Write-Output "Installed updates supplied by MSI/WU"
+$Session = New-Object -ComObject "Microsoft.Update.Session"
+$Searcher = $Session.CreateUpdateSearcher()
+$historyCount = $Searcher.GetTotalHistoryCount()
+$KB = @{
+	Name = "KB ID"
+	Expression = {[regex]::Match($_.Title,"(KB[0-9]{6,7})").Value}
+}
+$Date = @{
+	Name = "Installed on"
+	Expression = {$_.Date.Tostring().Split("")[0]}
+}
+($Searcher.QueryHistory(0, $historyCount) | Where-Object -FilterScript {$_.Title -notlike "*Defender*" -and $_.Title -notlike "*WebMedia*"} | Select-Object $KB, $Date -Unique | Format-Table | Out-String).Trim()
 Write-Output ""
 Write-Output BIOS
 $Version = @{
@@ -642,5 +658,5 @@ takeown /F folder /R
 icacls folder /grant:r %username%:F /T
 
 # Найти файл на всех локальных дисках и вывести его полный путь
-$file = file.ext
-(Get-ChildItem -Path ([System.IO.DriveInfo]::GetDrives() | Where-Object {$_.DriveType -ne 'Network'}).Name -Recurse -ErrorAction SilentlyContinue | Where-Object -FilterScript {$_.Name -like "$file"}).FullName
+$file = "file.ext"
+(Get-ChildItem -Path ([System.IO.DriveInfo]::GetDrives() | Where-Object {$_.DriveType -ne "Network"}).Name -Recurse -ErrorAction SilentlyContinue | Where-Object -FilterScript {$_.Name -like "$file"}).FullName
