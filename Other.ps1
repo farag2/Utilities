@@ -550,7 +550,7 @@ $Searcher = $Session.CreateUpdateSearcher()
 $historyCount = $Searcher.GetTotalHistoryCount()
 $KB = @{
 	Name = "KB ID"
-	Expression = {[regex]::Match($_.Title,"(KB[0-9]{6,7})").Value | Where-Object -FilterScript {$_.Title -like "*KB*"}
+	Expression = {[regex]::Match($_.Title,"(KB[0-9]{6,7})").Value | Where-Object -FilterScript {$_.Title -like "*KB*"}}
 }
 $Date = @{
 	Name = "Installed on"
