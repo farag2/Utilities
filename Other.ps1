@@ -500,8 +500,7 @@ $UserName = @{
 	Expression = {$_.UserName}
 }
 (Get-CimInstance –ClassName CIM_ComputerSystem | Select-Object -Property $PCName, $Domain, $UserName | Format-Table | Out-String).Trim()
-Write-Output ""
-Write-Output "Operating System"
+Write-Output "`nOperating System"
 # $Channel = (Get-CimInstance -ClassName SoftwareLicensingProduct | Where-Object -FilterScript {$null -ne $_.PartialProductKey -and $_.ApplicationID -eq "55c92734-d682-4d71-983e-d6ec3f16059f"}).ProductKeyChannel
 IF ($Channel -like "*Volume*")
 {
@@ -532,8 +531,7 @@ $b = Get-CimInstance -ClassName CIM_OperatingSystem | Select-Object -Property $I
 	"Install Date" = $b."Install Date"
 	Architecture = $b.Architecture
 } | Out-String).Trim()
-Write-Output ""
-Write-Output "Installed updates supplied by CBS"
+Write-Output "`nInstalled updates supplied by CBS"
 $HotFixID = @{
 	Name = "KB ID"
 	Expression = {$_.HotFixID}
@@ -543,32 +541,28 @@ $InstalledOn = @{
 	Expression = {$_.InstalledOn.Tostring().Split("")[0]}
 }
 (Get-HotFix | Select-Object -Property $HotFixID, $InstalledOn -Unique | Format-Table | Out-String).Trim()
-Write-Output ""
-Write-Output "Installed updates supplied by MSI/WU"
+Write-Output "`nInstalled updates supplied by MSI/WU"
 $Session = New-Object -ComObject "Microsoft.Update.Session"
 $Searcher = $Session.CreateUpdateSearcher()
 $historyCount = $Searcher.GetTotalHistoryCount()
 $KB = @{
 	Name = "KB ID"
-	Expression = {[regex]::Match($_.Title,"(KB[0-9]{6,7})").Value | Where-Object -FilterScript {$_.Title -like "*KB*"}}
+	Expression = {[regex]::Match($_.Title,"(KB[0-9]{6,7})").Value}
 }
 $Date = @{
 	Name = "Installed on"
 	Expression = {$_.Date.Tostring().Split("")[0]}
 }
 ($Searcher.QueryHistory(0, $historyCount) | Where-Object -FilterScript {$_.Title -like "*KB*"} | Select-Object $KB, $Date -Unique | Format-Table | Out-String).Trim()
-Write-Output ""
-Write-Output BIOS
+Write-Output "`nBIOS"
 $Version = @{
 	Name = "Version"
 	Expression = {$_.Name}
 }
 (Get-CimInstance -ClassName CIM_BIOSElement | Select-Object -Property Manufacturer, $Version | Format-Table | Out-String).Trim()
-Write-Output ""
-Write-Output Motherboard
+Write-Output "`nMotherboard"
 (Get-CimInstance -ClassName Win32_BaseBoard | Select-Object -Property Manufacturer, Product | Format-Table | Out-String).Trim()
-Write-Output ""
-Write-Output CPU
+Write-Output "`nCPU"
 $Cores = @{
 	Name = "Cores"
 	Expression = {$_.NumberOfCores}
@@ -582,8 +576,7 @@ $Threads = @{
 	Expression = {$_.NumberOfLogicalProcessors}
 }
 (Get-CimInstance -ClassName CIM_Processor | Select-Object -Property Name, $Cores, $L3CacheSize, $Threads | Format-Table | Out-String).Trim()
-Write-Output ""
-Write-Output RAM
+Write-Output "`nRAM"
 $Speed = @{
 	Name = "Speed, MHz"
 	Expression = {$_.Configuredclockspeed}
@@ -612,8 +605,7 @@ $BusType = @{
 	Expression = {$_.BusType}
 }
 (Get-PhysicalDisk | Select-Object -Property $Model, $MediaType, $BusType, $Size | Format-Table | Out-String).Trim()
-Write-Output ""
-Write-Output "Logical disks"
+Write-Output "`nLogical disks"
 Enum DriveType
 {
 	RemovableDrive	=	2
@@ -636,11 +628,9 @@ $Size = @{
 	Expression = {[math]::round($_.Size/1GB, 2)}
 }
 (Get-CimInstance -ClassName Win32_LogicalDisk | Where-Object -FilterScript {$_.DriveType -ne 4} | Select-Object -Property $Name, $Type, $Path, $Size | Format-Table | Out-String).Trim()
-Write-Output ""
-Write-Output "Mapped disks"
+Write-Output "`nMapped disks"
 (Get-SmbMapping | Select-Object -Property LocalPath, RemotePath | Format-Table | Out-String).Trim()
-Write-Output ""
-Write-Output "Video сontrollers"
+Write-Output "`nVideo сontrollers"
 $Caption = @{
 	Name = "Model"
 	Expression = {$_.Caption}
