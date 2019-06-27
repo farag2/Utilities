@@ -1,3 +1,4 @@
+exit
 # PSScriptAnalyzer
 Install-PackageProvider -Name NuGet -Force
 Install-Module -Name PSScriptAnalyzer -Force
@@ -508,7 +509,8 @@ IF ($Channel -like "*Volume*")
 }
 $ProductName = @{
 	Name = "Product Name"
-	Expression = {"$($_.ProductName) $($_.ReleaseId) $Channel"}
+	Expression = {"$($_.ProductName) $($_.ReleaseId)"}
+	# Expression = {"$($_.ProductName) $($_.ReleaseId) $Channel"}
 }
 $Build = @{
 	Name = "Build"
@@ -517,7 +519,7 @@ $Build = @{
 $a = Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows nt\CurrentVersion" | Select-Object -Property $ProductName, $Build
 $InstallDate = @{
 	Name = "Install Date"
-	Expression={$_.InstallDate}
+	Expression={$_.InstallDate.Tostring().Split("")[0]}
 }
 $Arch = @{
 	Name = "Architecture"
@@ -548,13 +550,13 @@ $Searcher = $Session.CreateUpdateSearcher()
 $historyCount = $Searcher.GetTotalHistoryCount()
 $KB = @{
 	Name = "KB ID"
-	Expression = {[regex]::Match($_.Title,"(KB[0-9]{6,7})").Value}
+	Expression = {[regex]::Match($_.Title,"(KB[0-9]{6,7})").Value | Where-Object -FilterScript {$_.Title -like "*KB*"}
 }
 $Date = @{
 	Name = "Installed on"
 	Expression = {$_.Date.Tostring().Split("")[0]}
 }
-($Searcher.QueryHistory(0, $historyCount) | Where-Object -FilterScript {$_.Title -notlike "*Defender*" -and $_.Title -notlike "*WebMedia*"} | Select-Object $KB, $Date -Unique | Format-Table | Out-String).Trim()
+($Searcher.QueryHistory(0, $historyCount) | Where-Object -FilterScript {$_.Title -like "*KB*"} | Select-Object $KB, $Date -Unique | Format-Table | Out-String).Trim()
 Write-Output ""
 Write-Output BIOS
 $Version = @{
