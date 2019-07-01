@@ -651,3 +651,15 @@ icacls folder /grant:r %username%:F /T
 # Найти файл на всех локальных дисках и вывести его полный путь
 $file = "file.ext"
 (Get-ChildItem -Path ([System.IO.DriveInfo]::GetDrives() | Where-Object {$_.DriveType -ne "Network"}).Name -Recurse -ErrorAction SilentlyContinue | Where-Object -FilterScript {$_.Name -like "$file"}).FullName
+
+# Удалить первые $l буквы в названиях файлов в папке
+$path = "D:\folder"
+$e = "flac"
+$l = 4
+(Get-ChildItem -Path $path -Filter *.$e) | Rename-Item -NewName {$_.Name.Substring($l)}
+
+# Записать прописными буквами первую букву каждого слова в названии каждом файле в папке
+$TextInfo = (Get-Culture).TextInfo
+$path = "D:\folder"
+$e = "flac"
+Get-ChildItem -Path $path -Filter *.$e | ForEach-Object {Rename-Item $_.FullName -NewName $TextInfo.ToTitleCase($_)}
