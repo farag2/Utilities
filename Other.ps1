@@ -640,6 +640,8 @@ $VRAM = @{
 	Expression = {[math]::round($_.AdapterRAM/1GB)}
 }
 (Get-CimInstance -ClassName CIM_VideoController | Select-Object -Property $Caption, $VRAM | Format-Table | Out-String).Trim()
+Write-Output "`nDefault IP gateway"
+(Get-CimInstance -ClassName Win32_NetworkAdapterConfiguration).DefaultIPGateway
 
 # Стать владельцем файла
 takeown /F file
@@ -652,13 +654,19 @@ icacls folder /grant:r %username%:F /T
 $file = "file.ext"
 (Get-ChildItem -Path ([System.IO.DriveInfo]::GetDrives() | Where-Object {$_.DriveType -ne "Network"}).Name -Recurse -ErrorAction SilentlyContinue | Where-Object -FilterScript {$_.Name -like "$file"}).FullName
 
-# Удалить первые $l буквы в названиях файлов в папке
+# Удалить первые $c буквы в названиях файлов в папке
 $path = "D:\folder"
 $e = "flac"
-$l = 4
-(Get-ChildItem -Path $path -Filter *.$e) | Rename-Item -NewName {$_.Name.Substring($l)}
+$c = 4
+(Get-ChildItem -Path $path -Filter *.$e) | Rename-Item -NewName {$_.Name.Substring($c)}
 
-# Записать прописными буквами первую букву каждого слова в названии каждом файле в папке
+# Удалить последние $c буквы в названиях файлов в папке
+$path = "D:\folder"
+$e = "flac"
+$c = 4
+Get-ChildItem -Path $path -Filter *.$e | Rename-Item -NewName {$_.Name.Substring(0,$_.BaseName.Length-$c) + $_.Extension}
+
+# Записать прописными буквами первую букву каждого слова в названии каждого файла в папке
 $TextInfo = (Get-Culture).TextInfo
 $path = "D:\folder"
 $e = "flac"
