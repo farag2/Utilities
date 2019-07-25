@@ -9,10 +9,11 @@ Invoke-ScriptAnalyzer -Path "D:\Программы\Прочее\ps1\Win 10.ps1"
 (Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\InboxApplications | Get-ItemProperty).Path | Add-AppxPackage -Register -DisableDevelopmentMode
 
 # Установка Microsoft Store из appxbundle
+SW_DVD9_NTRL_Win_10_1903_32_64_ARM64_MultiLang_App_Update_X22-01657.ISO
 https://store.rg-adguard.net
 CategoryID: 64293252-5926-453c-9494-2d4021f1c78d
 New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\Appx -Name AllowAllTrustedApps -Value 1 -Force
-Add-AppxProvisionedPackage -Online -PackagePath Store.appxbundle -LicensePath Store.xml
+Add-AppxProvisionedPackage -Online -PackagePath D:\Store.appxbundle -LicensePath D:\Store.xml
 New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\Appx -Name AllowAllTrustedApps -Value 0 -Force
 
 # Разрешить подключаться одноуровневому домену
@@ -28,15 +29,6 @@ $null = $acl.SetAccessRule($rule)
 $rule = New-Object System.Security.AccessControl.RegistryAccessRule ($ParentACL.Owner,"SetValue","Deny")
 $null = $acl.RemoveAccessRule($rule)
 $null = $k.SetAccessControl($acl)
-
-# Скрыть окно
-Start-Process -FilePath notepad.exe
-$AsyncWindow = Add-Type –MemberDefinition @"
-	[DllImport("user32.dll")]
-	public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
-"@ -Name "Win32ShowWindowAsync" -Namespace Win32Functions -PassThru
-$hwnd0 = (Get-Process -Name notepad).MainWindowHandle
-$null = $AsyncWindow::ShowWindowAsync($hwnd0, 0)
 
 # Стать владельцем ключа в Реестре
 function ElevatePrivileges
@@ -137,24 +129,6 @@ $params = @{
 }
 Register-ScheduledTask @Params -Force
 
-# Создать в Планировщике задач задачу по очистки папки "$env:SystemRoot\SoftwareDistribution\Download"
-$action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
-	`$getservice = Get-Service -Name wuauserv
-	`$getservice.WaitForStatus("Stopped", "01:00:00")
-	Get-ChildItem -Path `$env:SystemRoot\SoftwareDistribution\Download -Recurse -Force | Remove-Item -Recurse -Force
-"@
-$trigger = New-ScheduledTaskTrigger -Weekly -At 9am -DaysOfWeek Thursday -WeeksInterval 4
-$settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
-$principal = New-ScheduledTaskPrincipal -UserID System -RunLevel Highest
-$params = @{
-	"TaskName"	= "SoftwareDistribution"
-	"Action"	= $action
-	"Trigger"	= $trigger
-	"Settings"	= $settings
-	"Principal"	= $principal
-}
-Register-ScheduledTask @Params -Force
-
 # Создать в Планировщике задач задачу со всплывающим окошком с сообщением о перезагрузке
 $action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
 	-WindowStyle Hidden `
@@ -195,7 +169,7 @@ Foreach ($hostentry in $domains)
 {
 	IF (-not (Get-Content -Path $hostfile | Select-String "0.0.0.0 `t $hostentry"))
 	{
-		Add-content -Path $hostfile -Value "0.0.0.0 `t $hostentry"
+		Add-Content -Path $hostfile -Value "0.0.0.0 `t $hostentry"
 	}
 }
 
@@ -268,53 +242,11 @@ $HT = @{
 }
 Expand-Archive @HT
 
-# Обновить переменные среды
-IF (-not ([System.Management.Automation.PSTypeName]"WindowsDesktopTools.Explorer").Type)
-{
-	$type = @{
-		Namespace = "WindowsDesktopTools"
-		Name = "Explorer"
-		Language = "CSharp"
-		MemberDefinition = @"
-			private static readonly IntPtr HWND_BROADCAST = new IntPtr(0xffff);
-			private const int WM_SETTINGCHANGE = 0x1a;
-			private const int SMTO_ABORTIFHUNG = 0x0002;
-			[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = false)]
-			static extern bool SendNotifyMessage(IntPtr hWnd, uint Msg, IntPtr wParam, string lParam);
-			[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = false)]
-			private static extern IntPtr SendMessageTimeout(IntPtr hWnd, int Msg, IntPtr wParam, string lParam, int fuFlags, int uTimeout, IntPtr lpdwResult);
-			[DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = false)]
-			private static extern int SHChangeNotify(int eventId, int flags, IntPtr item1, IntPtr item2);
-			public static void Refresh()
-			{
-				// Update desktop icons
-				SHChangeNotify(0x8000000, 0x1000, IntPtr.Zero, IntPtr.Zero);
-				// Update environment variables
-				SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, IntPtr.Zero, null, SMTO_ABORTIFHUNG, 100, IntPtr.Zero);
-				// Update taskbar
-				SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, IntPtr.Zero, "TraySettings");
-			}
-"@
-	}
-	Add-Type @type
-}
-[WindowsDesktopTools.Explorer]::Refresh()
-
 # Конвертировать в кодировку UTF8 с BOM
 (Get-Content -Path "D:\1.ps1" -Encoding UTF8) | Set-Content -Encoding UTF8 -Path "D:\1.ps1"
 
 # Вычленить букву диска
 Split-Path -Path "D:\file.mp3" -Qualifier
-
-# try/catch
-try
-{
-	Do-Something
-}
-catch
-{
-	Write-Output "Something threw an exception"
-}
 
 # Получение контрольной суммы файла (MD2, MD4, MD5, SHA1, SHA256, SHA384, SHA512)
 certutil -hashfile C:\file.txt SHA1
@@ -347,69 +279,55 @@ Get-FileHash D:\1.txt -Algorithm MD5
 # Получить список установленных приложений
 (Get-Itemproperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*, HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*).DisplayName
 
-# Проверить, добавлен ли уже класс
-IF (-not (([System.Management.Automation.PSTypeName]"Win32Functions.Win32ShowWindowAsync").Type))
-{
-	code
-}
-#
-IF (-not ("Win32Functions.Win32ShowWindowAsync" -as [type]))
-{
-	code
-}
-
 # Развернуть окно с заголовком "Диспетчер задач", а остальные окна свернуть
+$Win32ShowWindowAsync = @{
+	Namespace = "Win32Functions"
+	Name = "Win32ShowWindowAsync"
+	Language = "CSharp"
+	MemberDefinition = @"
+		[DllImport("user32.dll")]
+		public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+"@
+}
 IF (-not ("Win32Functions.Win32ShowWindowAsync" -as [type]))
 {
-	$Win32ShowWindowAsync = Add-Type -MemberDefinition @"
-	[DllImport("user32.dll")]
-	public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
-"@ -name "Win32ShowWindowAsync" -Namespace Win32Functions -PassThru
+	Add-Type @Win32ShowWindowAsync
 }
 $title = "Диспетчер задач"
 Get-Process | Where-Object -FilterScript {$_.MainWindowHandle -ne 0} | ForEach-Object -Process {
 	IF ($_.MainWindowTitle -eq $title)
 	{
-		$Win32ShowWindowAsync::ShowWindowAsync($_.MainWindowHandle, 3) | Out-Null
+		[Win32Functions.Win32ShowWindowAsync]::ShowWindowAsync($_.MainWindowHandle, 3) | Out-Null
 	}
 	else
 	{
-		$Win32ShowWindowAsync::ShowWindowAsync($_.MainWindowHandle, 6) | Out-Null
+		[Win32Functions.Win32ShowWindowAsync]::ShowWindowAsync($_.MainWindowHandle, 6) | Out-Null
 	}
 }
 
-# Do/Until
-Do
-{
-	$preferences = Get-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\TaskManager -Name Preferences -ErrorAction SilentlyContinue
-}
-Until ($preferences)
-
-# Закрепить на начальном экране ярлык
-$Target = "D:\folder\file.lnk"
-$Directory = (Get-Childitem -Path $Target).Directory
-$File = (Get-ChildItem -Path $Target).Name
-$shell = New-Object -ComObject "Shell.Application"
-$folder = $shell.Namespace("$Directory\")
-$file = $folder.Parsename("$File")
+# Закрепить на начальном экране ярлык 1809
+$Target = Get-Item -Path "D:\folder\file.lnk"
+$shell = New-Object -ComObject Shell.Application
+$folder = $shell.NameSpace($target.DirectoryName)
+$file = $folder.ParseName($Target.Name)
 $verb = $file.Verbs() | Where-Object -FilterScript {$_.Name -like "Закрепить на начальном &экране"}
 $verb.DoIt()
 
-# Закрепить на панели задач ярлык
-$Target = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\file.lnk"
+# Закрепить на панели задач ярлык 1809
+$Target = Get-Item -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\file.lnk"
 $Value = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\Windows.taskbarpin").ExplorerCommandHandler
 IF (-not (Test-Path -Path "HKCU:\Software\Classes\*\shell\pin"))
 {
 	New-Item -Path "HKCU:\Software\Classes\*\shell\pin" -Force
 }
 New-ItemProperty -LiteralPath "HKCU:\Software\Classes\*\shell\pin" -Name ExplorerCommandHandler -Type String -Value $Value -Force
-$Shell = New-Object -ComObject "Shell.Application"
-$Folder = $Shell.Namespace((Get-Item -Path $Target).DirectoryName)
-$Item = $Folder.ParseName((Get-Item -Path Target).Name)
+$Shell = New-Object -ComObject Shell.Application
+$Folder = $Shell.NameSpace($Target.DirectoryName)
+$Item = $Folder.ParseName($Target.Name)
 $Item.InvokeVerb("pin")
 Remove-Item -LiteralPath "HKCU:\Software\Classes\*\shell\pin" -Recurse
 
-# Открепить от панели задач ярлык
+# Открепить от панели задач ярлык 1809
 $Target = "$env:APPDATA\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\file.lnk"
 $Value = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\Windows.taskbarpin").ExplorerCommandHandler
 IF (-not (Test-Path -Path "HKCU:\Software\Classes\*\shell\pin"))
@@ -427,8 +345,8 @@ Remove-Item -LiteralPath "HKCU:\Software\Classes\*\shell\pin" -Recurse
 function WindowState
 {
 	param(
-		[Parameter( ValueFromPipeline = $true, Mandatory = $true, Position = 0 )]
-		[ValidateScript({$_ -ne 0 })]
+		[Parameter(ValueFromPipeline = $true, Mandatory = $true, Position = 0)]
+		[ValidateScript({$_ -ne 0})]
 		[System.IntPtr] $MainWindowHandle,
 		[ValidateSet("FORCEMINIMIZE", "HIDE", "MAXIMIZE", "MINIMIZE", "RESTORE",
 				"SHOW", "SHOWDEFAULT", "SHOWMAXIMIZED", "SHOWMINIMIZED",
@@ -450,12 +368,18 @@ function WindowState
 		"SHOWNOACTIVATE"	=	4
 		"SHOWNORMAL"		=	1
 	}
-	IF (-not ( "Win32Functions.Win32ShowWindowAsync" -as [Type]))
-	{
-		Add-Type -MemberDefinition @"
+	$Win32ShowWindowAsync = @{
+	Namespace = "Win32Functions"
+	Name = "Win32ShowWindowAsync"
+	Language = "CSharp"
+	MemberDefinition = @"
 		[DllImport("user32.dll")]
 		public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
-"@ -Namespace "Win32Functions" -Name "Win32ShowWindowAsync"
+"@
+	}
+	IF (-not ("Win32Functions.Win32ShowWindowAsync" -as [type]))
+	{
+		Add-Type @Win32ShowWindowAsync
 	}
 	[Win32Functions.Win32ShowWindowAsync]::ShowWindowAsync($MainWindowHandle , $WindowStates[$State])
 }
@@ -463,6 +387,7 @@ $MainWindowHandle = (Get-Process -Name notepad | Where-Object -FilterScript {$_.
 $MainWindowHandle | WindowState -State HIDE
 
 # Установить бронзовый курсор из Windows XP
+# Функция для нахождения буквы диска, когда файл находится в известной папке, но не известна буква диска. Подходит, когда файл располагается на USB-носителе
 $cursor = "Программы\Прочее\bronze.cur"
 function Get-ResolvedPath
 {
@@ -474,16 +399,24 @@ function Get-ResolvedPath
 }
 $cursor | Get-ResolvedPath | Copy-Item -Destination $env:SystemRoot\Cursors -Force
 New-ItemProperty -Path "HKCU:\Control Panel\Cursors" -Name Arrow -Type ExpandString -Value "%SystemRoot%\cursors\bronze.cur" -Force
-$CSharpSig = @"
-	[DllImport("user32.dll", EntryPoint = "SystemParametersInfo")]
-	public static extern bool SystemParametersInfo(
-	uint uiAction,
-	uint uiParam,
-	uint pvParam,
-	uint fWinIni);
+$Signature = @{
+	Namespace = "SystemParamInfo"
+	Name = "WinAPICall"
+	Language = "CSharp"
+	MemberDefinition = @"
+		[DllImport("user32.dll", EntryPoint = "SystemParametersInfo")]
+		public static extern bool SystemParametersInfo(
+		uint uiAction,
+		uint uiParam,
+		uint pvParam,
+		uint fWinIni);
 "@
-$CursorRefresh = Add-Type -MemberDefinition $CSharpSig -Name WinAPICall -Namespace SystemParamInfo –PassThru
-$CursorRefresh::SystemParametersInfo(0x0057,0,$null,0)
+}
+IF (-not ("SystemParamInfo.WinAPICall" -as [type]))
+{
+	Add-Type @Signature
+}
+[SystemParamInfo.WinAPICall]::SystemParametersInfo(0x0057,0,$null,0)
 
 # Информация о ПК
 Write-Output User
@@ -501,21 +434,10 @@ $UserName = @{
 }
 (Get-CimInstance –ClassName CIM_ComputerSystem | Select-Object -Property $PCName, $Domain, $UserName | Format-Table | Out-String).Trim()
 Write-Output "`nOperating System"
-# $Channel = (Get-CimInstance -ClassName SoftwareLicensingProduct | Where-Object -FilterScript {$null -ne $_.PartialProductKey -and $_.ApplicationID -eq "55c92734-d682-4d71-983e-d6ec3f16059f"}).ProductKeyChannel
-IF ($Channel -like "*Volume*")
-{
-	$Channel = "VL"
-}
 $ProductName = @{
 	Name = "Product Name"
-	Expression = {"$($_.ProductName) $($_.ReleaseId)"}
-	# Expression = {"$($_.ProductName) $($_.ReleaseId) $Channel"}
+	Expression = {$_.Caption}
 }
-$Build = @{
-	Name = "Build"
-	Expression = {"$($_.CurrentMajorVersionNumber).$($_.CurrentMinorVersionNumber).$($_.CurrentBuild).$($_.UBR)"}
-}
-$a = Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows nt\CurrentVersion" | Select-Object -Property $ProductName, $Build
 $InstallDate = @{
 	Name = "Install Date"
 	Expression={$_.InstallDate.Tostring().Split("")[0]}
@@ -524,12 +446,17 @@ $Arch = @{
 	Name = "Architecture"
 	Expression = {$_.OSArchitecture}
 }
-$b = Get-CimInstance -ClassName CIM_OperatingSystem | Select-Object -Property $InstallDate, $Arch
+$a = Get-CimInstance -ClassName CIM_OperatingSystem | Select-Object -Property $ProductName, $InstallDate, $Arch
+$Build = @{
+	Name = "Build"
+	Expression = {"$($_.CurrentMajorVersionNumber).$($_.CurrentMinorVersionNumber).$($_.CurrentBuild).$($_.UBR)"}
+}
+$b = Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows nt\CurrentVersion" | Select-Object -Property $Build
 ([PSCustomObject] @{
 	"Product Name" = $a."Product Name"
-	Build = $a.Build
-	"Install Date" = $b."Install Date"
-	Architecture = $b.Architecture
+	Build = $b.Build
+	"Install Date" = $a."Install Date"
+	Architecture = $a.Architecture
 } | Out-String).Trim()
 Write-Output "`nInstalled updates supplied by CBS"
 $HotFixID = @{
@@ -605,7 +532,7 @@ $BusType = @{
 	Expression = {$_.BusType}
 }
 (Get-PhysicalDisk | Select-Object -Property $Model, $MediaType, $BusType, $Size | Format-Table | Out-String).Trim()
-Write-Output "`nLogical disks"
+Write-Output "`nLogical drives"
 Enum DriveType
 {
 	RemovableDrive	=	2
@@ -642,6 +569,10 @@ $VRAM = @{
 (Get-CimInstance -ClassName CIM_VideoController | Select-Object -Property $Caption, $VRAM | Format-Table | Out-String).Trim()
 Write-Output "`nDefault IP gateway"
 (Get-CimInstance -ClassName Win32_NetworkAdapterConfiguration).DefaultIPGateway
+Write-Output "`nVideo сontrollers"
+# (Get-MpThreatDetection | Select-Object -Property Resources, ThreatID, InitialDetectionTime | Format-Table | Out-String).Trim()
+Write-Output "`nVideo сontrollers"
+# (Get-MpPreference | Select-Object -Property ExclusionPath, ThreatIDDefaultAction_Ids | Format-Table | Out-String).Trim()
 
 # Стать владельцем файла
 takeown /F file
@@ -653,6 +584,22 @@ icacls folder /grant:r %username%:F /T
 # Найти файл на всех локальных дисках и вывести его полный путь
 $file = "file.ext"
 (Get-ChildItem -Path ([System.IO.DriveInfo]::GetDrives() | Where-Object {$_.DriveType -ne "Network"}).Name -Recurse -ErrorAction SilentlyContinue | Where-Object -FilterScript {$_.Name -like "$file"}).FullName
+
+# Создать ini-файл с кодировкой UCS-2 LE BOM
+$rarregkey = @"
+RAR registration data
+Alexander Roshal
+Unlimited Company License
+UID=00f650198f81e6607ec5
+64122122507ec5206fb48daec2aaa67b4afc9a80b6a2e60ac35c4d
+78565fc0aaa9d24b459460fce6cb5ffde62890079861be57638717
+7131ced835ed65cc743d9777f2ea71a8e32c7e593cf66794343565
+b41bcf56929486b8bcdac33d50ecf77399602d355a7873c5e960f7
+8c0c621c6c7c2040df0794978f4e20e362354119251b5ea1fecc9d
+bfa426c154150408200be88b82c1234bc3d4ee6e979bfff660dfe8
+821d4d458f9319f95f2533d09ce2d8b75beac25fb63a3215972308
+"@
+Set-Content -Path "$env:ProgramFiles\WinRAR\rarreg.key" -Value $rarregkey -Encoding Unicode -Force
 
 # Удалить первые $c буквы в названиях файлов в папке
 $path = "D:\folder"
@@ -670,4 +617,25 @@ Get-ChildItem -Path $path -Filter *.$e | Rename-Item -NewName {$_.Name.Substring
 $TextInfo = (Get-Culture).TextInfo
 $path = "D:\folder"
 $e = "flac"
-Get-ChildItem -Path $path -Filter *.$e | ForEach-Object {Rename-Item $_.FullName -NewName $TextInfo.ToTitleCase($_)}
+Get-ChildItem -Path $path -Filter *.$e | Rename-Item -NewName {$TextInfo.ToTitleCase($_.BaseName) + $_.Extension}
+
+# Найти файлы, в названии которых каждое слово не написано с заглавной буквы
+(Get-ChildItem -Path $path -File -Recurse | Where-Object -FilterScript {($_.BaseName -replace "'|``") -cmatch "\b\p{Ll}\w*"}).FullName
+
+# Добавить REG_NONE
+New-ItemProperty -Path HKCU:\Software -Name Name -PropertyType None -Value ([byte[]]@()) -Force
+
+# Выкачать видео с помощью youtube-dl
+$urls= @(
+	"https://",
+	"https://",
+)
+$youtubedl = "D:\youtube-dl.exe"
+$username = ""
+$password = ""
+$output = "D:\folder"
+$filename = "%(title)s.mp4"
+Foreach ($url in $urls)
+{
+	Start-Process -FilePath $youtubedl -ArgumentList "$url --username $username --password $password --output `"$output\$filename`""
+}
