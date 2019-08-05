@@ -165,7 +165,7 @@ Register-ScheduledTask @Params -Force
 # Добавление доменов в hosts
 $hostfile = "$env:SystemRoot\System32\drivers\etc\hosts"
 $domains = @("site.com","site2.com")
-Foreach ($hostentry in $domains)
+foreach ($hostentry in $domains)
 {
 	IF (-not (Get-Content -Path $hostfile | Select-String "0.0.0.0 `t $hostentry"))
 	{
@@ -199,8 +199,8 @@ IF ((Get-Service -ServiceName wuauserv).StartType -eq "Disabled")
 Get-WinEvent -LogName Security | Where-Object -FilterScript {$_.ID -eq 5157}
 Get-WinEvent -LogName System | Where-Object -FilterScript {$_.ID -like "1001" -and $_.Source -like "bugcheck"}
 Get-WinEvent -LogName System | Where-Object -FilterScript {$_.LevelDisplayName -match "Критическая" -or $_.LevelDisplayName -match "Ошибка"}
-Get-WinEvent -FilterHashtable @{LogName = "System"; level="1"}
-Get-WinEvent -FilterHashtable @{LogName = "System"} | Where-Object -FilterScript {($_.Level -eq 2) -or ($_.Level -eq 3)}
+Get-WinEvent -FilterHashtable @{LogName = "System"; level = "1"}
+Get-WinEvent -FilterHashtable @{LogName = "System"} | Where-Object -FilterScript {$_.Level -eq 2 -or $_.Level -eq 3}
 Get-WinEvent -LogName Application | Where-Object -FilterScript {$_.ProviderName -match "Windows Error*"}
 
 # Настройка и проверка исключений Защитника Windows
@@ -575,11 +575,11 @@ Write-Output "`nVideo сontrollers"
 # (Get-MpPreference | Select-Object -Property ExclusionPath, ThreatIDDefaultAction_Ids | Format-Table | Out-String).Trim()
 
 # Стать владельцем файла
-takeown /F file
-icacls file /grant:r %username%:F
+takeown /F D:\file.exe
+icacls D:\file.exefile /grant:r %username%:F
 # Стать владельцем папки
-takeown /F folder /R
-icacls folder /grant:r %username%:F /T
+takeown /F C:\HV\10 /R
+icacls C:\HV\10 /grant:r %username%:F /T
 
 # Найти файл на всех локальных дисках и вывести его полный путь
 $file = "file.ext"
@@ -628,14 +628,15 @@ New-ItemProperty -Path HKCU:\Software -Name Name -PropertyType None -Value ([byt
 # Выкачать видео с помощью youtube-dl
 $urls= @(
 	"https://",
-	"https://",
+	"https://"
 )
 $youtubedl = "D:\youtube-dl.exe"
 $username = ""
 $password = ""
-$output = "D:\folder"
+$videopassword = ""
+$output = "D:\"
 $filename = "%(title)s.mp4"
-Foreach ($url in $urls)
+foreach ($url in $urls)
 {
-	Start-Process -FilePath $youtubedl -ArgumentList "$url --username $username --password $password --output `"$output\$filename`""
+	Start-Process -FilePath $youtubedl -ArgumentList "$url --username $username --password $password --video-password $videopassword --output `"$output\$filename`""
 }
