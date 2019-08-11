@@ -626,17 +626,21 @@ Get-ChildItem -Path $path -Filter *.$e | Rename-Item -NewName {$TextInfo.ToTitle
 New-ItemProperty -Path HKCU:\Software -Name Name -PropertyType None -Value ([byte[]]@()) -Force
 
 # Выкачать видео с помощью youtube-dl
+# https://github.com/ytdl-org/youtube-dl/releases
+# https://ffmpeg.zeranoe.com/builds/
 $urls= @(
 	"https://",
 	"https://"
 )
 $youtubedl = "D:\youtube-dl.exe"
-$username = ""
-$password = ""
-$videopassword = ""
+# --list-formats url
+# --format 43+35 url
+# --username $username
+# --password $password
+# --video-password $videopassword
 $output = "D:\"
 $filename = "%(title)s.mp4"
 foreach ($url in $urls)
 {
-	Start-Process -FilePath $youtubedl -ArgumentList "$url --username $username --password $password --video-password $videopassword --output `"$output\$filename`""
+	Start-Process -FilePath $youtubedl -ArgumentList "--output `"$output\$filename`" $url"
 }
