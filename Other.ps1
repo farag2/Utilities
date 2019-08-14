@@ -196,12 +196,14 @@ IF ((Get-Service -ServiceName wuauserv).StartType -eq "Disabled")
 	Informational 4
 	Verbose 5
 #>
-Get-WinEvent -LogName Security | Where-Object -FilterScript {$_.ID -eq 5157}
-Get-WinEvent -LogName System | Where-Object -FilterScript {$_.ID -like "1001" -and $_.Source -like "bugcheck"}
 Get-WinEvent -LogName System | Where-Object -FilterScript {$_.LevelDisplayName -match "Критическая" -or $_.LevelDisplayName -match "Ошибка"}
-Get-WinEvent -FilterHashtable @{LogName = "System"; level = "1"}
-Get-WinEvent -FilterHashtable @{LogName = "System"} | Where-Object -FilterScript {$_.Level -eq 2 -or $_.Level -eq 3}
-Get-WinEvent -LogName Application | Where-Object -FilterScript {$_.ProviderName -match "Windows Error*"}
+Get-WinEvent -FilterHashtable @{
+	LogName = "Windows PowerShell"
+	ProviderName = "PowerShell"
+	Id = "800"
+} | Where-Object -FilterScript {$_.Level -eq "3" -or $_.Level -eq "4"}
+Get-WinEvent -LogName "Windows PowerShell" | Where-Object -FilterScript {$_.Message -match "HostApplication=(?<a>.*)"} | Format-List -Property *
+Get-EventLog -LogName "Windows PowerShell" -InstanceId 10 | Where-Object -FilterScript {$_.Message -match "powershell.exe"}
 
 # Настройка и проверка исключений Защитника Windows
 Add-MpPreference -ExclusionProcess D:\folder\file.ext
@@ -625,9 +627,9 @@ Get-ChildItem -Path $path -Filter *.$e | Rename-Item -NewName {$TextInfo.ToTitle
 # Добавить REG_NONE
 New-ItemProperty -Path HKCU:\Software -Name Name -PropertyType None -Value ([byte[]]@()) -Force
 
-# Выкачать видео с помощью youtube-dl
+# Скачать видео с помощью youtube-dl
 # https://github.com/ytdl-org/youtube-dl/releases
-# https://ffmpeg.zeranoe.com/builds/
+# https://ffmpeg.zeranoe.com/builds
 $urls= @(
 	"https://",
 	"https://"
