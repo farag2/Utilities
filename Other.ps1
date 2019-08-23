@@ -3,7 +3,7 @@ exit
 Install-PackageProvider -Name NuGet -Force
 Install-Module -Name PSScriptAnalyzer -Force
 Save-Module -Name PSScriptAnalyzer -Path D:\
-Invoke-ScriptAnalyzer -Path "D:\Программы\Прочее\ps1\Win 10.ps1"
+Invoke-ScriptAnalyzer -Path "D:\Программы\Прочее\ps1\*.ps1" | Where-Object -FilterScript {$_.RuleName -ne "PSAvoidUsingWriteHost"}
 
 # Перерегистрация всех UWP-приложений
 (Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\InboxApplications | Get-ItemProperty).Path | Add-AppxPackage -Register -DisableDevelopmentMode
@@ -119,7 +119,7 @@ $action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
 "@
 $trigger = New-ScheduledTaskTrigger -Weekly -At 9am -DaysOfWeek Thursday -WeeksInterval 4
 $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
-$principal = New-ScheduledTaskPrincipal -UserID System -RunLevel Highest
+$principal = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -RunLevel Highest
 $params = @{
 	"TaskName"	= "Office"
 	"Action"	= $action
@@ -344,6 +344,7 @@ $Item.InvokeVerb("pin")
 Remove-Item -LiteralPath "HKCU:\Software\Classes\*\shell\pin" -Recurse
 
 # Установить состояние показа окна
+# https://docs.microsoft.com/ru-ru/windows/win32/api/winuser/nf-winuser-showwindow
 function WindowState
 {
 	param(
@@ -356,19 +357,19 @@ function WindowState
 		[String] $State = "SHOW"
 	)
 	$WindowStates = @{
-		"FORCEMINIMIZE"		=	11
 		"HIDE"				=	0
-		"MAXIMIZE"			=	3
-		"MINIMIZE"			=	6
-		"RESTORE"			=	9
-		"SHOW"				=	5
-		"SHOWDEFAULT"		=	10
-		"SHOWMAXIMIZED"		=	3
+		"SHOWNORMAL"		=	1
 		"SHOWMINIMIZED"		=	2
+		"MAXIMIZE"			=	3
+		"SHOWMAXIMIZED"		=	3
+		"SHOWNOACTIVATE"	=	4
+		"SHOW"				=	5
+		"MINIMIZE"			=	6
 		"SHOWMINNOACTIVE"	=	7
 		"SHOWNA"			=	8
-		"SHOWNOACTIVATE"	=	4
-		"SHOWNORMAL"		=	1
+		"RESTORE"			=	9
+		"SHOWDEFAULT"		=	10
+		"FORCEMINIMIZE"		=	11
 	}
 	$Win32ShowWindowAsync = @{
 	Namespace = "Win32Functions"
