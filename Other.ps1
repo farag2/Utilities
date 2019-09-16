@@ -460,14 +460,14 @@ $e = "flac"
 $c = 4
 Get-ChildItem -Path $path -Filter *.$e | Rename-Item -NewName {$_.Name.Substring(0,$_.BaseName.Length-$c) + $_.Extension}
 
+# Найти файлы, в названии которых каждое слово не написано с заглавной буквы
+(Get-ChildItem -Path $path -File -Recurse | Where-Object -FilterScript {($_.BaseName -replace "'|``") -cmatch "\b\p{Ll}\w*"}).FullName
+
 # Записать прописными буквами первую букву каждого слова в названии каждого файла в папке
 $TextInfo = (Get-Culture).TextInfo
 $path = "D:\folder"
 $e = "flac"
 Get-ChildItem -Path $path -Filter *.$e | Rename-Item -NewName {$TextInfo.ToTitleCase($_.BaseName) + $_.Extension}
-
-# Найти файлы, в названии которых каждое слово не написано с заглавной буквы
-(Get-ChildItem -Path $path -File -Recurse | Where-Object -FilterScript {($_.BaseName -replace "'|``") -cmatch "\b\p{Ll}\w*"}).FullName
 
 # Добавить REG_NONE
 New-ItemProperty -Path HKCU:\Software -Name Name -PropertyType None -Value ([byte[]]@()) -Force
@@ -491,3 +491,38 @@ foreach ($url in $urls)
 {
 	Start-Process -FilePath $youtubedl -ArgumentList "--output `"$output\$filename`" $url"
 }
+
+# Конвертировать binary
+"50,33,01".Split(",") | ForEach-Object -Process {"0x$_"}
+
+# Отключить сетевые протоколы
+$ComponentIDs = @(
+	"ms_tcpip6"
+	"ms_pacer"
+)
+Disable-NetAdapterBinding -Name Ethernet -ComponentID $ComponentIDs
+
+# Изменить кодировку файла
+[System.Text.Encoding]::GetEncodings()
+Out-File -FilePath file.ext -Encoding UTF8 -Force
+Add-Content -Path file.ext -Value content -Encoding UTF8 -Force
+
+# Вычислить продолжительность видеофайлов
+Function Get-Duration
+{
+	param ($TargetFolder)
+	$shell = New-Object -ComObject Shell.Application
+	$TotalDuration = [timespan]0
+	Get-ChildItem -Path $TargetFolder | ForEach-Object -Process {
+		$Folder = $shell.Namespace($_.DirectoryName)
+		$File = $Folder.ParseName($_.Name)
+		$Duration = [timespan]$Folder.GetDetailsOf($File, 27)
+		$TotalDuration += $Duration
+		[PSCustomObject] @{
+			File = $_.Name
+			Duration = $Duration
+		}
+	}
+	"`nTotal duration $TotalDuration"
+}
+(Get-Duration D:\folder | Sort-Object Duration | Out-String).Trim()
