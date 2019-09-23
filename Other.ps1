@@ -507,7 +507,7 @@ Disable-NetAdapterBinding -Name Ethernet -ComponentID $ComponentIDs
 Out-File -FilePath file.ext -Encoding UTF8 -Force
 Add-Content -Path file.ext -Value content -Encoding UTF8 -Force
 
-# Вычислить продолжительность видеофайлов
+# Вычислить продолжительность видеофайлов в папке
 Function Get-Duration
 {
 	param ($TargetFolder)
@@ -526,3 +526,9 @@ Function Get-Duration
 	"`nTotal duration $TotalDuration"
 }
 (Get-Duration D:\folder | Sort-Object Duration | Out-String).Trim()
+
+# Изменить переменные среды на C:\Temp
+setx /M TEMP "%SystemDrive%\Temp"
+setx /M TMP "%SystemDrive%\Temp"
+setx TEMP "%SystemDrive%\Temp"
+setx TMP "%SystemDrive%\Temp"
