@@ -188,14 +188,15 @@ IF ((Get-Service -ServiceName wuauserv).StartType -eq "Disabled")
 }
 
 # Получить события из журналов событий и файлов журналов отслеживания событий
-<#
-	LogAlways 0
-	Critical 1
-	Error 2
-	Warning 3
-	Informational 4
-	Verbose 5
-#>
+enum Level
+{
+	LogAlways		= 0
+	Critical		= 1
+	Error			= 2
+	Warning			=3
+	Informational	=	4
+	Verbose			= 5
+}
 Get-WinEvent -LogName System | Where-Object -FilterScript {$_.LevelDisplayName -match "Критическая" -or $_.LevelDisplayName -match "Ошибка"}
 Get-WinEvent -FilterHashtable @{
 	LogName = "Windows PowerShell"
@@ -204,11 +205,6 @@ Get-WinEvent -FilterHashtable @{
 } | Where-Object -FilterScript {$_.Level -eq "3" -or $_.Level -eq "4"}
 Get-WinEvent -LogName "Windows PowerShell" | Where-Object -FilterScript {$_.Message -match "HostApplication=(?<a>.*)"} | Format-List -Property *
 Get-EventLog -LogName "Windows PowerShell" -InstanceId 10 | Where-Object -FilterScript {$_.Message -match "powershell.exe"}
-
-# Настройка и проверка исключений Защитника Windows
-Add-MpPreference -ExclusionProcess D:\folder\file.ext
-Add-MpPreference -ExclusionPath D:\folder
-Add-MpPreference -ExclusionExtension .ext
 
 # Скачать файл
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -221,7 +217,8 @@ $HT = @{
 Invoke-WebRequest @HT
 
 # Передача больших файлов по медленным и нестабильным сетям
-Import-Module BitsTransfer # Нагружает диск
+# Нагружает диск
+Import-Module BitsTransfer
 Start-BitsTransfer -Source $url -Destination $output
 # Start-BitsTransfer -Source $url -Destination $output -Asynchronous
 
@@ -244,8 +241,14 @@ $HT = @{
 }
 Expand-Archive @HT
 
-# Конвертировать в кодировку UTF8 с BOM
-(Get-Content -Path "D:\1.ps1" -Encoding UTF8) | Set-Content -Encoding UTF8 -Path "D:\1.ps1"
+# Конвертировать файл в кодировку UTF8 с BOM
+(Get-Content -Path "D:\file.ext" -Encoding UTF8) | Set-Content -Encoding UTF8 -Path "D:\file.ext"
+
+# Конвертировать файл в кодировку UTF8 без BOM
+$utf8 = New-Object System.Text.UTF8Encoding $false
+$Path = "D:\file.ext"
+$Content = Get-Content -Path $Path -Raw
+Set-Content -Value $utf8.GetBytes($Content) -Encoding Byte -Path $Path
 
 # Вычленить букву диска
 Split-Path -Path "D:\file.mp3" -Qualifier
@@ -254,6 +257,9 @@ Split-Path -Path "D:\file.mp3" -Qualifier
 certutil -hashfile C:\file.txt SHA1
 # Преобразование кодов ошибок в текстовое сообщение
 certutil -error 0xc0000409
+
+# Вычислить значение хеш-суммы файла
+Get-FileHash D:\1.txt -Algorithm MD5
 
 # Вычислить значение хеш-суммы строки
 Function Get-StringHash
@@ -274,12 +280,6 @@ Function Get-StringHash
 	$StringBuilder.ToString()
 }
 Get-StringHash 2 sha1
-
-# Вычислить значение хеш-суммы файла
-Get-FileHash D:\1.txt -Algorithm MD5
-
-# Получить список установленных приложений
-(Get-Itemproperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*, HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*).DisplayName
 
 # Развернуть окно с заголовком "Диспетчер задач", а остальные окна свернуть
 $Win32ShowWindowAsync = @{
@@ -306,42 +306,6 @@ Get-Process | Where-Object -FilterScript {$_.MainWindowHandle -ne 0} | ForEach-O
 		[Win32Functions.Win32ShowWindowAsync]::ShowWindowAsync($_.MainWindowHandle, 6) | Out-Null
 	}
 }
-
-# Закрепить на начальном экране ярлык 1809
-$Target = Get-Item -Path "D:\folder\file.lnk"
-$shell = New-Object -ComObject Shell.Application
-$folder = $shell.NameSpace($target.DirectoryName)
-$file = $folder.ParseName($Target.Name)
-$verb = $file.Verbs() | Where-Object -FilterScript {$_.Name -like "Закрепить на начальном &экране"}
-$verb.DoIt()
-
-# Закрепить на панели задач ярлык 1809
-$Target = Get-Item -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\file.lnk"
-$Value = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\Windows.taskbarpin").ExplorerCommandHandler
-IF (-not (Test-Path -Path "HKCU:\Software\Classes\*\shell\pin"))
-{
-	New-Item -Path "HKCU:\Software\Classes\*\shell\pin" -Force
-}
-New-ItemProperty -LiteralPath "HKCU:\Software\Classes\*\shell\pin" -Name ExplorerCommandHandler -Type String -Value $Value -Force
-$Shell = New-Object -ComObject Shell.Application
-$Folder = $Shell.NameSpace($Target.DirectoryName)
-$Item = $Folder.ParseName($Target.Name)
-$Item.InvokeVerb("pin")
-Remove-Item -LiteralPath "HKCU:\Software\Classes\*\shell\pin" -Recurse
-
-# Открепить от панели задач ярлык 1809
-$Target = "$env:APPDATA\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\file.lnk"
-$Value = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\Windows.taskbarpin").ExplorerCommandHandler
-IF (-not (Test-Path -Path "HKCU:\Software\Classes\*\shell\pin"))
-{
-	New-Item -Path "HKCU:\Software\Classes\*\shell\pin" -Force
-}
-New-ItemProperty -LiteralPath "HKCU:\Software\Classes\*\shell\pin" -Name ExplorerCommandHandler -Type String -Value $Value -Force
-$Shell = New-Object -ComObject "Shell.Application"
-$Folder = $Shell.Namespace((Get-Item -Path $Target).DirectoryName)
-$Item = $Folder.ParseName((Get-Item -Path $Target).Name)
-$Item.InvokeVerb("pin")
-Remove-Item -LiteralPath "HKCU:\Software\Classes\*\shell\pin" -Recurse
 
 # Установить состояние показа окна
 # https://docs.microsoft.com/ru-ru/windows/win32/api/winuser/nf-winuser-showwindow
