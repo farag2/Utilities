@@ -206,6 +206,12 @@ Get-WinEvent -FilterHashtable @{
 Get-WinEvent -LogName "Windows PowerShell" | Where-Object -FilterScript {$_.Message -match "HostApplication=(?<a>.*)"} | Format-List -Property *
 Get-EventLog -LogName "Windows PowerShell" -InstanceId 10 | Where-Object -FilterScript {$_.Message -match "powershell.exe"}
 
+# Передача больших файлов по медленным и нестабильным сетям
+# Нагружает диск
+Import-Module BitsTransfer
+Start-BitsTransfer -Source $url -Destination $output
+# Start-BitsTransfer -Source $url -Destination $output -Asynchronous
+
 # Скачать файл
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $HT = @{
@@ -216,11 +222,9 @@ $HT = @{
 }
 Invoke-WebRequest @HT
 
-# Передача больших файлов по медленным и нестабильным сетям
-# Нагружает диск
-Import-Module BitsTransfer
-Start-BitsTransfer -Source $url -Destination $output
-# Start-BitsTransfer -Source $url -Destination $output -Asynchronous
+#
+$url = "http://"
+Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($url)
 
 # Скачать и отобразить текстовый файл
 (Invoke-WebRequest -Uri "https://site.com/1.js" -OutFile D:\1.js -PassThru).Content
