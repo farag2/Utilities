@@ -180,13 +180,6 @@ Split-Path -Path file.ext -Parent
 # Отделить от пути название последней папки
 Get-Item -Path file.ext | Split-Path -Parent | Split-Path -Parent | Split-Path -Leaf
 
-# Проверить тип запуска службы
-IF ((Get-Service -ServiceName wuauserv).StartType -eq "Disabled")
-{
-	Start-Service -ServiceName wuauserv -Force
-	Set-Service -ServiceName wuauserv -StartupType Automatic
-}
-
 # Получить события из журналов событий и файлов журналов отслеживания событий
 enum Level
 {
@@ -224,7 +217,7 @@ Invoke-WebRequest @HT
 
 #
 $url = "http://"
-Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($url)
+Invoke-Expression (New-Object System.Net.WebClient).DownloadString($url)
 
 # Скачать и отобразить текстовый файл
 (Invoke-WebRequest -Uri "https://site.com/1.js" -OutFile D:\1.js -PassThru).Content
@@ -560,3 +553,9 @@ $UpdateSession = New-Object -ComObject Microsoft.Update.Session
 $UpdateSearcher = $UpdateSession.CreateupdateSearcher()
 $Updates = @($UpdateSearcher.Search("IsHidden=0 and IsInstalled=0").Updates)
 $Updates | Select-Object Title
+
+# Закрыть определенное окно Проводника
+$folder = "D:\folder"
+$shell = New-Object -ComObject Shell.Application
+$window = $shell.Windows() | Where-Object {$_.LocationURL -eq "file:///"+([uri]$folder.Replace("\","/")).OriginalString}
+$window | ForEach-Object -Process {$_.Quit()}
