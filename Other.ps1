@@ -215,8 +215,8 @@ $HT = @{
 }
 Invoke-WebRequest @HT
 
-#
-$url = "http://"
+# Исполнить код по ссылке
+$url = "https://site.com/1.js"
 Invoke-Expression (New-Object System.Net.WebClient).DownloadString($url)
 
 # Скачать и отобразить текстовый файл
