@@ -557,5 +557,18 @@ $Updates | Select-Object Title
 # Закрыть определенное окно Проводника
 $folder = "D:\folder"
 $shell = New-Object -ComObject Shell.Application
-$window = $shell.Windows() | Where-Object {$_.LocationURL -eq "file:///"+([uri]$folder.Replace("\","/")).OriginalString}
+$window = $shell.Windows() | Where-Object {$_.LocationURL -eq ("file:///" + ([uri]$folder.Replace("\","/")).OriginalString)}
 $window | ForEach-Object -Process {$_.Quit()}
+
+# StartsWith/EndsWith
+$str = "1234"
+$str.StartsWith("1")
+$str.EndsWith("4")
+
+# Контекстное меню файла
+$Target = Get-Item -Path "D:\folder\file.lnk"
+$shell = New-Object -ComObject Shell.Application
+$folder = $shell.NameSpace($target.DirectoryName)
+$file = $folder.ParseName($Target.Name)
+$verb = $file.Verbs() | Where-Object -FilterScript {$_.Name -like "Закрепить на начальном &экране"}
+$verb.DoIt()
