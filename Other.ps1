@@ -9,107 +9,19 @@ Invoke-ScriptAnalyzer -Path "D:\Программы\Прочее\ps1\*.ps1" | Whe
 (Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\InboxApplications | Get-ItemProperty).Path | Add-AppxPackage -Register -DisableDevelopmentMode
 
 # Установка Microsoft Store из appxbundle
-SW_DVD9_NTRL_Win_10_1903_32_64_ARM64_MultiLang_App_Update_X22-01657.ISO
-https://store.rg-adguard.net
-CategoryID: 64293252-5926-453c-9494-2d4021f1c78d
+# SW_DVD9_NTRL_Win_10_1903_32_64_ARM64_MultiLang_App_Update_X22-01657.ISO
+# https://forums.mydigitallife.net/threads/discussion-windows-10-1903-9-final-build-18362-3-xxx-pc-19h1-2-release.79259/page-68#post-1517053
+# https://forums.mydigitallife.net/threads/guide-add-store-to-windows-10-enterprises-sku-ltsb-ltsc.70741/
+# http://inventorsparadox.blogspot.com/2019/10/repair-your-windows-store-and-metro.html
+# http://puresoftapps.blogspot.com/2018/06/uwp-runtime.html
+# https://store.rg-adguard.net
+# CategoryID: 64293252-5926-453c-9494-2d4021f1c78d
 New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\Appx -Name AllowAllTrustedApps -Value 1 -Force
 Add-AppxProvisionedPackage -Online -PackagePath D:\Store.appxbundle -LicensePath D:\Store.xml
 New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\Appx -Name AllowAllTrustedApps -Value 0 -Force
 
 # Разрешить подключаться одноуровневому домену
 New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters -Name AllowSingleLabelDnsDomain -Value 1 -Force
-
-# Стать владельцем ключа в Реестре
-$ParentACL = Get-Acl -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.txt"
-$k = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.txt\UserChoice","ReadWriteSubTree","TakeOwnership")
-$acl = $k.GetAccessControl()
-$null = $acl.SetAccessRuleProtection($false,$true)
-$rule = New-Object System.Security.AccessControl.RegistryAccessRule ($ParentACL.Owner,"FullControl","Allow")
-$null = $acl.SetAccessRule($rule)
-$rule = New-Object System.Security.AccessControl.RegistryAccessRule ($ParentACL.Owner,"SetValue","Deny")
-$null = $acl.RemoveAccessRule($rule)
-$null = $k.SetAccessControl($acl)
-
-# Стать владельцем ключа в Реестре
-function ElevatePrivileges
-{
-	param($Privilege)
-	$Definition = @"
-	using System;
-	using System.Runtime.InteropServices;
-	public class AdjPriv
-	{
-		[DllImport("advapi32.dll", ExactSpelling = true, SetLastError = true)]
-		internal static extern bool AdjustTokenPrivileges(IntPtr htok, bool disall, ref TokPriv1Luid newst, int len, IntPtr prev, IntPtr rele);
-		[DllImport("advapi32.dll", ExactSpelling = true, SetLastError = true)]
-		internal static extern bool OpenProcessToken(IntPtr h, int acc, ref IntPtr phtok);
-		[DllImport("advapi32.dll", SetLastError = true)]
-		internal static extern bool LookupPrivilegeValue(string host, string name, ref long pluid);
-		[StructLayout(LayoutKind.Sequential, Pack = 1)]
-		internal struct TokPriv1Luid
-		{
-			public int Count;
-			public long Luid;
-			public int Attr;
-		}
-		internal const int SE_PRIVILEGE_ENABLED = 0x00000002;
-		internal const int TOKEN_QUERY = 0x00000008;
-		internal const int TOKEN_ADJUST_PRIVILEGES = 0x00000020;
-		public static bool EnablePrivilege(long processHandle, string privilege)
-		{
-			bool retVal;
-			TokPriv1Luid tp;
-			IntPtr hproc = new IntPtr(processHandle);
-			IntPtr htok = IntPtr.Zero;
-			retVal = OpenProcessToken(hproc, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, ref htok);
-			tp.Count = 1;
-			tp.Luid = 0;
-			tp.Attr = SE_PRIVILEGE_ENABLED;
-			retVal = LookupPrivilegeValue(null, privilege, ref tp.Luid);
-			retVal = AdjustTokenPrivileges(htok, false, ref tp, 0, IntPtr.Zero, IntPtr.Zero);
-			return retVal;
-		}
-	}
-"@
-	$ProcessHandle = (Get-Process -id $pid).Handle
-	$type = Add-Type $definition -PassThru
-	$type[0]::EnablePrivilege($processHandle, $Privilege)
-}
-
-function TakeownRegistry($key)
-{
-	switch ($key.split("\")[0])
-	{
-		"HKEY_CLASSES_ROOT"
-		{
-			$reg = [Microsoft.Win32.Registry]::ClassesRoot
-			$key = $key.substring(18)
-		}
-		"HKEY_CURRENT_USER"
-		{
-			$reg = [Microsoft.Win32.Registry]::CurrentUser
-			$key = $key.substring(18)
-		}
-		"HKEY_LOCAL_MACHINE"
-		{
-			$reg = [Microsoft.Win32.Registry]::LocalMachine
-			$key = $key.substring(19)
-		}
-	}
-	$admins = New-Object System.Security.Principal.SecurityIdentifier("S-1-5-32-544")
-	$admins = $admins.Translate([System.Security.Principal.NTAccount])
-	$key = $reg.OpenSubKey($key, "ReadWriteSubTree", "TakeOwnership")
-	$acl = $key.GetAccessControl()
-	$acl.SetOwner($admins)
-	$key.SetAccessControl($acl)
-	$acl = $key.GetAccessControl()
-	$rule = New-Object System.Security.AccessControl.RegistryAccessRule($admins, "FullControl", "Allow")
-	$acl.SetAccessRule($rule)
-	$key.SetAccessControl($acl)
-}
-
-do {} until (ElevatePrivileges SeTakeOwnershipPrivilege)
-TakeownRegistry ("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WinDefend")
 
 # Включение в Планировщике задач удаление устаревших обновлений Office, кроме Office 2019
 $action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
@@ -572,3 +484,34 @@ $folder = $shell.NameSpace($target.DirectoryName)
 $file = $folder.ParseName($Target.Name)
 $verb = $file.Verbs() | Where-Object -FilterScript {$_.Name -like "Закрепить на начальном &экране"}
 $verb.DoIt()
+
+# Конвертировать хэш-таблицу в объекты
+$hash = @{
+	Name = 'Tobias'
+	Age = 66
+	Status = 'Online'
+}
+New-Object PSObject -Property $hash
+
+# Кодирование строки в Base64 и обратно
+[System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("SecretMessage"))
+[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("U2VjcmV0TWVzc2FnZQ=="))
+
+# Удалить неудаляемый ключ в реестре
+$parent = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ps1', $true)
+$parent.DeleteSubKey('UserChoice', $true)
+$parent.Close()
+
+# Показания накопителей
+Get-PhysicalDisk | Get-StorageReliabilityCounter | Select-Object -Property *
+
+# Что запускается автоматически
+Get-EventLog -LogName System -InstanceId 1073748869 | ForEach-Object {
+	[PSCustomObject]@{
+		Date = $_.TimeGenerated
+		Name = $_.ReplacementStrings[0]
+		Path = $_.ReplacementStrings[1]
+		StartMode = $_.ReplacementStrings[3]
+		User = $_.ReplacementStrings[4]
+	}
+}
