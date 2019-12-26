@@ -360,8 +360,9 @@ $urls= @(
 	"https://"
 )
 $youtubedl = "D:\youtube-dl.exe"
-# --list-formats url
-# --format 43+35 url
+# --list-formats url (in PS)
+# --all-subs
+# --format 43+35 $url
 # --username $username
 # --password $password
 # --video-password $videopassword
