@@ -360,9 +360,8 @@ $urls= @(
 	"https://"
 )
 $youtubedl = "D:\youtube-dl.exe"
-# --list-formats url (in PS)
-# --all-subs
-# --format 43+35 $url
+# --list-formats url
+# --format 43+35 url
 # --username $username
 # --password $password
 # --video-password $videopassword
@@ -516,3 +515,20 @@ Get-EventLog -LogName System -InstanceId 1073748869 | ForEach-Object {
 		User = $_.ReplacementStrings[4]
 	}
 }
+
+# break, continue, return, exit
+$fishtank = 1..10
+Foreach ($fish in $fishtank)
+{
+	if ($fish -eq 7)
+	{
+		# break		# abort loop
+		# continue	# skip just this iteration, but continue loop
+		# return	# abort code, and continue in caller scope
+		# exit		# abort code at caller scope
+	}
+	"fishing fish #$fish"
+}
+
+# Find all the running notepad processes, convert to an @array and kill/stop them:
+@(Get-Process –Name notepad).ForEach({Stop-Process -InputObject $_})
