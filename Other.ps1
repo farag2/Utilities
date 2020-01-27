@@ -102,6 +102,14 @@ enum Level
 	Informational	= 4
 	Verbose			= 5
 }
+$Level = @{
+	Name = "Level"
+	Expression = {[Level]$_.Level}
+}
+Get-WinEvent -LogName System | Select-Object Id, $Level, ProviderName, ThreadId, LevelDisplayName, TaskDisplayName
+# [Status]::LogAlways.Value__
+# [Status]0
+
 Get-WinEvent -LogName System | Where-Object -FilterScript {$_.LevelDisplayName -match "Критическая" -or $_.LevelDisplayName -match "Ошибка"}
 Get-WinEvent -FilterHashtable @{
 	LogName = "Windows PowerShell"
@@ -360,7 +368,7 @@ $urls= @(
 	"https://"
 )
 $youtubedl = "D:\youtube-dl.exe"
-# --list-formats url
+# --list-formats url (in PS)
 # --format 43+35 url
 # --username $username
 # --password $password
@@ -530,5 +538,25 @@ Foreach ($fish in $fishtank)
 	"fishing fish #$fish"
 }
 
-# Find all the running notepad processes, convert to an @array and kill/stop them:
-@(Get-Process –Name notepad).ForEach({Stop-Process -InputObject $_})
+# Найти все прцоессы notepad, сконвертировать в массив и убить процессы
+@(Get-Process –Name Notepad).ForEach({Stop-Process -InputObject $_})
+
+# Проверить, сходятся ли хэш-суммы из файла .cat с хэш-суммами файлов в папке
+$HT = @{
+	CatalogFilePath = "D:\file.cat"
+	Path = "D:\folder"
+	Detailed = $true
+	FilesToSkip = "file.xml"
+}
+Test-FileCatalog @HT
+
+# special characters
+`0 # Null
+`a # Alert
+`b # Backspace
+`f # Form feed
+`n # New line
+`r # Carriage return
+`t # Horizontal tab
+`v # Vertical tab
+–% # Stop parsing
