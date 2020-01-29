@@ -53,7 +53,7 @@ $action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
 	`$balmsg.BalloonTipTitle = 'Внимание'
 	`$balmsg.Visible = `$true
 	`$balmsg.ShowBalloonTip(60000)
-	Start-Sleep -s 60
+	Start-Sleep -Seconds 60
 "@
 $trigger = New-ScheduledTaskTrigger -Weekly -At 10am -DaysOfWeek Thursday -WeeksInterval 4
 $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
@@ -102,14 +102,13 @@ enum Level
 	Informational	= 4
 	Verbose			= 5
 }
+# [Level]::LogAlways.Value__
+# [Level]0
 $Level = @{
 	Name = "Level"
 	Expression = {[Level]$_.Level}
 }
 Get-WinEvent -LogName System | Select-Object Id, $Level, ProviderName, ThreadId, LevelDisplayName, TaskDisplayName
-# [Status]::LogAlways.Value__
-# [Status]0
-
 Get-WinEvent -LogName System | Where-Object -FilterScript {$_.LevelDisplayName -match "Критическая" -or $_.LevelDisplayName -match "Ошибка"}
 Get-WinEvent -FilterHashtable @{
 	LogName = "Windows PowerShell"
@@ -118,6 +117,19 @@ Get-WinEvent -FilterHashtable @{
 } | Where-Object -FilterScript {$_.Level -eq "3" -or $_.Level -eq "4"}
 Get-WinEvent -LogName "Windows PowerShell" | Where-Object -FilterScript {$_.Message -match "HostApplication=(?<a>.*)"} | Format-List -Property *
 Get-EventLog -LogName "Windows PowerShell" -InstanceId 10 | Where-Object -FilterScript {$_.Message -match "powershell.exe"}
+$NewProcessName = @{
+	Name = "NewProcessName"
+	Expression = {$_.Properties[5].Value}
+}
+$CommandLine = @{
+	Name = "CommandLine"
+	Expression = {$_.Properties[8].Value}
+}
+Get-WinEvent -FilterHashtable @{
+	LogName = "Security"
+	# A new process has been created
+	ID = 4688
+} | Select-Object TimeCreated, $NewProcessName, $CommandLine
 
 # Передача больших файлов по медленным и нестабильным сетям
 # Нагружает диск
@@ -475,10 +487,10 @@ $Updates = @($UpdateSearcher.Search("IsHidden=0 and IsInstalled=0").Updates)
 $Updates | Select-Object Title
 
 # Закрыть определенное окно Проводника
-$folder = "D:\folder"
-$shell = New-Object -ComObject Shell.Application
-$window = $shell.Windows() | Where-Object {$_.LocationURL -eq ("file:///" + ([uri]$folder.Replace("\","/")).OriginalString)}
-$window | ForEach-Object -Process {$_.Quit()}
+$FolderName = "D:\folder"
+$Shell = New-Object -ComObject Shell.Application
+$Window = $Shell.Windows() | Where-Object {$_.LocationURL -eq ("file:///" + ([uri]$FolderName.Replace("\","/")).OriginalString)}
+$Window | ForEach-Object -Process {$_.Quit()}
 
 # StartsWith/EndsWith
 $str = "1234"
@@ -538,7 +550,7 @@ Foreach ($fish in $fishtank)
 	"fishing fish #$fish"
 }
 
-# Найти все прцоессы notepad, сконвертировать в массив и убить процессы
+# Найти все процессы notepad, сконвертировать в массив и убить процессы
 @(Get-Process –Name Notepad).ForEach({Stop-Process -InputObject $_})
 
 # Проверить, сходятся ли хэш-суммы из файла .cat с хэш-суммами файлов в папке
@@ -560,3 +572,14 @@ Test-FileCatalog @HT
 `t # Horizontal tab
 `v # Vertical tab
 –% # Stop parsing
+
+# Оператор -f
+$proc = Get-Process | Sort-Object -Property CPU -Descending | Select-Object -First 10
+foreach ($p in $proc)
+{
+	"{0,-10} {1,10}" -f $p.ProcessName, $p.CPU
+}
+# Без escape ("`"$FileName`"")
+$Folder = "${env:ProgramFiles}\Folder\SubFolder"
+$Argument = '"{0}"' -f $Folder 
+Start-Process -FilePath utility.exe -ArgumentList $Argument
