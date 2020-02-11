@@ -332,16 +332,6 @@ $file = "file.ext"
 # Создать ini-файл с кодировкой UCS-2 LE BOM
 $rarregkey = @"
 RAR registration data
-Alexander Roshal
-Unlimited Company License
-UID=00f650198f81e6607ec5
-64122122507ec5206fb48daec2aaa67b4afc9a80b6a2e60ac35c4d
-78565fc0aaa9d24b459460fce6cb5ffde62890079861be57638717
-7131ced835ed65cc743d9777f2ea71a8e32c7e593cf66794343565
-b41bcf56929486b8bcdac33d50ecf77399602d355a7873c5e960f7
-8c0c621c6c7c2040df0794978f4e20e362354119251b5ea1fecc9d
-bfa426c154150408200be88b82c1234bc3d4ee6e979bfff660dfe8
-821d4d458f9319f95f2533d09ce2d8b75beac25fb63a3215972308
 "@
 Set-Content -Path "$env:ProgramFiles\WinRAR\rarreg.key" -Value $rarregkey -Encoding Unicode -Force
 
@@ -562,16 +552,16 @@ $HT = @{
 }
 Test-FileCatalog @HT
 
-# special characters
-`0 # Null
-`a # Alert
-`b # Backspace
-`f # Form feed
-`n # New line
-`r # Carriage return
-`t # Horizontal tab
-`v # Vertical tab
-–% # Stop parsing
+# Спец. символы
+# Null `0
+# Alert`a
+# Backspace`b
+# Form feed`f
+# New line`n
+# Carriage return`r
+# Horizontal tab`t
+# Vertical tab`v
+# Stop parsing–%
 
 # Оператор -f
 $proc = Get-Process | Sort-Object -Property CPU -Descending | Select-Object -First 10
@@ -581,5 +571,58 @@ foreach ($p in $proc)
 }
 # Без escape ("`"$FileName`"")
 $Folder = "${env:ProgramFiles}\Folder\SubFolder"
-$Argument = '"{0}"' -f $Folder 
+$Argument = '"{0}"' -f $Folder
 Start-Process -FilePath utility.exe -ArgumentList $Argument
+
+# Defining a JSON List
+$JSON = @{}
+$basket = @(
+	"apples",
+	"pears"
+)
+$JSON | Add-Member -MemberType NoteProperty -Name Data -Value $basket -Force
+$JSON | ConvertTo-Json
+# Defining a JSON Array
+$JSON = @{}
+$array = @{}
+$person = @{
+	"Name" = "Matt"
+	"Colour" = "Black"
+}
+$array.Add("Person",$person)
+#$array | Add-Member -MemberType NoteProperty -Name Person -Value $person -Force
+$JSON | Add-Member -MemberType NoteProperty -Name Data -Value $array -Force
+$JSON | ConvertTo-Json -Depth 4
+# Combining Lists and Arrays
+$JSON = @{}
+$basket = @{
+	"Basket" = "apples","pears","oranges","strawberries"
+}
+$JSON | Add-Member -MemberType NoteProperty -Name Data -Value $basket -Force
+$JSON | ConvertTo-Json
+# lists containing arrays
+$JSON = @{}
+$list = New-Object System.Collections.ArrayList
+$list.Add(@{
+	"Name" = "John"
+	"Surname" = "Smith"
+	"OnSubscription" = $true
+})
+$customers = @{
+	"Customers" = $list
+}
+$JSON | Add-Member -MemberType NoteProperty -Name Data -Value $customers -Force
+$JSON | ConvertTo-Json -Depth 4
+# Вложенные уровени. Depth 4
+$JSON = @{}
+$Lelevs = @{
+	Level2 = @{
+		Level3 = @{
+			Level4 = @{
+				P1 = "T1"
+			}
+		}
+	}
+}
+$JSON | Add-Member -MemberType NoteProperty -Name Level1 -Value $Lelevs
+$JSON | ConvertTo-Json -Depth 4
