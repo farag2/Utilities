@@ -1,4 +1,4 @@
-exit
+﻿exit
 # PSScriptAnalyzer
 Install-PackageProvider -Name NuGet -Force
 Install-Module -Name PSScriptAnalyzer -Force
@@ -110,13 +110,17 @@ $Level = @{
 }
 Get-WinEvent -LogName System | Select-Object Id, $Level, ProviderName, ThreadId, LevelDisplayName, TaskDisplayName
 Get-WinEvent -LogName System | Where-Object -FilterScript {$_.LevelDisplayName -match "Критическая" -or $_.LevelDisplayName -match "Ошибка"}
+#
 Get-WinEvent -FilterHashtable @{
 	LogName = "Windows PowerShell"
 	ProviderName = "PowerShell"
 	Id = "800"
 } | Where-Object -FilterScript {$_.Level -eq "3" -or $_.Level -eq "4"}
+#
 Get-WinEvent -LogName "Windows PowerShell" | Where-Object -FilterScript {$_.Message -match "HostApplication=(?<a>.*)"} | Format-List -Property *
+#
 Get-EventLog -LogName "Windows PowerShell" -InstanceId 10 | Where-Object -FilterScript {$_.Message -match "powershell.exe"}
+#
 $NewProcessName = @{
 	Name = "NewProcessName"
 	Expression = {$_.Properties[5].Value}
@@ -574,7 +578,8 @@ $Folder = "${env:ProgramFiles}\Folder\SubFolder"
 $Argument = '"{0}"' -f $Folder
 Start-Process -FilePath utility.exe -ArgumentList $Argument
 
-# Defining a JSON List
+# JSON
+# Список
 $JSON = @{}
 $basket = @(
 	"apples",
@@ -582,7 +587,7 @@ $basket = @(
 )
 $JSON | Add-Member -MemberType NoteProperty -Name Data -Value $basket -Force
 $JSON | ConvertTo-Json
-# Defining a JSON Array
+# Массив
 $JSON = @{}
 $array = @{}
 $person = @{
@@ -593,14 +598,14 @@ $array.Add("Person",$person)
 #$array | Add-Member -MemberType NoteProperty -Name Person -Value $person -Force
 $JSON | Add-Member -MemberType NoteProperty -Name Data -Value $array -Force
 $JSON | ConvertTo-Json -Depth 4
-# Combining Lists and Arrays
+# Комбинирование списка с массивом
 $JSON = @{}
 $basket = @{
 	"Basket" = "apples","pears","oranges","strawberries"
 }
 $JSON | Add-Member -MemberType NoteProperty -Name Data -Value $basket -Force
 $JSON | ConvertTo-Json
-# lists containing arrays
+# Список содержит массив
 $JSON = @{}
 $list = New-Object System.Collections.ArrayList
 $list.Add(@{
@@ -613,7 +618,7 @@ $customers = @{
 }
 $JSON | Add-Member -MemberType NoteProperty -Name Data -Value $customers -Force
 $JSON | ConvertTo-Json -Depth 4
-# Вложенные уровени. Depth 4
+# Вложенные уровени
 $JSON = @{}
 $Lelevs = @{
 	Level2 = @{
@@ -626,3 +631,48 @@ $Lelevs = @{
 }
 $JSON | Add-Member -MemberType NoteProperty -Name Level1 -Value $Lelevs
 $JSON | ConvertTo-Json -Depth 4
+
+# Сбросить пароль локального пользователя через WinPE
+# WinPE
+MOVE C:\Windows\system32\utilman.exe C:\Windows\system32\utilman.exe.bak
+RENAME C:\Windows\system32\utilman.exe utilman.exe.bak
+COPY C:\Windows\system32\cmd.exe C:\Windows\system32\utilman.exe
+wpeutil reboot
+#
+$user = (Get-LocalUser | Where-Object -FilterScript {$_.Enabled}).Name
+$user
+$Password = Read-Host -Prompt "Enter the new password" -AsSecureString
+Get-LocalUser -Name $user | Set-LocalUser -Password $Password
+# WinPE
+DEL C:\Windows\system32\utilman.exe /F
+RENAME C:\Windows\system32\utilman.exe.bak utilman.exe
+
+# Восстановление компонентов хранилища
+DISM /Online /Cleanup-Image /RestoreHealth
+# Восстановление компонентов хранилища локально
+DISM /Get-WimInfo /WimFile:E:\sources\install.wim
+DISM /Online /Cleanup-Image /RestoreHealth /Source:E:\sources\install.wim:3 /LimitAccess
+# Восстановление компонентов хранилища в среде Windows PE
+DISM /Get-WimInfo /WimFile:E:\sources\install.wim
+DISM /Image:C:\ /Cleanup-Image /RestoreHealth /Source:E:\sources\install.wim:3 /ScratchDir:C:\mnt
+# Восстановление системных файлов
+sfc /scannow
+sfc /scannow /offbootdir=C:\ /offwindir=C:\Windows
+# Очистка папки WinSxS
+DISM /Online /Cleanup-Image /StartComponentCleanup /ResetBase
+
+# Операторы Google
+Только на указанном сайте: site:site.ru
+В заголовке страницы: intitle:"index of"
+В тексте страницы: intext:текст
+В тексте url: inurl:текст
+В тексте ссылок: inanchor:текст
+По расширению ext:pdf
+Со схожей тематикой: related:site.ru
+Ссылки на данный ресурс: link:site.ru
+Кэш страницы: cache:site.ru
+Точная фраза: "site"
+Любой текст: *pedia.org
+Логическое ИЛИ: site1 | site2
+Логическое НЕ: error –warning
+Диапазон: cve 2006..2016
