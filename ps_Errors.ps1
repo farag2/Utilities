@@ -1,4 +1,4 @@
-# https://gist.github.com/techthoughts2/0945276362aeebb4926a11b848844926
+﻿# https://gist.github.com/techthoughts2/0945276362aeebb4926a11b848844926
 
 function Reset-Errors {
     $Global:Error.Clear()
