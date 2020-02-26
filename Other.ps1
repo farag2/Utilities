@@ -104,6 +104,10 @@ enum Level
 }
 # [Level]::LogAlways.Value__
 # [Level]0
+
+# WinEvent
+# https://schneegans.de/windows/process-audit/
+# https://devblogs.microsoft.com/commandline/how-to-determine-what-just-ran-on-windows-console/
 $Level = @{
 	Name = "Level"
 	Expression = {[Level]$_.Level}
@@ -134,7 +138,34 @@ Get-WinEvent -FilterHashtable @{
 	# A new process has been created
 	ID = 4688
 } | Select-Object TimeCreated, $NewProcessName, $CommandLine
-
+#
+function Get-ProcessAuditEvents ([long] $MaxEvents)
+{
+	function Prettify([string] $Message)
+	{
+		$Message = [regex]::Replace( $Message, '\s+Token Elevation Type indicates.+$', '', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+		$Message = [regex]::Replace( $Message, '(Token Elevation Type:\s+%%1936)', '$1 (Full token)')
+		$Message = [regex]::Replace( $Message, '(Token Elevation Type:\s+%%1937)', '$1 (Elevated token)')
+		$Message = [regex]::Replace( $Message, '(Token Elevation Type:\s+%%1938)', '$1 (Limited token)')
+		return $Message
+	}
+	Get-WinEvent -MaxEvents $MaxEvents -FilterHashtable @{
+		LogName = "Security"
+		Id = 4688
+	} | Sort-Object -Property TimeCreated | ForEach-Object {
+		[pscustomobject] @{
+			TimeCreated = $_.TimeCreated
+			Message		= $_.Message
+		}
+	}
+}
+Get-ProcessAuditEvents -MaxEvents 10 | Format-List
+#
+$ParentProcess = @{
+	Label = "ParentProcess"
+	Expression = {$_.Properties[13].Value}
+}
+Get-WinEvent -LogName Security | Where-Object -FilterScript {$_.Id -eq "4688"} | Where-Object -FilterScript {$_.Properties[5].Value -match 'conhost'} | Select-Object TimeCreated, $ParentProcess | Select-Object -First 10
 # Передача больших файлов по медленным и нестабильным сетям
 # Нагружает диск
 Import-Module BitsTransfer
@@ -343,16 +374,17 @@ Set-Content -Path "$env:ProgramFiles\WinRAR\rarreg.key" -Value $rarregkey -Encod
 $path = "D:\folder"
 $e = "flac"
 $c = 4
-(Get-ChildItem -Path $path -Filter *.$e) | Rename-Item -NewName {$_.Name.Substring($c)}
+(Get-ChildItem -LiteralPath $path -Filter *.$e) | Rename-Item -NewName {$_.Name.Substring($c)}
 
 # Удалить последние $c буквы в названиях файлов в папке
 $path = "D:\folder"
 $e = "flac"
 $c = 4
-Get-ChildItem -Path $path -Filter *.$e | Rename-Item -NewName {$_.Name.Substring(0,$_.BaseName.Length-$c) + $_.Extension}
+Get-ChildItem -LiteralPath $path -Filter *.$e | Rename-Item -NewName {$_.Name.Substring(0,$_.BaseName.Length-$c) + $_.Extension}
 
 # Найти файлы, в названии которых каждое слово не написано с заглавной буквы
-(Get-ChildItem -Path D:\Программы\AIMP -File -Recurse | Where-Object -FilterScript {($_.BaseName -replace "'|``") -cmatch "\b\p{Ll}\w*"}).FullName
+$path = "D:\folder"
+(Get-ChildItem -LiteralPath $path -File -Recurse | Where-Object -FilterScript {($_.BaseName -replace "'|``") -cmatch "\b\p{Ll}\w*"}).FullName
 
 # Записать прописными буквами первую букву каждого слова в названии каждого файла в папке
 $TextInfo = (Get-Culture).TextInfo
