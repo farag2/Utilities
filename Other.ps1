@@ -10,15 +10,9 @@ Invoke-ScriptAnalyzer -Path "D:\Программы\Прочее\ps1\*.ps1" | Whe
 
 # Установка Microsoft Store из appxbundle
 # SW_DVD9_NTRL_Win_10_1903_32_64_ARM64_MultiLang_App_Update_X22-01657.ISO
-# https://forums.mydigitallife.net/threads/discussion-windows-10-1903-9-final-build-18362-3-xxx-pc-19h1-2-release.79259/page-68#post-1517053
-# https://forums.mydigitallife.net/threads/guide-add-store-to-windows-10-enterprises-sku-ltsb-ltsc.70741/
-# http://inventorsparadox.blogspot.com/2019/10/repair-your-windows-store-and-metro.html
-# http://puresoftapps.blogspot.com/2018/06/uwp-runtime.html
-# https://store.rg-adguard.net
-# CategoryID: 64293252-5926-453c-9494-2d4021f1c78d
-New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\Appx -Name AllowAllTrustedApps -Value 1 -Force
-Add-AppxProvisionedPackage -Online -PackagePath D:\Store.appxbundle -LicensePath D:\Store.xml
-New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\Appx -Name AllowAllTrustedApps -Value 0 -Force
+# https://store.rg-adguard.net CategoryID: 64293252-5926-453c-9494-2d4021f1c78d
+Add-AppxPackage -Path D:\Microsoft.DesktopAppInstaller.appxbundle
+Add-AppxPackage -Path D:\Microsoft.StorePurchaseApp.appxbundle
 
 # Разрешить подключаться одноуровневому домену
 New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters -Name AllowSingleLabelDnsDomain -Value 1 -Force
@@ -672,7 +666,6 @@ COPY C:\Windows\system32\cmd.exe C:\Windows\system32\utilman.exe
 wpeutil reboot
 #
 $user = (Get-LocalUser | Where-Object -FilterScript {$_.Enabled}).Name
-$user
 $Password = Read-Host -Prompt "Enter the new password" -AsSecureString
 Get-LocalUser -Name $user | Set-LocalUser -Password $Password
 # WinPE
