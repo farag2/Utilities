@@ -20,7 +20,7 @@ New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Paramete
 # Включение в Планировщике задач удаление устаревших обновлений Office, кроме Office 2019
 $action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
 	`$getservice = Get-Service -Name wuauserv
-	`$getservice.WaitForStatus("Stopped", '01:00:00')
+	`$getservice.WaitForStatus('Stopped', '01:00:00')
 	Start-Process -FilePath D:\Программы\Прочее\Office_task.bat
 "@
 $trigger = New-ScheduledTaskTrigger -Weekly -At 9am -DaysOfWeek Thursday -WeeksInterval 4
@@ -508,9 +508,7 @@ $Updates | Select-Object Title
 
 # Закрыть определенное окно Проводника
 $FolderName = "D:\folder"
-$Shell = New-Object -ComObject Shell.Application
-$Window = $Shell.Windows() | Where-Object {$_.LocationURL -eq ("file:///" + ([uri]$FolderName.Replace("\","/")).OriginalString)}
-$Window | ForEach-Object -Process {$_.Quit()}
+(New-Object -ComObject "Shell.Application").Windows() | Where-Object {$_.Document.Folder.Self.Path -eq $FolderName} | ForEach-Object -Process {$_.Quit()}
 
 # StartsWith/EndsWith
 $str = "1234"
@@ -557,21 +555,27 @@ Get-EventLog -LogName System -InstanceId 1073748869 | ForEach-Object {
 }
 
 # break, continue, return, exit
-$fishtank = 1..10
-Foreach ($fish in $fishtank)
+function Test-Function
 {
-	if ($fish -eq 7)
+	$fishtank = 1..10
+	foreach ($fish in $fishtank)
 	{
-		# break		# abort loop
-		# continue	# skip just this iteration, but continue loop
-		# return	# abort code, and continue in caller scope
-		# exit		# abort code at caller scope
+		if ($fish -eq 7)
+		{
+			# break     # abort loop
+			# continue  # skip just this iteration, but continue loop
+			# return    # abort code, and continue in caller scope
+			# exit      # abort code at caller scope 
+		}
+		"fishing fish #$fish"
 	}
-	"fishing fish #$fish"
+	"Done"
 }
+Test-Function
+"Script done"
 
 # Найти все процессы notepad, сконвертировать в массив и убить процессы
-@(Get-Process –Name Notepad).ForEach({Stop-Process -InputObject $_})
+@(Get-Process -Name Notepad).ForEach({Stop-Process -InputObject $_})
 
 # Проверить, сходятся ли хэш-суммы из файла .cat с хэш-суммами файлов в папке
 $HT = @{
@@ -591,7 +595,7 @@ Test-FileCatalog @HT
 # Carriage return`r
 # Horizontal tab`t
 # Vertical tab`v
-# Stop parsing–%
+# Stop parsing --%
 
 # Оператор -f
 $proc = Get-Process | Sort-Object -Property CPU -Descending | Select-Object -First 10
@@ -666,6 +670,7 @@ COPY C:\Windows\system32\cmd.exe C:\Windows\system32\utilman.exe
 wpeutil reboot
 #
 $user = (Get-LocalUser | Where-Object -FilterScript {$_.Enabled}).Name
+$user
 $Password = Read-Host -Prompt "Enter the new password" -AsSecureString
 Get-LocalUser -Name $user | Set-LocalUser -Password $Password
 # WinPE
@@ -699,5 +704,16 @@ DISM /Online /Cleanup-Image /StartComponentCleanup /ResetBase
 Точная фраза: "site"
 Любой текст: *pedia.org
 Логическое ИЛИ: site1 | site2
-Логическое НЕ: error –warning
+Логическое НЕ: error -warning
 Диапазон: cve 2006..2016
+
+# Проверка: был ли скрипт сохранен в кодировке UTF-8 c BOM, если он запускается локально
+if ($PSCommandPath)
+{
+	$bytes = Get-Content -Path $PSCommandPath -Encoding Byte -Raw
+	if ($bytes[0] -ne 239 -and $bytes[1] -ne 187 -and $bytes[2] -ne 191)
+	{
+		Write-Warning -Message "The script wasn't saved in `"UTF-8 with BOM`" encoding"
+		break
+	}
+}
