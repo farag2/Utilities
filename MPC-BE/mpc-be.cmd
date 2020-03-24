@@ -1,0 +1,1 @@
+robocopy "%~dp0." "%ProgramFiles%\MPC-BE x64" mpc-be64.ini
