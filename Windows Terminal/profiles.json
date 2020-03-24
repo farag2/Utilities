@@ -1,0 +1,90 @@
+
+// To view the default settings, hold "alt" while clicking on the "Settings" button.
+// For documentation on these settings, see: https://aka.ms/terminal-documentation
+
+{
+    "$schema": "https://aka.ms/terminal-profiles-schema",
+
+    "defaultProfile": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+
+    "profiles":
+    {
+        "defaults":
+        {
+            // Put settings here that you want to apply to all profiles
+        },
+        "list":
+        [
+            {
+                // Make changes here to the powershell.exe profile
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "name": "Windows PowerShell",
+                "commandline": "powershell.exe",
+                "hidden": false,
+				// The directory the shell starts in when it is loaded
+				// Начальная директория, когда запускается оболочка
+				"startingDirectory": "%SYSTEMDRIVE%\\"
+            },
+            {
+                // Make changes here to the cmd.exe profile
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "name": "cmd",
+                "commandline": "cmd.exe",
+                "hidden": false,
+				// The directory the shell starts in when it is loaded
+				// Начальная директория, когда запускается оболочка
+				"startingDirectory": "%SYSTEMDRIVE%\\"
+            },
+            {
+                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
+                "hidden": true,
+                "name": "Azure Cloud Shell",
+                "source": "Windows.Terminal.Azure"
+            }
+        ]
+    },
+
+    // Add custom color schemes to this array
+    "schemes": [],
+
+    // Add any keybinding overrides to this array.
+    // To unbind a default keybinding, set the command to "unbound"
+    "keybindings":
+	[
+		{
+			// Close tab
+			// Закрыть вкладку
+			"command": "closeTab",
+			"keys": ["ctrl+w"]
+		},
+		{
+			// New tab
+			// Новая вкладка
+			"command": "newTab",
+			"keys": ["ctrl+t"]
+		},
+		{
+			// Find
+			//Поиск
+			"command": "find",
+			"keys": ["ctrl+f"]
+		},
+		{
+			// Splitting pane
+			// Разделение панели
+			"command":
+			{
+				"action": "splitPane",
+				"split": "auto",
+				"splitMode": "duplicate"
+			},
+			"keys": ["ctrl+shift+d"]
+		}
+	],
+	// The titlebar sits above the tabs
+	// Заголовок располагается выше вкладок
+	"showTabsInTitlebar": false,
+	// Closing a window with multiple tabs open WILL NOT require confirmation
+	// Закрытие окна со множеством открытых вкладок не требует подтверждения
+	"confirmCloseAllTabs": false
+}
