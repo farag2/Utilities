@@ -10,7 +10,7 @@ if (Get-Content -Path $JsonPath | Select-String -Pattern "//" -SimpleMatch)
 (Get-Content -Path $JsonPath) | Where-Object -FilterScript {$_.Trim(" `t")} | Set-Content -Path $JsonPath
 $Terminal = Get-Content -Path $JsonPath | ConvertFrom-Json
 # Do not show tabs in title bar
-# не отображать вкладки в заголовке
+# Не отображать вкладки в заголовке
 if ($Terminal.showTabsInTitlebar)
 {
 	$Terminal.showTabsInTitlebar = $false
@@ -40,7 +40,7 @@ else
 	$Terminal.profiles.list[0] | Add-Member -MemberType NoteProperty -Name startingDirectory -Value "%SYSTEMDRIVE%\" -Force
 }
 # Starting directory for cmd.exe — %SYSTEMDRIVE%
-# Начальная директория для  cmd.exe — %SYSTEMDRIVE%
+# Начальная директория для cmd.exe — %SYSTEMDRIVE%
 if ($Terminal.profiles.list[1].startingDirectory)
 {
 	$Terminal.profiles.list[1].startingDirectory = "%SYSTEMDRIVE%\"
@@ -83,7 +83,7 @@ $Terminal.keybindings += $find
 # Copy by ctrl+с
 # Копирование по ctrl+c
 $Copy = [PSCustomObject]@{
-	"command" = "Copy"
+	"command" = "copy"
 	"keys" = "ctrl+c"
 }
 $Terminal.keybindings += $Copy
