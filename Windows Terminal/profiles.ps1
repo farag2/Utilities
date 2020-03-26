@@ -20,7 +20,7 @@ else
 	$Terminal | Add-Member -MemberType NoteProperty -Name showTabsInTitlebar -Value $false -Force
 }
 # Do not confirm closing all tabs
-# Не подтверджать закрытие всех вкладок
+# Не подтверждать закрытие всех вкладок
 if ($Terminal.confirmCloseAllTabs)
 {
 	$Terminal.confirmCloseAllTabs = $false
@@ -29,8 +29,9 @@ else
 {
 	$Terminal | Add-Member -MemberType NoteProperty -Name confirmCloseAllTabs -Value $false -Force
 }
-# Starting directory for powershell.exe — %SYSTEMDRIVE%
-# Начальная директория для powershell.exe — %SYSTEMDRIVE%
+# Set powershell.exe starting directory to %SYSTEMDRIVE%
+# Установить начальную директорию powershell.exe на %SYSTEMDRIVE%
+# https://github.com/microsoft/terminal/issues/1555#issuecomment-505157311
 if ($Terminal.profiles.list[0].startingDirectory)
 {
 	$Terminal.profiles.list[0].startingDirectory = "%SYSTEMDRIVE%\"
@@ -39,8 +40,8 @@ else
 {
 	$Terminal.profiles.list[0] | Add-Member -MemberType NoteProperty -Name startingDirectory -Value "%SYSTEMDRIVE%\" -Force
 }
-# Starting directory for cmd.exe — %SYSTEMDRIVE%
-# Начальная директория для cmd.exe — %SYSTEMDRIVE%
+# Set cmd.exe starting directory to %SYSTEMDRIVE%
+# Установить начальную директорию cmd.exe на %SYSTEMDRIVE%
 if ($Terminal.profiles.list[1].startingDirectory)
 {
 	$Terminal.profiles.list[1].startingDirectory = "%SYSTEMDRIVE%\"
@@ -80,22 +81,22 @@ $find = [PSCustomObject]@{
 	"keys" = "ctrl+f"
 }
 $Terminal.keybindings += $find
-# Copy by ctrl+с
+# Copying by ctrl+с
 # Копирование по ctrl+c
 $Copy = [PSCustomObject]@{
 	"command" = "copy"
 	"keys" = "ctrl+c"
 }
 $Terminal.keybindings += $Copy
-# Paste by ctrl+v
+# Pasting by ctrl+v
 # Вставка по ctrl+v
 $Paste = [PSCustomObject]@{
 	"command" = "paste"
 	"keys" = "ctrl+v"
 }
 $Terminal.keybindings += $Paste
-# Turn on split pane by ctrl+shift+d
-# Включить разделение оболочки по ctrl+shift+d
+# Splitting pane by ctrl+shift+d
+# Разделение оболочки по ctrl+shift+d
 $split = [PSCustomObject]@{
 	"action" = "splitPane"
 	"split" = "auto"
