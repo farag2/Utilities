@@ -1,0 +1,1 @@
+robocopy "%~dp0." "%APPDATA%\qBittorrent" qBittorrent.ini
