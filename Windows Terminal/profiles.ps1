@@ -1,4 +1,6 @@
-﻿$JsonPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\profiles.json"
+﻿# https://github.com/microsoft/terminal/blob/master/doc/cascadia/SettingsSchema.md
+
+$JsonPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\profiles.json"
 # Remove all comments to parse JSON file
 # Удалить все комментарии, чтобы пропарсить JSON-файл
 if (Get-Content -Path $JsonPath | Select-String -Pattern "//" -SimpleMatch)
@@ -29,8 +31,8 @@ else
 {
 	$Terminal | Add-Member -MemberType NoteProperty -Name confirmCloseAllTabs -Value $false -Force
 }
-# Set powershell.exe starting directory to %SYSTEMDRIVE%
-# Установить начальную директорию powershell.exe на %SYSTEMDRIVE%
+# Starting directory for powershell.exe — %SYSTEMDRIVE%
+# Начальная директория для powershell.exe — %SYSTEMDRIVE%
 # https://github.com/microsoft/terminal/issues/1555#issuecomment-505157311
 if ($Terminal.profiles.list[0].startingDirectory)
 {
@@ -40,8 +42,8 @@ else
 {
 	$Terminal.profiles.list[0] | Add-Member -MemberType NoteProperty -Name startingDirectory -Value "%SYSTEMDRIVE%\" -Force
 }
-# Set cmd.exe starting directory to %SYSTEMDRIVE%
-# Установить начальную директорию cmd.exe на %SYSTEMDRIVE%
+# Starting directory for cmd.exe — %SYSTEMDRIVE%
+# Начальная директория для cmd.exe — %SYSTEMDRIVE%
 if ($Terminal.profiles.list[1].startingDirectory)
 {
 	$Terminal.profiles.list[1].startingDirectory = "%SYSTEMDRIVE%\"
@@ -81,22 +83,22 @@ $find = [PSCustomObject]@{
 	"keys" = "ctrl+f"
 }
 $Terminal.keybindings += $find
-# Copying by ctrl+с
+# Copy by ctrl+с
 # Копирование по ctrl+c
 $Copy = [PSCustomObject]@{
 	"command" = "copy"
 	"keys" = "ctrl+c"
 }
 $Terminal.keybindings += $Copy
-# Pasting by ctrl+v
+# Paste by ctrl+v
 # Вставка по ctrl+v
 $Paste = [PSCustomObject]@{
 	"command" = "paste"
 	"keys" = "ctrl+v"
 }
 $Terminal.keybindings += $Paste
-# Splitting pane by ctrl+shift+d
-# Разделение оболочки по ctrl+shift+d
+# Turn on split pane by ctrl+shift+d
+# Включить разделение оболочки по ctrl+shift+d
 $split = [PSCustomObject]@{
 	"action" = "splitPane"
 	"split" = "auto"
