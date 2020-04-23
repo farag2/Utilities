@@ -83,20 +83,6 @@ $find = [PSCustomObject]@{
 	"keys" = "ctrl+f"
 }
 $Terminal.keybindings += $find
-# Copy by ctrl+с
-# Копирование по ctrl+c
-$Copy = [PSCustomObject]@{
-	"command" = "copy"
-	"keys" = "ctrl+c"
-}
-$Terminal.keybindings += $Copy
-# Paste by ctrl+v
-# Вставка по ctrl+v
-$Paste = [PSCustomObject]@{
-	"command" = "paste"
-	"keys" = "ctrl+v"
-}
-$Terminal.keybindings += $Paste
 # Turn on split pane by ctrl+shift+d
 # Включить разделение оболочки по ctrl+shift+d
 $split = [PSCustomObject]@{
