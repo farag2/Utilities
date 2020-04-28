@@ -1,6 +1,6 @@
 ﻿# Make Windows Terminal run as Administrator by default and pin it to Start
 # Make any UWP app run as Administrator by default
-# Запускать Windows Terminal от имени адмнистратора по умолчанию и закрепить на начальном экране 
+# Запускать Windows Terminal от имени администратора по умолчанию и закрепить на начальном экране 
 # Inspired by https://lennybacon.com/post/Create-a-link-to-a-UWP-app-to-run-as-administrator
 
 Clear-Host
