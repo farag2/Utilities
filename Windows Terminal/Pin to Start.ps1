@@ -7,7 +7,7 @@ Clear-Host
 $Error.Clear()
 
 Remove-Item -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows Terminal.lnk" -Force -ErrorAction Ignore
-Start-Sleep -Seconds 3
+Start-Sleep -Seconds 5
 
 $shell = New-Object -ComObject Wscript.Shell
 $shortcut = $shell.CreateShortcut("$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows Terminal.lnk")
