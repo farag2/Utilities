@@ -8,7 +8,7 @@ do
 	if ($Process)
 	{
 		# "Still running: TeamViewer"
-		Start-Sleep 1
+		Start-Sleep -Seconds 1
 	}
 }
 until (-not ($Process))
