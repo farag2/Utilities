@@ -1,17 +1,4 @@
-﻿Clear-Host
-
-Start-Process $PSScriptRoot\..\TeamViewer.exe
-
-do
-{
-	$Process = Get-Process | Where-Object -FilterScript {$_.Name -eq "TeamViewer"}
-	if ($Process)
-	{
-		# "Still running: TeamViewer"
-		Start-Sleep -Seconds 1
-	}
-}
-until (-not ($Process))
+﻿Start-Process -FilePath $PSScriptRoot\..\TeamViewer.exe -Wait
 
 Start-Sleep -Seconds 3
 TAKEOWN /F $PSScriptRoot\..\rolloutfile.tv13

@@ -1,17 +1,4 @@
-﻿Clear-Host
-
-Start-Process $PSScriptRoot\..\AlterID.exe -ArgumentList "-silent"
-Start-Sleep 5
-do
-{
-	$Process = Get-Process | Where-Object -FilterScript {$_.Name -eq "TeamViewer"}
-	if ($Process)
-	{
-		# "Still running: TeamViewer"
-		Start-Sleep -Seconds 1
-	}
-}
-until (-not ($Process))
+﻿Start-Process $PSScriptRoot\..\AlterID.exe -ArgumentList "-silent" -Wait
 
 powershell.exe -NoProfile -NoLogo -Command Start-Process powershell -WindowStyle Hidden -ArgumentList "{
 	Start-Sleep -Seconds 3
