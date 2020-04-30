@@ -2,6 +2,8 @@
 # PSScriptAnalyzer
 Install-PackageProvider -Name NuGet -Force
 Install-Module -Name PSScriptAnalyzer -Force
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Force
+Import-Module PSScriptAnalyzer
 Save-Module -Name PSScriptAnalyzer -Path D:\
 Invoke-ScriptAnalyzer -Path "D:\Программы\Прочее\ps1\*.ps1" | Where-Object -FilterScript {$_.RuleName -ne "PSAvoidUsingWriteHost"}
 
@@ -166,16 +168,6 @@ Import-Module BitsTransfer
 Start-BitsTransfer -Source $url -Destination $output
 # Start-BitsTransfer -Source $url -Destination $output -Asynchronous
 
-# Скачать файл
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$HT = @{
-	Uri = "https://site.com/1.js"
-	OutFile = "D:\1.js"
-	UseBasicParsing = [switch]::Present
-	Verbose = [switch]::Present
-}
-Invoke-WebRequest @HT
-
 # Исполнить код по ссылке
 $url = "https://site.com/1.js"
 Invoke-Expression (New-Object System.Net.WebClient).DownloadString($url)
@@ -221,7 +213,7 @@ certutil -hashfile C:\file.txt SHA1
 certutil -error 0xc0000409
 
 # Вычислить значение хеш-суммы файла
-Get-FileHash D:\1.txt -Algorithm MD5
+Get-FileHash -Path D:\1.txt -Algorithm MD5
 
 # Вычислить значение хеш-суммы строки
 Function Get-StringHash
@@ -450,7 +442,6 @@ setx TEMP "%SystemDrive%\Temp"
 setx TMP "%SystemDrive%\Temp"
 
 # Отобразить форму с выпадающим списком накопителей
-# Загрузить класс System.Windows.Forms
 Add-Type -AssemblyName System.Windows.Forms
 # Создать графическую форму
 $window_form = New-Object System.Windows.Forms.Form
@@ -562,10 +553,10 @@ function Test-Function
 	{
 		if ($fish -eq 7)
 		{
-			# break     # abort loop
-			# continue  # skip just this iteration, but continue loop
-			# return    # abort code, and continue in caller scope
-			# exit      # abort code at caller scope 
+			# break		# abort loop
+			# continue	# skip just this iteration, but continue loop
+			# return	# abort code, and continue in caller scope
+			# exit		# abort code at caller scope
 		}
 		"fishing fish #$fish"
 	}
@@ -603,6 +594,7 @@ foreach ($p in $proc)
 {
 	"{0,-10} {1,10}" -f $p.ProcessName, $p.CPU
 }
+
 # Без escape ("`"$FileName`"")
 $Folder = "${env:ProgramFiles}\Folder\SubFolder"
 $Argument = '"{0}"' -f $Folder
@@ -642,6 +634,11 @@ $list.Add(@{
 	"Name" = "John"
 	"Surname" = "Smith"
 	"OnSubscription" = $true
+})
+$list.Add(@{
+	"Name2" = "John"
+	"Surname2" = "Smith"
+	"OnSubscription2" = $true
 })
 $customers = @{
 	"Customers" = $list
@@ -717,3 +714,66 @@ if ($PSCommandPath)
 		break
 	}
 }
+
+# Write-Progress
+$ExcludedAppxPackages = @(
+	# ...
+	# Панель управления NVidia
+	"NVIDIACorp.NVIDIAControlPanel"
+)
+$OFS = "|"
+$AppxPackages = (Get-AppxPackage -PackageTypeFilter Bundle -AllUsers).Name | Select-String $ExcludedAppxPackages -NotMatch
+foreach ($AppxPackage in $AppxPackages)
+{
+	Write-Progress -Activity "Uninstalling UWP apps" -Status "Removing $AppxPackage" -PercentComplete ($AppxPackages.IndexOf($AppxPackage)/$AppxPackages.Count * 100)
+	Get-AppxPackage -PackageTypeFilter Bundle -AllUsers | Where-Object -FilterScript {$_.Name -cmatch $AppxPackage} | Remove-AppxPackage -AllUsers
+}
+Write-Progress -Activity "Uninstalling UWP apps" -Completed
+
+# Включить режим питания
+$PowerPlan = Get-CimInstance -Namespace root\cimv2\power -ClassName Win32_PowerPlan | Where-Object -FilterScript {$_.Elementname -eq "Высокая производительность"}
+Invoke-CimMethod -InputObject $PowerPlan -MethodName Activate
+
+# Выключить режим гибернации ###
+$ActivePowerPlanInstanceID = (Get-CimInstance -Namespace root\cimv2\power -ClassName Win32_PowerPlan | Where-Object -FilterScript {$_.IsActive -eq $true}).InstanceID.Split("\")[1]
+$HibernateAfterInstanceID = (Get-CimInstance -Namespace root\cimv2\power -ClassName Win32_PowerSetting | Where-Object -FilterScript {$_.Elementname -eq "Hibernate after"}).InstanceID.Split("\")[1]
+Get-CimInstance -Namespace root\cimv2\power -ClassName Win32_PowerSettingDataIndex | Where-Object -FilterScript {$_.InstanceID -eq "Microsoft:PowerSettingDataIndex\$ActivePowerPlanInstanceID\AC\$HibernateAfterInstanceID"} | Set-CimInstance -Property @{SettingIndexValue = 0}
+
+# Функция исключить папку из сканирования Microsoft Defender
+function ExclusionPath
+{
+	[CmdletBinding()]
+	Param
+	(
+		[Parameter(Mandatory = $true)]
+		[string[]]$Paths
+	)
+	$Paths = $Paths.Replace("`"", "").Split(",").Trim()
+	Add-MpPreference -ExclusionPath $Paths -Force
+}
+
+#
+$Fruits = "Apple","Pear","Banana","Orange"
+$Fruits.GetType()
+
+$Fruits.Add("Kiwi")
+$Fruits.Remove("Apple")
+$Fruits.IsFixedSize
+
+[System.Collections.ArrayList]$ArrayList = $Fruits
+$ArrayList.GetType()
+
+$ArrayList.Add("Kiwi")
+$ArrayList
+$ArrayList.Remove("Apple")
+$ArrayList
+
+# Конвертировать массив в System.Collections.ObjectModel.Collection`1
+$Collection = {$Fruits}.Invoke()
+$Collection
+$Collection.GetType()
+
+$Collection.Add("Melon")
+$Collection
+$Collection.Remove("Apple")
+$Collection
