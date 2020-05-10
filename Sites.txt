@@ -29,3 +29,6 @@ https://www.itdroplets.com/category/powershell/
 # Penetration
 https://xz.aliyun.com/t/6498
 https://www.malwarearchaeology.com/cheat-sheets/
+
+# Блоки питания
+https://docs.google.com/spreadsheets/d/1bEcFiMdLWPtPu3c1JsvsLIbcYANlLUVO1ICQdh-jxsg/edit
