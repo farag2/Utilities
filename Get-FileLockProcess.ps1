@@ -3,8 +3,9 @@ function Get-FileLockProcess
 {
 	[CmdletBinding()]
 	Param(
-		[Parameter(Mandatory=$True)]
-		[string[]]$FilePath
+		[Parameter(Mandatory = $true)]
+		[string[]]
+		$FilePath
 	)
 	$AssembliesFullInfo = [System.AppDomain]::CurrentDomain.GetAssemblies() | Where-Object {
 		$_.GetName().Name -eq "Microsoft.CSharp" -or
@@ -144,7 +145,7 @@ function Get-FileLockProcess
 			}
 		}
 "@
-	IF (-not ("MyCore.Utils.FileLockUtil" -as [type]))
+	if (-not ("MyCore.Utils.FileLockUtil" -as [type]))
 	{
 		Add-Type -ReferencedAssemblies $ReferencedAssemblies -TypeDefinition $TypeDefinition
 	}
