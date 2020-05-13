@@ -5,7 +5,7 @@ Install-Module -Name PSScriptAnalyzer -Force
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Force
 Import-Module PSScriptAnalyzer
 Save-Module -Name PSScriptAnalyzer -Path D:\
-Invoke-ScriptAnalyzer -Path "D:\Программы\Прочее\ps1\*.ps1" | Where-Object -FilterScript {$_.RuleName -ne "PSAvoidUsingWriteHost"}
+Invoke-ScriptAnalyzer -Path "D:\Программы\Прочее\ps1\*.ps1" | Where-Object -FilterScript {$_.RuleName -ne "PSAvoidUsingWriteHost"} | Sort-Object -Property ScriptName, Line
 
 # Перерегистрация всех UWP-приложений
 (Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\InboxApplications | Get-ItemProperty).Path | Add-AppxPackage -Register -DisableDevelopmentMode
@@ -20,42 +20,17 @@ Add-AppxPackage -Path D:\Microsoft.StorePurchaseApp.appxbundle
 New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters -Name AllowSingleLabelDnsDomain -Value 1 -Force
 
 # Включение в Планировщике задач удаление устаревших обновлений Office, кроме Office 2019
-$action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
-	`$getservice = Get-Service -Name wuauserv
-	`$getservice.WaitForStatus('Stopped', '01:00:00')
-	Start-Process -FilePath D:\Программы\Прочее\Office_task.bat
-"@
+$Script = '
+	(Get-Service -Name wuauserv).WaitForStatus("Stopped", "01:00:00")
+	Start-Process -FilePath D:\folder\Office_task.cmd
+'
+$EncodedScript = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($Script))
+$action = New-ScheduledTaskAction -Execute powershell.exe -Argument "-WindowStyle Hidden -EncodedCommand $EncodedScript"
 $trigger = New-ScheduledTaskTrigger -Weekly -At 9am -DaysOfWeek Thursday -WeeksInterval 4
 $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
 $principal = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -RunLevel Highest
 $params = @{
 	"TaskName"	= "Office"
-	"Action"	= $action
-	"Trigger"	= $trigger
-	"Settings"	= $settings
-	"Principal"	= $principal
-}
-Register-ScheduledTask @Params -Force
-
-# Создать в Планировщике задач задачу со всплывающим окошком с сообщением о перезагрузке
-$action = New-ScheduledTaskAction -Execute powershell.exe -Argument @"
-	-WindowStyle Hidden `
-	Add-Type -AssemblyName System.Windows.Forms
-	`$global:balmsg = New-Object System.Windows.Forms.NotifyIcon
-	`$path = (Get-Process -Id `$pid).Path
-	`$balmsg.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon(`$path)
-	`$balmsg.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Warning
-	`$balmsg.BalloonTipText = 'Перезагрузка через 1 мин.'
-	`$balmsg.BalloonTipTitle = 'Внимание'
-	`$balmsg.Visible = `$true
-	`$balmsg.ShowBalloonTip(60000)
-	Start-Sleep -Seconds 60
-"@
-$trigger = New-ScheduledTaskTrigger -Weekly -At 10am -DaysOfWeek Thursday -WeeksInterval 4
-$settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
-$principal = New-ScheduledTaskPrincipal -UserID $env:USERNAME -RunLevel Highest
-$params = @{
-	"TaskName"	= "Reboot"
 	"Action"	= $action
 	"Trigger"	= $trigger
 	"Settings"	= $settings
@@ -75,7 +50,7 @@ $hostfile = "$env:SystemRoot\System32\drivers\etc\hosts"
 $domains = @("site.com","site2.com")
 foreach ($hostentry in $domains)
 {
-	IF (-not (Get-Content -Path $hostfile | Select-String "0.0.0.0 `t $hostentry"))
+	if (-not (Get-Content -Path $hostfile | Select-String "0.0.0.0 `t $hostentry"))
 	{
 		Add-Content -Path $hostfile -Value "0.0.0.0 `t $hostentry"
 	}
@@ -111,16 +86,21 @@ $Level = @{
 Get-WinEvent -LogName System | Select-Object Id, $Level, ProviderName, ThreadId, LevelDisplayName, TaskDisplayName
 Get-WinEvent -LogName System | Where-Object -FilterScript {$_.LevelDisplayName -match "Критическая" -or $_.LevelDisplayName -match "Ошибка"}
 #
-Get-WinEvent -FilterHashtable @{
+$WindowsPowerShell = @{
 	LogName = "Windows PowerShell"
 	ProviderName = "PowerShell"
 	Id = "800"
-} | Where-Object -FilterScript {$_.Level -eq "3" -or $_.Level -eq "4"}
+}
+Get-WinEvent -FilterHashtable $WindowsPowerShell | Where-Object -FilterScript {$_.Level -eq "3" -or $_.Level -eq "4"}
 #
 Get-WinEvent -LogName "Windows PowerShell" | Where-Object -FilterScript {$_.Message -match "HostApplication=(?<a>.*)"} | Format-List -Property *
 #
 Get-EventLog -LogName "Windows PowerShell" -InstanceId 10 | Where-Object -FilterScript {$_.Message -match "powershell.exe"}
 #
+$Security = @{
+	LogName = "Security"
+	Id = 4688
+}
 $NewProcessName = @{
 	Name = "NewProcessName"
 	Expression = {$_.Properties[5].Value}
@@ -129,26 +109,23 @@ $CommandLine = @{
 	Name = "CommandLine"
 	Expression = {$_.Properties[8].Value}
 }
-Get-WinEvent -FilterHashtable @{
-	LogName = "Security"
-	# A new process has been created
-	ID = 4688
-} | Select-Object TimeCreated, $NewProcessName, $CommandLine
+Get-WinEvent -FilterHashtable $Security | Select-Object TimeCreated, $NewProcessName, $CommandLine
 #
-function Get-ProcessAuditEvents ([long] $MaxEvents)
+function Get-ProcessAuditEvents ([long]$MaxEvents)
 {
-	function Prettify([string] $Message)
+	function Prettify([string]$Message)
 	{
-		$Message = [regex]::Replace( $Message, '\s+Token Elevation Type indicates.+$', '', [System.Text.RegularExpressions.RegexOptions]::Singleline)
-		$Message = [regex]::Replace( $Message, '(Token Elevation Type:\s+%%1936)', '$1 (Full token)')
-		$Message = [regex]::Replace( $Message, '(Token Elevation Type:\s+%%1937)', '$1 (Elevated token)')
-		$Message = [regex]::Replace( $Message, '(Token Elevation Type:\s+%%1938)', '$1 (Limited token)')
+		$Message = [regex]::Replace($Message, '\s+Token Elevation Type indicates.+$', '', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+		$Message = [regex]::Replace($Message, '(Token Elevation Type:\s+%%1936)', '$1 (Full token)')
+		$Message = [regex]::Replace($Message, '(Token Elevation Type:\s+%%1937)', '$1 (Elevated token)')
+		$Message = [regex]::Replace($Message, '(Token Elevation Type:\s+%%1938)', '$1 (Limited token)')
 		return $Message
 	}
-	Get-WinEvent -MaxEvents $MaxEvents -FilterHashtable @{
+	$Security = @{
 		LogName = "Security"
 		Id = 4688
-	} | Sort-Object -Property TimeCreated | ForEach-Object {
+	}
+	Get-WinEvent -MaxEvents $MaxEvents -FilterHashtable $Security | Sort-Object -Property TimeCreated | ForEach-Object {
 		[pscustomobject] @{
 			TimeCreated = $_.TimeCreated
 			Message		= $_.Message
@@ -218,14 +195,14 @@ Get-FileHash -Path D:\1.txt -Algorithm MD5
 # Вычислить значение хеш-суммы строки
 Function Get-StringHash
 {
-	param
+	Param
 	(
 		[Parameter(Mandatory = $true)]
 		[string]$String,
 
 		[Parameter(Mandatory = $true)]
 		[ValidateSet("MACTripleDES", "MD5", "RIPEMD160", "SHA1", "SHA256", "SHA384", "SHA512")]
-		[String] $HashName
+		[string]$HashName
 	)
 	$StringBuilder = New-Object System.Text.StringBuilder
 	[System.Security.Cryptography.HashAlgorithm]::Create($HashName).ComputeHash([System.Text.Encoding]::UTF8.GetBytes($String))| ForEach-Object -Process {
@@ -245,13 +222,13 @@ $Win32ShowWindowAsync = @{
 		public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 "@
 }
-IF (-not ("Win32Functions.Win32ShowWindowAsync" -as [type]))
+if (-not ("Win32Functions.Win32ShowWindowAsync" -as [type]))
 {
 	Add-Type @Win32ShowWindowAsync
 }
 $title = "Диспетчер задач"
 Get-Process | Where-Object -FilterScript {$_.MainWindowHandle -ne 0} | ForEach-Object -Process {
-	IF ($_.MainWindowTitle -eq $title)
+	if ($_.MainWindowTitle -eq $title)
 	{
 		[Win32Functions.Win32ShowWindowAsync]::ShowWindowAsync($_.MainWindowHandle, 3) | Out-Null
 	}
@@ -265,29 +242,37 @@ Get-Process | Where-Object -FilterScript {$_.MainWindowHandle -ne 0} | ForEach-O
 # https://docs.microsoft.com/ru-ru/windows/win32/api/winuser/nf-winuser-showwindow
 function WindowState
 {
-	param(
-		[Parameter(ValueFromPipeline = $true, Mandatory = $true, Position = 0)]
+	Param
+	(
+		[Parameter(
+			ValueFromPipeline = $true,
+			Mandatory = $true,
+			Position = 0
+		)]
 		[ValidateScript({$_ -ne 0})]
-		[System.IntPtr] $MainWindowHandle,
-		[ValidateSet("FORCEMINIMIZE", "HIDE", "MAXIMIZE", "MINIMIZE", "RESTORE",
-				"SHOW", "SHOWDEFAULT", "SHOWMAXIMIZED", "SHOWMINIMIZED",
-				"SHOWMINNOACTIVE", "SHOWNA", "SHOWNOACTIVATE", "SHOWNORMAL")]
-		[String] $State = "SHOW"
+		[System.IntPtr]$MainWindowHandle,
+		[ValidateSet(
+			"FORCEMINIMIZE", "HIDE", "MAXIMIZE", "MINIMIZE", "RESTORE",
+			"SHOW", "SHOWDEFAULT", "SHOWMAXIMIZED", "SHOWMINIMIZED",
+			"SHOWMINNOACTIVE", "SHOWNA", "SHOWNOACTIVATE", "SHOWNORMAL"
+		)]
+		[string]
+		$State = "SHOW"
 	)
 	$WindowStates = @{
-		"HIDE"				=	0
-		"SHOWNORMAL"		=	1
-		"SHOWMINIMIZED"		=	2
-		"MAXIMIZE"			=	3
-		"SHOWMAXIMIZED"		=	3
-		"SHOWNOACTIVATE"	=	4
-		"SHOW"				=	5
-		"MINIMIZE"			=	6
+		"HIDE"				=	0 # Скрыть окно и активизировать другое окно
+		"SHOWNORMAL"		=	1 # Активизировать и отобразить окно, если окно свернуто или развернуто
+		"SHOWMINIMIZED"		=	2 # Отобразить окно в свернутом виде
+		"MAXIMIZE"			=	3 # Maximizes the specified window. 
+		"SHOWMAXIMIZED"		=	3 # Activates the window and displays it as a maximized window. 
+		"SHOWNOACTIVATE"	=	4 # Отобразить окно в соответствии с последними значениями позиции и размера. Активное окно остается активным
+		"SHOW"				=	5 # Активизировать окно
+		"MINIMIZE"			=	6 # Свернуть окно и активизировать следующее окно в Z-порядке (следующее под свернутым окном)
 		"SHOWMINNOACTIVE"	=	7
-		"SHOWNA"			=	8
-		"RESTORE"			=	9
-		"SHOWDEFAULT"		=	10
-		"FORCEMINIMIZE"		=	11
+		"SHOWNA"			=	8 # Отобразить окно в текущем состоянии. Активное окно остается активным
+		"RESTORE"			=	9 # Активизировать и отобразить окно. Если окно свернуто или развернуто, Windows восстанавливает его исходный размер и положение
+		"SHOWDEFAULT"		=	10 # (1+9) Активизировать и отобразить окно на переднем плане, если было свернуто или скрыто
+		"FORCEMINIMIZE"		=	11 # Minimizes a window, even if the thread that owns the window is not responding. This flag should only be used when minimizing windows from a different thread
 	}
 	$Win32ShowWindowAsync = @{
 	Namespace = "Win32Functions"
@@ -298,7 +283,7 @@ function WindowState
 		public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 "@
 	}
-	IF (-not ("Win32Functions.Win32ShowWindowAsync" -as [type]))
+	if (-not ("Win32Functions.Win32ShowWindowAsync" -as [type]))
 	{
 		Add-Type @Win32ShowWindowAsync
 	}
@@ -309,16 +294,18 @@ $MainWindowHandle | WindowState -State HIDE
 
 # Установить бронзовый курсор из Windows XP
 # Функция для нахождения буквы диска, когда файл находится в известной папке, но не известна буква диска. Подходит, когда файл располагается на USB-носителе
-$cursor = "Программы\Прочее\bronze.cur"
-function Get-ResolvedPath
+function Get-ResolvedPath ###
 {
-	param (
+	[CmdletBinding()]
+	Param
+	(
 		[Parameter(ValueFromPipeline = 1)]
 		$Path
 	)
-	(Get-Disk | Where-Object -FilterScript {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object -Process {Join-Path ($_ + ":") $Path -Resolve -ErrorAction SilentlyContinue}
+	(Get-Disk | Where-Object -FilterScript {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object -Process {Join-Path ($_ + ":") $Path -Resolve -ErrorAction Ignore}
 }
-$cursor | Get-ResolvedPath | Copy-Item -Destination $env:SystemRoot\Cursors -Force
+Get-ResolvedPath -Path "Программы\Прочее" | Copy-Item -Destination $env:SystemRoot\Cursors -Force
+
 New-ItemProperty -Path "HKCU:\Control Panel\Cursors" -Name Arrow -Type ExpandString -Value "%SystemRoot%\cursors\bronze.cur" -Force
 $Signature = @{
 	Namespace = "SystemParamInfo"
@@ -333,7 +320,7 @@ $Signature = @{
 		uint fWinIni);
 "@
 }
-IF (-not ("SystemParamInfo.WinAPICall" -as [type]))
+if (-not ("SystemParamInfo.WinAPICall" -as [type]))
 {
 	Add-Type @Signature
 }
@@ -373,13 +360,20 @@ $path = "D:\folder"
 (Get-ChildItem -LiteralPath $path -File -Recurse | Where-Object -FilterScript {($_.BaseName -replace "'|``") -cmatch "\b\p{Ll}\w*"}).FullName
 
 # Записать прописными буквами первую букву каждого слова в названии каждого файла в папке
-$TextInfo = (Get-Culture).TextInfo
 $path = "D:\folder"
 $e = "flac"
-Get-ChildItem -Path $path -Filter *.$e | Rename-Item -NewName {$TextInfo.ToTitleCase($_.BaseName) + $_.Extension}
+Get-ChildItem -Path $path -Filter *.$e | Rename-Item -NewName {(Get-Culture).TextInfo.ToTitleCase($_.BaseName) + $_.Extension}
+
+# Перевод первых букв в верхний регистр (капитализация)
+$text = "аа аа аа"
+(Get-Culture).TextInfo.ToTitleCase($text.ToLower())
 
 # Заменить слово в названии файлов в папке
 Get-ChildItem -Path "D:\folder" | Rename-Item -NewName {$_.Name.Replace("abc","cba")}
+
+# Переименовать расширения в папке
+$path = "D:\folder"
+Get-ChildItem -Path $path | Rename-Item -NewName {$_.FullName.Replace(".txt1",".txt")}
 
 # Добавить REG_NONE
 New-ItemProperty -Path HKCU:\Software -Name Name -PropertyType None -Value ([byte[]]@()) -Force
@@ -387,7 +381,7 @@ New-ItemProperty -Path HKCU:\Software -Name Name -PropertyType None -Value ([byt
 # Скачать видео с помощью youtube-dl
 # https://github.com/ytdl-org/youtube-dl/releases
 # https://ffmpeg.zeranoe.com/builds
-$urls= @(
+$URLs = @(
 	"https://",
 	"https://"
 )
@@ -416,12 +410,20 @@ Disable-NetAdapterBinding -Name Ethernet -ComponentID $ComponentIDs
 
 # Вычислить продолжительность видеофайлов в папке
 # http://code.avalon-zone.be/retrieve-the-extended-attibutes-of-a-file
-Function Get-Duration
+function Get-Duration
 {
-	param ($TargetFolder)
+	[CmdletBinding()]
+	[OutputType([string])]
+	Param
+	(
+		[Parameter(Mandatory = $true)]
+		$Path,
+		$Extention
+	)
+
 	$shell = New-Object -ComObject Shell.Application
 	$TotalDuration = [timespan]0
-	Get-ChildItem -Path $TargetFolder | ForEach-Object -Process {
+	Get-ChildItem -Path $Path -Filter "*.$Extention" | ForEach-Object -Process {
 		$Folder = $shell.Namespace($_.DirectoryName)
 		$File = $Folder.ParseName($_.Name)
 		$Duration = [timespan]$Folder.GetDetailsOf($File, 27)
@@ -433,7 +435,8 @@ Function Get-Duration
 	}
 	"`nTotal duration $TotalDuration"
 }
-(Get-Duration D:\folder | Sort-Object Duration | Out-String).Trim()
+# (Get-Duration -Path D:\folder -Extention mp4 | Sort-Object Duration | Out-String).Trim()
+
 
 # Изменить переменные среды на C:\Temp
 setx /M TEMP "%SystemDrive%\Temp"
@@ -459,7 +462,7 @@ $window_form.Controls.Add($Label)
 $ComboBox = New-Object System.Windows.Forms.ComboBox
 $ComboBox.Width = 250
 $Disks = Get-PhysicalDisk
-Foreach ($Disk in $Disks)
+foreach ($Disk in $Disks)
 {
 	$ComboBox.Items.Add($Disk.FriendlyName);
 }
@@ -523,7 +526,7 @@ $hash = @{
 New-Object PSObject -Property $hash
 
 # Кодирование строки в Base64 и обратно
-[System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("SecretMessage"))
+[Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes(("SecretMessage"))))
 [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("U2VjcmV0TWVzc2FnZQ=="))
 
 # Удалить неудаляемый ключ в реестре
@@ -777,3 +780,89 @@ $Collection.Add("Melon")
 $Collection
 $Collection.Remove("Apple")
 $Collection
+
+# Ожидание процесса
+do
+{
+	$Process = Get-Process -Name notepad
+	if ($Process)
+	{
+		Write-Host "Running: $($Process.Name)"
+		Start-Sleep 1
+	}
+}
+until (-not ($Process))
+#
+while ($true)
+{
+	$Process = Get-Process -Name notepad
+	if ($Process)
+	{
+		Write-Host "Running: $($Process.Name)"
+		Start-Sleep 1
+	}
+}
+#
+$Process = Get-Process -Name notepad
+while
+(
+	$($Process.Refresh()
+	$Process.ProcessName)
+)
+{
+	Write-Host "Running: $($Process.Name)"
+	Start-Sleep -Milliseconds 500
+}
+
+# Цикл
+Write-Host ""
+do
+{
+	$Prompt = Read-Host -Prompt " "
+	if ([string]::IsNullOrEmpty($Prompt))
+	{
+		break
+	}
+	else
+	{
+		switch ($Prompt)
+		{
+			"Y" {}
+			"N" {}
+			Default {}
+		}
+	}
+}
+while ($Prompt -ne "N")
+
+# Unpin all Start menu tiles
+$StartMenuLayout = @"
+<LayoutModificationTemplate xmlns:defaultlayout="http://schemas.microsoft.com/Start/2014/FullDefaultLayout" xmlns:start="http://schemas.microsoft.com/Start/2014/StartLayout" Version="1" xmlns:taskbar="http://schemas.microsoft.com/Start/2014/TaskbarLayout" xmlns="http://schemas.microsoft.com/Start/2014/LayoutModification">
+<LayoutOptions StartTileGroupCellWidth="6" />
+	<DefaultLayoutOverride>
+		<StartLayoutCollection>
+			<defaultlayout:StartLayout GroupCellWidth="6" />
+		</StartLayoutCollection>
+	</DefaultLayoutOverride>
+</LayoutModificationTemplate>
+"@
+$StartMenuLayoutPath = "$env:TEMP\StartMenuLayout.xml"
+Set-Content -Path $StartMenuLayoutPath -Value $StartMenuLayout -Encoding OEM -Force
+
+if (-not (Test-Path -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer))
+{
+	New-Item -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Force
+}
+# Temporarily disable changing Start layout
+# Временно выключаем возможность редактировать начальный экран
+New-ItemProperty -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Name LockedStartLayout -Value 1 -Force
+New-ItemProperty -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Name StartLayoutFile -Value $StartMenuLayoutPath -Force
+
+Stop-Process -Name StartMenuExperienceHost -Force
+Start-Sleep -Seconds 3
+
+Remove-ItemProperty -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Name LockedStartLayout -Force
+Remove-ItemProperty -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Name StartLayoutFile -Force
+
+Stop-Process -Name StartMenuExperienceHost -Force
+Remove-Item -Path $StartMenuLayoutPath -Force
