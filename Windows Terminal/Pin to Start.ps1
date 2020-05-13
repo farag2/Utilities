@@ -1,4 +1,4 @@
-﻿# Make Windows Terminal run as Administrator by default and pin it to Start
+# Make Windows Terminal run as Administrator by default and pin it to Start
 # Make any UWP app run as Administrator by default
 # Запускать Windows Terminal от имени администратора по умолчанию и закрепить на начальном экране 
 # Inspired by https://lennybacon.com/post/Create-a-link-to-a-UWP-app-to-run-as-administrator
@@ -11,7 +11,8 @@ Start-Sleep -Seconds 5
 
 $shell = New-Object -ComObject Wscript.Shell
 $shortcut = $shell.CreateShortcut("$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows Terminal.lnk")
-$Shortcut.TargetPath = "shell:AppsFolder\Microsoft.WindowsTerminal_8wekyb3d8bbwe!App"
+$WindowsTerminalAppID = (Get-StartApps | Where-Object -FilterScript {$_.Name -eq "Windows Terminal"}).AppID[-1]
+$Shortcut.TargetPath = "shell:AppsFolder\$WindowsTerminalAppID"
 $Shortcut.Save()
 
 # Run upcoming the Windows Terminal shortcut as Administrator
