@@ -1,7 +1,9 @@
 # Make Windows Terminal run as Administrator by default and pin it to Start
 # Make any UWP app run as Administrator by default
-# Запускать Windows Terminal от имени администратора по умолчанию и закрепить на начальном экране 
-# Inspired by https://lennybacon.com/post/Create-a-link-to-a-UWP-app-to-run-as-administrator
+# Run the script after every Windows Terminal update
+# Запускать Windows Terminal от имени администратора по умолчанию и закрепить на начальном экране
+# Запускайте скрипт после каждого обновления Windows Terminal
+# Inspired by https://lennybacon.com/post/Create-a-link-to-a-UWP-app-to-run-as-administrator/
 
 Clear-Host
 $Error.Clear()
@@ -35,14 +37,14 @@ $shortCut.IconLocation = "$env:ProgramFiles\WindowsApps\$PackageFullName\Windows
 $Shortcut.WindowStyle = 7
 $Shortcut.Save()
 
-# Pin the second shortcut to Start
-# Закрепить второй ярлык на нчальном экране
-# Download syspin.exe to the "Downloads" folder
-# Скачать syspin.exe в папку "Загрузки"
+# Pin the shortcuts to Start
+# Закрепить ярлыки на начальном экране
 # http://www.technosys.net/products/utils/pintotaskbar
 # SHA256: 6967E7A3C2251812DD6B3FA0265FB7B61AADC568F562A98C50C345908C6E827
 if (Test-Connection -ComputerName google.com -Quiet)
 {
+	# Download syspin.exe to the "Downloads" folder
+	# Скачать syspin.exe в папку "Загрузки"
 	$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 	$param = @{
