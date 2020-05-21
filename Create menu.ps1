@@ -1,4 +1,4 @@
-﻿# Create menu using PowerShell with the up and down arrow keys and enter key to make a selection
+# Three "Create menu" functions using PowerShell with the up/down arrow keys and enter key to make a selection
 
 # https://community.spiceworks.com/scripts/show/4656-powershell-create-menu-easily-add-arrow-key-driven-menu-to-scripts
 function Menu
