@@ -6,10 +6,9 @@
 # Inspired by https://lennybacon.com/post/Create-a-link-to-a-UWP-app-to-run-as-administrator/
 
 Clear-Host
-$Error.Clear()
 
 Remove-Item -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows Terminal.lnk" -Force -ErrorAction Ignore
-Start-Sleep -Seconds 5
+Stop-Process -Name StartMenuExperienceHost -Force
 
 $shell = New-Object -ComObject Wscript.Shell
 $shortcut = $shell.CreateShortcut("$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows Terminal.lnk")
@@ -72,5 +71,3 @@ Remove-Item -Path "$DesktopFolder\Windows Terminal.lnk" -Force
 # Restart the Start menu
 # Перезапустить меню "Пуск"
 Stop-Process -Name StartMenuExperienceHost -Force
-
-Start-Sleep -Seconds 5
