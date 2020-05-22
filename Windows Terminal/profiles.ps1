@@ -1,4 +1,4 @@
-﻿# https://github.com/microsoft/terminal/blob/master/doc/cascadia/SettingsSchema.md
+# https://docs.microsoft.com/en-us/windows/terminal/
 
 $JsonPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\profiles.json"
 # Remove all comments to parse JSON file
