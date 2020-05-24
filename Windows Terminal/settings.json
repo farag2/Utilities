@@ -1,104 +1,87 @@
-
-// To view the default settings, hold "alt" while clicking on the "Settings" button.
-// For documentation on these settings, see: https://aka.ms/terminal-documentation
-
 {
     "$schema": "https://aka.ms/terminal-profiles-schema",
+    "defaultProfile":  "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+    "copyOnSelect":  false,
+    "copyFormatting":  false,
+    "profiles":  {
+                     "defaults":  {
 
-    "defaultProfile": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                                  },
+                     "list":  [
+                                  {
+                                      "guid":  "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                                      "name":  "Windows PowerShell",
+                                      "commandline":  "powershell.exe",
+                                      "hidden":  false,
+                                      "backgroundImageAlignment":  "bottomRight",
+                                      "backgroundImageOpacity":  0.3,
+                                      "backgroundImageStretchMode":  "none",
+                                      "startingDirectory":  "C:\\Desktop",
+                                      "useAcrylic":  true,
+                                      "acrylicOpacity":  0.75,
+                                      "backgroundImage":  "ms-appdata:///roaming/Windows95.gif"
+                                  },
+                                  {
+                                      "guid":  "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                                      "name":  "Командная строка",
+                                      "commandline":  "cmd.exe",
+                                      "hidden":  false,
+                                      "backgroundImageAlignment":  "bottomRight",
+                                      "backgroundImageOpacity":  0.3,
+                                      "backgroundImageStretchMode":  "none",
+                                      "startingDirectory":  "C:\\Desktop",
+                                      "useAcrylic":  true,
+                                      "acrylicOpacity":  0.75,
+                                      "backgroundImage":  "ms-appdata:///roaming/Windows95.gif"
+                                  },
+                                  {
+                                      "guid":  "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
+                                      "name":  "Azure Cloud Shell",
+                                      "source":  "Windows.Terminal.Azure",
+                                      "hidden":  true
+                                  }
+                              ]
+                 },
+    "schemes":  [
 
-    "profiles":
-    {
-        "defaults":
-        {
-            // Put settings here that you want to apply to all profiles
-        },
-        "list":
-        [
-            {
-                // Make changes here to the powershell.exe profile
-                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-                "name": "Windows PowerShell",
-                "commandline": "powershell.exe",
-                "hidden": false,
-				// The directory the shell starts in when it is loaded
-				// Начальная директория, когда запускается оболочка
-				"startingDirectory": "%SYSTEMDRIVE%\\"
-            },
-            {
-                // Make changes here to the cmd.exe profile
-                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
-                "name": "cmd",
-                "commandline": "cmd.exe",
-                "hidden": false,
-				// The directory the shell starts in when it is loaded
-				// Начальная директория, когда запускается оболочка
-				"startingDirectory": "%SYSTEMDRIVE%\\"
-            },
-            {
-                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
-				// Hidden
-				// Скрытый
-                "hidden": true,
-                "name": "Azure Cloud Shell",
-                "source": "Windows.Terminal.Azure"
-            }
-        ]
-    },
-
-    // Add custom color schemes to this array
-    "schemes": [],
-
-    // Add any keybinding overrides to this array.
-    // To unbind a default keybinding, set the command to "unbound"
-    "keybindings":
-	[
-		{
-			// Close tab
-			// Закрыть вкладку
-			"command": "closeTab",
-			"keys": ["ctrl+w"]
-		},
-		{
-			// New tab
-			// Новая вкладка
-			"command": "newTab",
-			"keys": ["ctrl+t"]
-		},
-		{
-			// Find
-			//Поиск
-			"command": "find",
-			"keys": ["ctrl+f"]
-		},
-		{
-			// Copy
-			// Копировать
-			"command": "copy",
-			"keys": ["ctrl+c"]
-		},
-		{
-			// Paste
-			// Вставить
-			"command": "paste",
-			"keys": ["ctrl+v"]
-		},
-		{
-			// Splitting pane
-			// Разделение панели
-			"command":
-			{
-				"action": "splitPane",
-				"split": "auto",
-				"splitMode": "duplicate"
-			},
-			"keys": ["ctrl+shift+d"]
-		}
-	],
-	// The titlebar sits above the tabs
-	// Заголовок располагается выше вкладок
-	"showTabsInTitlebar": false,
-	// Closing a window with multiple tabs open WILL NOT require confirmation
-	// Закрытие окна со множеством открытых вкладок не требует подтверждения
-	"confirmCloseAllTabs": false
+                ],
+    "keybindings":  [
+                        {
+                            "command":  {
+                                            "action":  "copy",
+                                            "singleLine":  false
+                                        },
+                            "keys":  "ctrl+c"
+                        },
+                        {
+                            "command":  "paste",
+                            "keys":  "ctrl+v"
+                        },
+                        {
+                            "command":  "find",
+                            "keys":  "ctrl+shift+f"
+                        },
+                        {
+                            "command":  {
+                                            "action":  "splitPane",
+                                            "split":  "auto",
+                                            "splitMode":  "duplicate"
+                                        },
+                            "keys":  "alt+shift+d"
+                        },
+                        {
+                            "command":  "closeTab",
+                            "keys":  "ctrl+w"
+                        },
+                        {
+                            "command":  "newTab",
+                            "keys":  "ctrl+t"
+                        },
+                        {
+                            "command":  "find",
+                            "keys":  "ctrl+f"
+                        }
+                    ],
+    "confirmCloseAllTabs":  false,
+    "showTabsInTitlebar":  false
 }
