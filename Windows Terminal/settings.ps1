@@ -9,7 +9,7 @@ $param = @{
 }
 Invoke-WebRequest @param
 
-$JsonPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\profiles.json"
+$JsonPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 
 # Remove all comments to parse JSON file
 # Удалить все комментарии, чтобы пропарсить JSON-файл
