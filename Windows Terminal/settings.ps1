@@ -1,13 +1,13 @@
-﻿# https://docs.microsoft.com/en-us/windows/terminal/
+# https://docs.microsoft.com/en-us/windows/terminal/
 # https://github.com/microsoft/terminal/issues/1555#issuecomment-505157311
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$param = @{
+$Parameters = @{
 	Uri = "https://github.com/farag2/Utilities/raw/master/Windows%20Terminal/Windows95.gif"
 	OutFile = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\Windows95.gif"
 	Verbose = [switch]::Present
 }
-Invoke-WebRequest @param
+Invoke-WebRequest @Parameters
 
 $JsonPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 
