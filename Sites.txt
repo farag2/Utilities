@@ -26,6 +26,7 @@ https://blog.it-kb.ru/tag/powershell/
 https://michael-casey.com
 https://www.itdroplets.com/category/powershell/
 https://sohabr.net/habr/post/304420/
+https://vimalshekar.github.io
 
 # Penetration
 https://xz.aliyun.com/t/6498
