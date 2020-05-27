@@ -35,7 +35,7 @@ https://www.malwarearchaeology.com/cheat-sheets
 
 # Penetration
 https://xz.aliyun.com/t/6498
-https://www.malwarearchaeology.com/cheat-sheets/
+https://www.malwarearchaeology.com/logging
 
 # Блоки питания
 https://docs.google.com/spreadsheets/d/1bEcFiMdLWPtPu3c1JsvsLIbcYANlLUVO1ICQdh-jxsg/edit
