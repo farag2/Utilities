@@ -36,6 +36,8 @@ https://www.malwarearchaeology.com/cheat-sheets
 # Penetration
 https://xz.aliyun.com/t/6498
 https://www.malwarearchaeology.com/logging
+https://schneegans.de/windows/process-audit/
+https://devblogs.microsoft.com/commandline/how-to-determine-what-just-ran-on-windows-console/
 
 # Блоки питания
 https://docs.google.com/spreadsheets/d/1bEcFiMdLWPtPu3c1JsvsLIbcYANlLUVO1ICQdh-jxsg/edit
