@@ -1,11 +1,8 @@
 <#
 .SYNOPSIS
 	The "Show menu" function using PowerShell with the up/down arrow keys and enter key to make a selection
-.EXAMPLE
-	ShowMenu -Menu $ListOfItems -Default $DefaultChoice
 .NOTES
 	Doesn't work in PowerShell ISE
-	https://community.spiceworks.com/scripts/show/4656-powershell-create-menu-easily-add-arrow-key-driven-menu-to-scripts
 #>
 
 function Menu
@@ -199,11 +196,20 @@ Write-Host $selection
 
 
 # https://qna.habr.com/answer?answer_id=1522379#answers_list_answer
+<#
+.SYNOPSIS
+	The "Show menu" function using PowerShell with the up/down arrow keys and enter key to make a selection
+.EXAMPLE
+	ShowMenu -Menu $ListOfItems -Default $DefaultChoice
+.NOTES
+	Doesn't work in PowerShell ISE
+#>
 function ShowMenu
 {
+	[CmdletBinding()]
 	param
 	(
-		[Parameter(Mandatory = $true)]
+		[Parameter()]
 		[string]
 		$Title,
 
@@ -216,7 +222,7 @@ function ShowMenu
 		$Default
 	)
 
-	Write-Host $Title
+	Write-Verbose $Title -Verbose
 
 	$minY = [Console]::CursorTop
 	$y = [Math]::Max([Math]::Min($Default, $Menu.Count), 0)
@@ -260,7 +266,7 @@ function ShowMenu
 			}
 			"DownArrow"
 			{
-				if ($y -lt ($Ьenu.Count - 1))
+				if ($y -lt ($Menu.Count - 1))
 				{
 					$y++
 				}
@@ -274,6 +280,18 @@ function ShowMenu
 	while ($k.Key -notin ([ConsoleKey]::Escape, [ConsoleKey]::Enter))
 }
 
-$DriveLetters = (Get-Disk | Where-Object -FilterScript {$_.BusType -ne "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | Sort-Object
-$Title = "Choose the drive letter in the root of which the `"Desktop`" folder will be created"
-ShowMenu -Title $Title -Menu $DriveLetters -Default $Default 0
+$Title = "Choose theme color for default Windows mode"
+$Options = @("Light", "Dark", "Skip")
+$Result = ShowMenu -Title $Title -Menu $Options -Default 2
+
+switch ($Result)
+{
+	"0"
+	{}
+	"1"
+	{}
+	"2"
+	{
+		Write-Verbose -Message "Skipped" -Verbose
+	}
+}
