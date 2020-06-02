@@ -1,6 +1,13 @@
-# Three "Create menu" functions using PowerShell with the up/down arrow keys and enter key to make a selection
+<#
+.SYNOPSIS
+	The "Show menu" function using PowerShell with the up/down arrow keys and enter key to make a selection
+.EXAMPLE
+	ShowMenu -Menu $ListOfItems -Default $DefaultChoice
+.NOTES
+	Doesn't work in PowerShell ISE
+	https://community.spiceworks.com/scripts/show/4656-powershell-create-menu-easily-add-arrow-key-driven-menu-to-scripts
+#>
 
-# https://community.spiceworks.com/scripts/show/4656-powershell-create-menu-easily-add-arrow-key-driven-menu-to-scripts
 function Menu
 {
 	param
