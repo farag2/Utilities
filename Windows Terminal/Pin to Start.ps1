@@ -32,6 +32,8 @@ else
 	break
 }
 
+Remove-Item -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows Terminal*.lnk" -Force
+
 $PackageFullName = (Get-AppxPackage -Name Microsoft.WindowsTerminal).PackageFullName
 
 $Shell = New-Object -ComObject Wscript.Shell
