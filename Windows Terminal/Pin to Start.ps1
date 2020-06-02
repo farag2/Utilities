@@ -1,4 +1,4 @@
-# Make Windows Terminal run as Administrator by default and pin it to Start
+﻿# Make Windows Terminal run as Administrator by default and pin it to Start
 # Run the script after every Windows Terminal update
 # Запускать Windows Terminal от имени администратора по умолчанию и закрепить на начальном экране
 # Запускайте скрипт после каждого обновления Windows Terminal
