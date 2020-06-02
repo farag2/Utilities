@@ -1,7 +1,16 @@
-﻿# Change location of the user folders programmatically (without moving user files) within interactive menu
-# using up/down arrows and Enter key to make a selection 
+# Change location of the user folders
+# Изменить расположение пользовательских папок
+<#
+.SYNOPSIS
+	Change location of the each user folders using SHSetKnownFolderPath function
+.EXAMPLE
+	UserShellFolder -UserFolder Desktop -FolderPath "C:\Desktop"
+.NOTES
+	User files or folders won't me moved to the new location
+#>
 function KnownFolderPath
 {
+	[CmdletBinding()]
 	param
 	(
 		[Parameter(Mandatory = $true)]
@@ -43,6 +52,7 @@ function KnownFolderPath
 
 function UserShellFolder
 {
+	[CmdletBinding()]
 	param
 	(
 		[Parameter(Mandatory = $true)]
@@ -73,6 +83,8 @@ function UserShellFolder
 		"Videos"	=	"{35286A68-3C57-41A1-BBB1-0EAE73D76C95}"
 	}
 
+	# Hidden desktop.ini for each type of user folders
+	# Скрытый desktop.ini для каждого типа пользовательских папок
 	$DesktopINI = @{
 		"Desktop"	=	"",
 						"[.ShellClassInfo]",
@@ -107,6 +119,8 @@ function UserShellFolder
 						"IconFile=%SystemRoot%\system32\shell32.dll","IconIndex=-238"
 	}
 
+	# Checking the current user folder path
+	# Проверяем текущее значение пути пользовательской папки
 	$UserShellFolderRegValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name $UserShellFoldersRegName[$UserFolder]
 	if ($UserShellFolderRegValue -ne $FolderPath)
 	{
@@ -121,23 +135,36 @@ function UserShellFolder
 				Write-Error -Message "Some files left in the $UserShellFolderRegValue folder. Move them manually to a new location" -ErrorAction SilentlyContinue
 			}
 		}
+
+		# Creating a new folder if there is no one
+		# Создаем новую папку, если таковая отсутствует
 		if (-not (Test-Path -Path $FolderPath))
 		{
 			New-Item -Path $FolderPath -ItemType Directory -Force
 		}
+
 		KnownFolderPath -KnownFolder $UserFolder -Path $FolderPath
 		New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name $UserShellFoldersGUID[$UserFolder] -PropertyType ExpandString -Value $FolderPath -Force
+
 		Set-Content -Path "$FolderPath\desktop.ini" -Value $DesktopINI[$UserFolder] -Encoding Unicode -Force
 		(Get-Item -Path "$FolderPath\desktop.ini" -Force).Attributes = "Hidden", "System", "Archive"
 		(Get-Item -Path "$FolderPath\desktop.ini" -Force).Refresh()
 	}
 }
-
+<#
+.SYNOPSIS
+	The "Show menu" function using PowerShell with the up/down arrow keys and enter key to make a selection
+.EXAMPLE
+	ShowMenu -Menu $ListOfItems -Default $DefaultChoice
+.NOTES
+	Doesn't work in PowerShell ISE
+#>
 function ShowMenu
 {
+	[CmdletBinding()]
 	param
 	(
-		[Parameter(Mandatory = $true)]
+		[Parameter()]
 		[string]
 		$Title,
 
@@ -208,11 +235,14 @@ function ShowMenu
 	while ($k.Key -notin ([ConsoleKey]::Escape, [ConsoleKey]::Enter))
 }
 
+# Store all drives letters to use them within ShowMenu function
+# Сохранить все буквы диска, чтобы использовать их в функции ShowMenu
 $DriveLetters = @((Get-Disk | Where-Object -FilterScript {$_.BusType -ne "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | Sort-Object)
+
 if ($DriveLetters.Count -gt 1)
 {
-	# If drive letters count is more than, then make the second drive in the list the default drive
-	# Если количество букв дисков больше одного, то сделать второй диск в списке диском по умолчанию
+	# If the number of disks is more than one, set the second drive in the list as default drive
+	# Если количество дисков больше одного, сделать второй диск в списке диском по умолчанию
 	$Default = 1
 }
 else
@@ -222,78 +252,139 @@ else
 
 # Desktop
 # Рабочий стол
-if ($RU)
+$Title = ""
+$Message = "To change the location of the Desktop folder enter the required letter"
+Write-Warning "`nFiles will not be moved"
+$Options = "&Change", "&Skip"
+$DefaultChoice = 1
+$Result = $Host.UI.PromptForChoice($Title, $Message, $Options, $DefaultChoice)
+
+switch ($Result)
 {
-	$Title = "Выберите букву диска, в корне которого будет создана папка для `"Рабочий стол`".`nФайлы не будут перенесены: сделайте это вручную"
+	"0"
+	{
+		$Title = "`nSelect the drive within the root of which the `"Desktop`" folder will be created"
+		$SelectedDrive = ShowMenu -Title $Title -Menu $DriveLetters -Default $Default
+		UserShellFolder -UserFolder Desktop -FolderPath "${SelectedDrive}:\Desktop"
+	}
+	"1"
+	{
+		Write-Verbose -Message "Skipped" -Verbose
+	}
 }
-else
-{
-	$Title = "Choose the drive letter in the root of which the `"Desktop`" folder will be created.`nFiles will not be moved. Do it manually"
-}
-$SelectedDrive = ShowMenu -Title $Title -Menu $DriveLetters -Default $Default
-UserShellFolder -UserFolder Desktop -FolderPath "${SelectedDrive}:\Desktop"
 
 # Documents
 # Документы
-if ($RU)
+$Title = ""
+$Message = "To change the location of the Documents folder enter the required letter"
+Write-Warning "`nFiles will not be moved"
+$Options = "&Change", "&Skip"
+$DefaultChoice = 1
+$Result = $Host.UI.PromptForChoice($Title, $Message, $Options, $DefaultChoice)
+
+switch ($Result)
 {
-	$Title = "Выберите букву диска, в корне которого будет создана папка для `"Документы`".`nФайлы не будут перенесены: сделайте это вручную"
+	"0"
+	{
+		$Title = "`nSelect the drive within the root of which the `"Documents`" folder will be created"
+		$SelectedDrive = ShowMenu -Title $Title -Menu $DriveLetters -Default $Default
+		UserShellFolder -UserFolder Documents -FolderPath "${SelectedDrive}:\Documents"
+	}
+	"1"
+	{
+		Write-Verbose -Message "Skipped" -Verbose
+	}
 }
-else
-{
-	$Title = "Choose the drive letter in the root of which the `"Documents`" folder will be created.`nFiles will not be moved. Do it manually"
-}
-$SelectedDrive = ShowMenu -Title $Title -Menu $DriveLetters -Default $Default
-UserShellFolder -UserFolder Documents -FolderPath "${SelectedDrive}:\Documents"
 
 # Downloads
 # Загрузки
-if ($RU)
+$Title = ""
+$Message = "To change the location of the Downloads folder enter the required letter"
+Write-Warning "`nFiles will not be moved"
+$Options = "&Change", "&Skip"
+$DefaultChoice = 1
+$Result = $Host.UI.PromptForChoice($Title, $Message, $Options, $DefaultChoice)
+
+switch ($Result)
 {
-	$Title = "Выберите букву диска, в корне которого будет создана папка для `"Загрузки`""
+	"0"
+	{
+		$Title = "`nSelect the drive within the root of which the `"Downloads`" folder will be created"
+		$SelectedDrive = ShowMenu -Title $Title -Menu $DriveLetters -Default $Default
+		UserShellFolder -UserFolder Downloads -FolderPath "${SelectedDrive}:\Downloads"
+	}
+	"1"
+	{
+		Write-Verbose -Message "Skipped" -Verbose
+	}
 }
-else
-{
-	$Title = "Choose the drive letter in the root of which the `"Downloads`" folder will be created.`nFiles will not be moved. Do it manually"
-}
-$SelectedDrive = ShowMenu -Title $Title -Menu $DriveLetters -Default $Default
-UserShellFolder -UserFolder Downloads -FolderPath "${SelectedDrive}:\Downloads"
 
 # Music
 # Музыка
-if ($RU)
+$Title = ""
+$Message = "To change the location of the Music folder enter the required letter"
+Write-Warning "`nFiles will not be moved"
+$Options = "&Change", "&Skip"
+$DefaultChoice = 1
+$Result = $Host.UI.PromptForChoice($Title, $Message, $Options, $DefaultChoice)
+
+switch ($Result)
 {
-	$Title = "Выберите букву диска, в корне которого будет создана папка для `"Музыка`".`nФайлы не будут перенесены: сделайте это вручную"
+	"0"
+	{
+		$Title = "`nSelect the drive within the root of which the `"Music`" folder will be created"
+		$SelectedDrive = ShowMenu -Title $Title -Menu $DriveLetters -Default $Default
+		UserShellFolder -UserFolder Music -FolderPath "${SelectedDrive}:\Music"
+	}
+	"1"
+	{
+		Write-Verbose -Message "Skipped" -Verbose
+	}
 }
-else
-{
-	$Title = "Choose the drive letter in the root of which the `"Music`" folder will be created.`nFiles will not be moved. Do it manually"
-}
-$SelectedDrive = ShowMenu -Title $Title -Menu $DriveLetters -Default $Default
-UserShellFolder -UserFolder Music -FolderPath "${SelectedDrive}:\Music"
+
 
 # Pictures
 # Изображения
-if ($RU)
+$Title = ""
+$Message = "To change the location of the Pictures folder enter the required letter"
+Write-Warning "`nFiles will not be moved"
+$Options = "&Change", "&Skip"
+$DefaultChoice = 1
+$Result = $Host.UI.PromptForChoice($Title, $Message, $Options, $DefaultChoice)
+
+switch ($Result)
 {
-	$Title = "Выберите букву диска, в корне которого будет создана папка для `"Изображения`".`nФайлы не будут перенесены: сделайте это вручную"
+	"0"
+	{
+		$Title = "`nSelect the drive within the root of which the `"Pictures`" folder will be created"
+		$SelectedDrive = ShowMenu -Title $Title -Menu $DriveLetters -Default $Default
+		UserShellFolder -UserFolder Pictures -FolderPath "${SelectedDrive}:\Pictures"
+	}
+	"1"
+	{
+		Write-Verbose -Message "Skipped" -Verbose
+	}
 }
-else
-{
-	$Title = "Choose the drive letter in the root of which the `"Pictures`" folder will be created.`nFiles will not be moved. Do it manually"
-}
-$SelectedDrive = ShowMenu -Title $Title -Menu $DriveLetters -Default $Default
-UserShellFolder -UserFolder Pictures -FolderPath "${SelectedDrive}:\Pictures"
 
 # Videos
 # Видео
-if ($RU)
+$Title = ""
+$Message = "To change the location of the Videos folder enter the required letter"
+Write-Warning "`nFiles will not be moved"
+$Options = "&Change", "&Skip"
+$DefaultChoice = 1
+$Result = $Host.UI.PromptForChoice($Title, $Message, $Options, $DefaultChoice)
+
+switch ($Result)
 {
-	$Title = "Выберите букву диска, в корне которого будет создана папка для `"Видео`".`nФайлы не будут перенесены: сделайте это вручную"
+	"0"
+	{
+		$Title = "`nSelect the drive within the root of which the `"Videos`" folder will be created"
+		$SelectedDrive = ShowMenu -Title $Title -Menu $DriveLetters -Default $Default
+		UserShellFolder -UserFolder Videos -FolderPath "${SelectedDrive}:\Videos"
+	}
+	"1"
+	{
+		Write-Verbose -Message "Skipped" -Verbose
+	}
 }
-else
-{
-	$Title = "Choose the drive letter in the root of which the `"Videos`" folder will be created.`nFiles will not be moved. Do it manually"
-}
-$SelectedDrive = ShowMenu -Title $Title -Menu $DriveLetters -Default $Default
-UserShellFolder -UserFolder Videos -FolderPath "${SelectedDrive}:\Videos"
