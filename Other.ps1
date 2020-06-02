@@ -10,13 +10,39 @@ Invoke-ScriptAnalyzer -Path "D:\Программы\Прочее\ps1\*.ps1" | Whe
 # Перерегистрация всех UWP-приложений
 (Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\InboxApplications | Get-ItemProperty).Path | Add-AppxPackage -Register -DisableDevelopmentMode
 
+# Восстановить UWP-приложения
+$DamagedPackages = @()
+$DamagedFiles = (Get-ChildItem -Path "$env:ProgramFiles\WindowsApps\" -Recurse | Where-Object -FilterScript {$_.Length -eq 0}).FullName
+
+foreach ($DamagedFile in $DamagedFiles)
+{
+	if ($DamagedFile -like "*8wekyb3d8bbwe*")
+	{
+		$DamagedPackages += ((Split-Path -Path $DamagedFile).Replace("$env:ProgramFiles\WindowsApps\","") -Split ("8wekyb3d8bbwe"))[0] + "8wekyb3d8bbwe"
+	}
+}
+
+foreach ($Package in $($DamagedPackages | Get-Unique))
+{
+	New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package"  -Force
+	New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Name "PackageStatus" -Value "2" -PropertyType "DWORD" -Force  
+}
+
+Get-CimInstance -Namespace "Root\cimv2\mdm\dmmap" -ClassName "MDM_EnterpriseModernAppManagement_AppManagement01" | Invoke-CimMethod -MethodName UpdateScanMethod
+
+foreach ($Package in $($DamagedPackages | Get-Unique))
+{
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Force
+}
+
 # Установка Microsoft Store из appxbundle
 # SW_DVD9_NTRL_Win_10_1903_32_64_ARM64_MultiLang_App_Update_X22-01657.ISO
-# https://store.rg-adguard.net CategoryID: 64293252-5926-453c-9494-2d4021f1c78d
+# https://store.rg-adguard.net
+# CategoryID: 64293252-5926-453c-9494-2d4021f1c78d
 Add-AppxPackage -Path D:\Microsoft.DesktopAppInstaller.appxbundle
 Add-AppxPackage -Path D:\Microsoft.StorePurchaseApp.appxbundle
 
-# Разрешить подключаться одноуровневому домену
+# Разрешить подключаться к одноуровневому домену
 New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters -Name AllowSingleLabelDnsDomain -Value 1 -Force
 
 # Включение в Планировщике задач удаление устаревших обновлений Office, кроме Office 2019
@@ -139,6 +165,7 @@ $ParentProcess = @{
 	Expression = {$_.Properties[13].Value}
 }
 Get-WinEvent -LogName Security | Where-Object -FilterScript {$_.Id -eq "4688"} | Where-Object -FilterScript {$_.Properties[5].Value -match 'conhost'} | Select-Object TimeCreated, $ParentProcess | Select-Object -First 10
+
 # Передача больших файлов по медленным и нестабильным сетям
 # Нагружает диск
 Import-Module BitsTransfer
@@ -193,9 +220,10 @@ certutil -error 0xc0000409
 Get-FileHash -Path D:\1.txt -Algorithm MD5
 
 # Вычислить значение хеш-суммы строки
-Function Get-StringHash
+function Get-StringHash
 {
-	Param
+	[CmdletBinding()]
+	param
 	(
 		[Parameter(Mandatory = $true)]
 		[string]$String,
@@ -242,7 +270,8 @@ Get-Process | Where-Object -FilterScript {$_.MainWindowHandle -ne 0} | ForEach-O
 # https://docs.microsoft.com/ru-ru/windows/win32/api/winuser/nf-winuser-showwindow
 function WindowState
 {
-	Param
+	[CmdletBinding()]
+	param
 	(
 		[Parameter(
 			ValueFromPipeline = $true,
@@ -263,8 +292,8 @@ function WindowState
 		"HIDE"				=	0 # Скрыть окно и активизировать другое окно
 		"SHOWNORMAL"		=	1 # Активизировать и отобразить окно, если окно свернуто или развернуто
 		"SHOWMINIMIZED"		=	2 # Отобразить окно в свернутом виде
-		"MAXIMIZE"			=	3 # Maximizes the specified window. 
-		"SHOWMAXIMIZED"		=	3 # Activates the window and displays it as a maximized window. 
+		"MAXIMIZE"			=	3 # Maximizes the specified window
+		"SHOWMAXIMIZED"		=	3 # Activates the window and displays it as a maximized window
 		"SHOWNOACTIVATE"	=	4 # Отобразить окно в соответствии с последними значениями позиции и размера. Активное окно остается активным
 		"SHOW"				=	5 # Активизировать окно
 		"MINIMIZE"			=	6 # Свернуть окно и активизировать следующее окно в Z-порядке (следующее под свернутым окном)
@@ -294,10 +323,10 @@ $MainWindowHandle | WindowState -State HIDE
 
 # Установить бронзовый курсор из Windows XP
 # Функция для нахождения буквы диска, когда файл находится в известной папке, но не известна буква диска. Подходит, когда файл располагается на USB-носителе
-function Get-ResolvedPath ###
+function Get-ResolvedPath
 {
 	[CmdletBinding()]
-	Param
+	param
 	(
 		[Parameter(ValueFromPipeline = 1)]
 		$Path
@@ -381,16 +410,16 @@ New-ItemProperty -Path HKCU:\Software -Name Name -PropertyType None -Value ([byt
 # Скачать видео с помощью youtube-dl
 # https://github.com/ytdl-org/youtube-dl/releases
 # https://ffmpeg.zeranoe.com/builds
+# "D:\youtube-dl.exe" --list-formats url
 $URLs = @(
-	"https://",
-	"https://"
+	"",
+	""
 )
-$youtubedl = "D:\youtube-dl.exe"
-# --list-formats url (in PS)
 # --format 43+35 url
 # --username $username
 # --password $password
 # --video-password $videopassword
+$youtubedl = "D:\youtube-dl.exe"
 $output = "D:\"
 $filename = "%(title)s.mp4"
 foreach ($url in $urls)
@@ -398,8 +427,13 @@ foreach ($url in $urls)
 	Start-Process -FilePath $youtubedl -ArgumentList "--output `"$output\$filename`" $url"
 }
 
-# Конвертировать binary
+# Binary
 "50,33,01".Split(",") | ForEach-Object -Process {"0x$_"}
+#
+$int = 0x6054b50
+$bytes = [System.BitConverter]::GetBytes($int)
+$int = [System.BitConverter]::ToInt32($bytes, 0)
+'0x{0:x}' -f $int
 
 # Отключить сетевые протоколы
 $ComponentIDs = @(
@@ -526,7 +560,7 @@ $hash = @{
 New-Object PSObject -Property $hash
 
 # Кодирование строки в Base64 и обратно
-[Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes(("SecretMessage"))))
+[Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("SecretMessage"))
 [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("U2VjcmV0TWVzc2FnZQ=="))
 
 # Удалить неудаляемый ключ в реестре
@@ -836,6 +870,7 @@ do
 while ($Prompt -ne "N")
 
 # Unpin all Start menu tiles
+# Открепеить все плитки от начального экрана
 $StartMenuLayout = @"
 <LayoutModificationTemplate xmlns:defaultlayout="http://schemas.microsoft.com/Start/2014/FullDefaultLayout" xmlns:start="http://schemas.microsoft.com/Start/2014/StartLayout" Version="1" xmlns:taskbar="http://schemas.microsoft.com/Start/2014/TaskbarLayout" xmlns="http://schemas.microsoft.com/Start/2014/LayoutModification">
 <LayoutOptions StartTileGroupCellWidth="6" />
@@ -866,3 +901,7 @@ Remove-ItemProperty -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Na
 
 Stop-Process -Name StartMenuExperienceHost -Force
 Remove-Item -Path $StartMenuLayoutPath -Force
+
+# Сравнить бинарные значения
+((Get-ItemPropertyValue -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer -Name link) -join " ") -ne ([byte[]](00, 00, 00, 00) -join " ")
+
