@@ -25,7 +25,7 @@ foreach ($DamagedFile in $DamagedFiles)
 foreach ($Package in $($DamagedPackages | Get-Unique))
 {
 	New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package"  -Force
-	New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Name "PackageStatus" -Value "2" -PropertyType "DWORD" -Force  
+	New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Name "PackageStatus" -Value "2" -PropertyType "DWORD" -Force
 }
 
 Get-CimInstance -Namespace "Root\cimv2\mdm\dmmap" -ClassName "MDM_EnterpriseModernAppManagement_AppManagement01" | Invoke-CimMethod -MethodName UpdateScanMethod
