@@ -25,7 +25,7 @@ foreach ($DamagedFile in $DamagedFiles)
 foreach ($Package in $($DamagedPackages | Get-Unique))
 {
 	New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package"  -Force
-	New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Name "PackageStatus" -Value "2" -PropertyType "DWORD" -Force
+	New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Name "PackageStatus" -Value "2" -PropertyType "DWORD" -Force  
 }
 
 Get-CimInstance -Namespace "Root\cimv2\mdm\dmmap" -ClassName "MDM_EnterpriseModernAppManagement_AppManagement01" | Invoke-CimMethod -MethodName UpdateScanMethod
@@ -174,7 +174,7 @@ Start-BitsTransfer -Source $url -Destination $output
 
 # Исполнить код по ссылке
 $url = "https://site.com/1.js"
-Invoke-Expression (New-Object System.Net.WebClient).DownloadString($url)
+Invoke-Expression (New-Object -TypeName System.Net.WebClient).DownloadString($url)
 
 # Скачать и отобразить текстовый файл
 (Invoke-WebRequest -Uri "https://site.com/1.js" -OutFile D:\1.js -PassThru).Content
@@ -198,16 +198,6 @@ $HT = @{
 }
 Expand-Archive @HT
 
-# Конвертировать файл в кодировку UTF8 с BOM
-$Path = "D:\file.ext"
-(Get-Content -Path $Path -Encoding UTF8) | Set-Content -Encoding UTF8 -Path $Path
-
-# Конвертировать файл в кодировку UTF8 без BOM
-$utf8 = New-Object System.Text.UTF8Encoding $false
-$Path = "D:\file.ext"
-$Content = Get-Content -Path $Path -Raw
-Set-Content -Value $utf8.GetBytes($Content) -Encoding Byte -Path $Path
-
 # Вычленить букву диска
 Split-Path -Path "D:\file.mp3" -Qualifier
 
@@ -226,19 +216,22 @@ function Get-StringHash
 	param
 	(
 		[Parameter(Mandatory = $true)]
-		[string]$String,
+		[string]
+		$String,
 
 		[Parameter(Mandatory = $true)]
 		[ValidateSet("MACTripleDES", "MD5", "RIPEMD160", "SHA1", "SHA256", "SHA384", "SHA512")]
-		[string]$HashName
+		[string]
+		$HashName
 	)
-	$StringBuilder = New-Object System.Text.StringBuilder
+
+	$StringBuilder = New-Object -TypeName System.Text.StringBuilder
 	[System.Security.Cryptography.HashAlgorithm]::Create($HashName).ComputeHash([System.Text.Encoding]::UTF8.GetBytes($String))| ForEach-Object -Process {
 		[Void]$StringBuilder.Append($_.ToString("x2"))
 	}
 	$StringBuilder.ToString()
 }
-Get-StringHash 2 sha1
+Get-StringHash -String "2" -HashName SHA1
 
 # Развернуть окно с заголовком "Диспетчер задач", а остальные окна свернуть
 $Win32ShowWindowAsync = @{
@@ -279,7 +272,9 @@ function WindowState
 			Position = 0
 		)]
 		[ValidateScript({$_ -ne 0})]
-		[System.IntPtr]$MainWindowHandle,
+		[System.IntPtr]
+		$MainWindowHandle,
+
 		[ValidateSet(
 			"FORCEMINIMIZE", "HIDE", "MAXIMIZE", "MINIMIZE", "RESTORE",
 			"SHOW", "SHOWDEFAULT", "SHOWMAXIMIZED", "SHOWMINIMIZED",
@@ -288,6 +283,7 @@ function WindowState
 		[string]
 		$State = "SHOW"
 	)
+
 	$WindowStates = @{
 		"HIDE"				=	0 # Скрыть окно и активизировать другое окно
 		"SHOWNORMAL"		=	1 # Активизировать и отобразить окно, если окно свернуто или развернуто
@@ -303,15 +299,17 @@ function WindowState
 		"SHOWDEFAULT"		=	10 # (1+9) Активизировать и отобразить окно на переднем плане, если было свернуто или скрыто
 		"FORCEMINIMIZE"		=	11 # Minimizes a window, even if the thread that owns the window is not responding. This flag should only be used when minimizing windows from a different thread
 	}
+
 	$Win32ShowWindowAsync = @{
-	Namespace = "Win32Functions"
-	Name = "Win32ShowWindowAsync"
-	Language = "CSharp"
-	MemberDefinition = @"
-		[DllImport("user32.dll")]
-		public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+		Namespace = "Win32Functions"
+		Name = "Win32ShowWindowAsync"
+		Language = "CSharp"
+		MemberDefinition = @"
+			[DllImport("user32.dll")]
+			public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 "@
 	}
+
 	if (-not ("Win32Functions.Win32ShowWindowAsync" -as [type]))
 	{
 		Add-Type @Win32ShowWindowAsync
@@ -331,6 +329,7 @@ function Get-ResolvedPath
 		[Parameter(ValueFromPipeline = 1)]
 		$Path
 	)
+
 	(Get-Disk | Where-Object -FilterScript {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object -Process {Join-Path ($_ + ":") $Path -Resolve -ErrorAction Ignore}
 }
 Get-ResolvedPath -Path "Программы\Прочее" | Copy-Item -Destination $env:SystemRoot\Cursors -Force
@@ -481,42 +480,42 @@ setx TMP "%SystemDrive%\Temp"
 # Отобразить форму с выпадающим списком накопителей
 Add-Type -AssemblyName System.Windows.Forms
 # Создать графическую форму
-$window_form = New-Object System.Windows.Forms.Form
+$window_form = New-Object -TypeName System.Windows.Forms.Form
 $window_form.Text ="Пример"
 $window_form.Width = 600
 $window_form.Height = 400
 $window_form.AutoSize = $true
 # Создать надпись
-$Label = New-Object System.Windows.Forms.Label
+$Label = New-Object -TypeName System.Windows.Forms.Label
 $Label.Text = "Label"
-$Label.Location = New-Object System.Drawing.Point(0,10)
+$Label.Location = New-Object -TypeName System.Drawing.Point(0,10)
 $Label.AutoSize = $true
 $window_form.Controls.Add($Label)
 # Выпадающий список дисков
-$ComboBox = New-Object System.Windows.Forms.ComboBox
+$ComboBox = New-Object -TypeName System.Windows.Forms.ComboBox
 $ComboBox.Width = 250
 $Disks = Get-PhysicalDisk
 foreach ($Disk in $Disks)
 {
 	$ComboBox.Items.Add($Disk.FriendlyName);
 }
-$ComboBox.Location = New-Object System.Drawing.Point(60,10)
+$ComboBox.Location = New-Object -TypeName System.Drawing.Point(60,10)
 $window_form.Controls.Add($ComboBox)
 # Надпись
-$Label2 = New-Object System.Windows.Forms.Label
+$Label2 = New-Object -TypeName System.Windows.Forms.Label
 $Label2.Text = "Disk size:"
-$Label2.Location = New-Object System.Drawing.Point(0,40)
+$Label2.Location = New-Object -TypeName System.Drawing.Point(0,40)
 $Label2.AutoSize = $true
 $window_form.Controls.Add($Label2)
-$Label3 = New-Object System.Windows.Forms.Label
+$Label3 = New-Object -TypeName System.Windows.Forms.Label
 $Label3.Text = ""
-$Label3.Location = New-Object System.Drawing.Point(110,40)
+$Label3.Location = New-Object -TypeName System.Drawing.Point(110,40)
 $Label3.AutoSize = $true
 $window_form.Controls.Add($Label3)
 # Кнопка
-$Button = New-Object System.Windows.Forms.Button
+$Button = New-Object -TypeName System.Windows.Forms.Button
 $Button.Location = New-Object System.Drawing.Size(400,10)
-$Button.Size = New-Object System.Drawing.Size(120,23)
+$Button.Size = New-Object -TypeName System.Drawing.Size(120,23)
 $Button.Text = "Check"
 $window_form.Controls.Add($Button)
 # Расчет
@@ -557,7 +556,7 @@ $hash = @{
 	Age = 66
 	Status = 'Online'
 }
-New-Object PSObject -Property $hash
+New-Object -TypeName PSObject -Property $hash
 
 # Кодирование строки в Base64 и обратно
 [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("SecretMessage"))
@@ -666,7 +665,7 @@ $JSON | Add-Member -MemberType NoteProperty -Name Data -Value $basket -Force
 $JSON | ConvertTo-Json
 # Список содержит массив
 $JSON = @{}
-$list = New-Object System.Collections.ArrayList
+$list = New-Object -TypeName System.Collections.ArrayList
 $list.Add(@{
 	"Name" = "John"
 	"Surname" = "Smith"
@@ -780,11 +779,12 @@ Get-CimInstance -Namespace root\cimv2\power -ClassName Win32_PowerSettingDataInd
 function ExclusionPath
 {
 	[CmdletBinding()]
-	Param
+	param
 	(
 		[Parameter(Mandatory = $true)]
 		[string[]]$Paths
 	)
+
 	$Paths = $Paths.Replace("`"", "").Split(",").Trim()
 	Add-MpPreference -ExclusionPath $Paths -Force
 }
