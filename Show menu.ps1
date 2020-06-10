@@ -1,3 +1,5 @@
+function Menu
+{
 <#
 .SYNOPSIS
 	The "Show menu" function using PowerShell with the up/down arrow keys and enter key to make a selection
@@ -5,9 +7,6 @@
 .NOTES
 	Doesn't work in PowerShell ISE
 #>
-
-function Menu
-{
 	param
 	(
 		[Parameter(Mandatory = $true)]
@@ -197,6 +196,8 @@ Write-Host $selection
 
 
 # https://qna.habr.com/answer?answer_id=1522379#answers_list_answer
+function ShowMenu
+{
 <#
 .SYNOPSIS
 	The "Show menu" function using PowerShell with the up/down arrow keys and enter key to make a selection
@@ -205,8 +206,6 @@ Write-Host $selection
 .NOTES
 	Doesn't work in PowerShell ISE
 #>
-function ShowMenu
-{
 	[CmdletBinding()]
 	param
 	(
@@ -223,7 +222,7 @@ function ShowMenu
 		$Default
 	)
 
-	Write-Verbose $Title -Verbose
+	Write-Information -MessageData $Title -InformationAction Continue
 
 	$minY = [Console]::CursorTop
 	$y = [Math]::Max([Math]::Min($Default, $Menu.Count), 0)
@@ -234,6 +233,16 @@ function ShowMenu
 		$i = 0
 		foreach ($item in $Menu)
 		{
+			if ($i -ne $y)
+			{
+				Write-Information -MessageData ('  {0}. {1}  ' -f ($i+1), $item) -InformationAction Continue
+			}
+			else
+			{
+				Write-Information -MessageData ('[ {0}. {1} ]' -f ($i+1), $item) -InformationAction Continue
+			}
+			$i++
+			<#
 			$colors = @{
 				BackgroundColor = if ($i -ne $y)
 				{
@@ -254,6 +263,7 @@ function ShowMenu
 			}
 			Write-Host (' {0}. {1} ' -f ($i+1), $item) @colors
 			$i++
+			#>
 		}
 		$k = [Console]::ReadKey()
 		switch ($k.Key)
