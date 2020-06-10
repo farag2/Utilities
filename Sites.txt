@@ -29,7 +29,7 @@ https://www.itdroplets.com/category/powershell/
 https://sohabr.net/habr/post/304420/
 https://vimalshekar.github.io
 https://smsagent.blog/category/powershell/
-http://www.systanddeploy.com
+http://www.systanddeploy.com/search?max-results=10&q=+
 
 # CheetSheets
 https://packetlife.net/library/cheat-sheets/
