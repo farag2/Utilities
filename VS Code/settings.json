@@ -24,14 +24,18 @@
 	// Show On Startup
 	"powershell.integratedConsole.showOnStartup": false,
 	// Default Language
-	"files.defaultLanguage": "powershell"
+	"files.defaultLanguage": "powershell",
 	// Render Whitespaces
-	"editor.renderWhitespace": "all"
+	"editor.renderWhitespace": "all",
 	// Auto Guess Encoding
-	"files.autoGuessEncoding": true
+	"files.autoGuessEncoding": true,
 
 	"[powershell]": {
 		"files.encoding": "utf8bom",
 		"files.autoGuessEncoding": true
-	}
+	},
+	"powershell.codeFormatting.autoCorrectAliases": true,
+	"powershell.codeFormatting.useCorrectCasing": true,
+	"powershell.codeFormatting.whitespaceInsideBrace": false,
+	"powershell.codeFormatting.whitespaceBetweenParameters": true
 }
