@@ -1,4 +1,4 @@
-﻿# Setup Start Menu
+# Setup Start Menu
 $StartMenuLayout = @"
 <LayoutModificationTemplate xmlns:defaultlayout="http://schemas.microsoft.com/Start/2014/FullDefaultLayout" xmlns:start="http://schemas.microsoft.com/Start/2014/StartLayout" Version="1" xmlns="http://schemas.microsoft.com/Start/2014/LayoutModification">
   <LayoutOptions StartTileGroupCellWidth="6" />
@@ -15,30 +15,8 @@ $StartMenuLayout = @"
   </DefaultLayoutOverride>
 </LayoutModificationTemplate>
 "@
-$StartMenuLayoutPath = "$env:TEMP\StartMenuLayout.xml"
-Set-Content -Value (New-Object System.Text.UTF8Encoding).GetBytes($StartMenuLayout) -Encoding Byte -Path $StartMenuLayoutPath -Force
 
-if (-not (Test-Path -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer))
-{
-	New-Item -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Force
-}
-# Temporarily disable changing Start layout
-# Временно выключаем возможность редактировать начальный экран
-New-ItemProperty -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Name LockedStartLayout -Value 1 -Force
-New-ItemProperty -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Name StartLayoutFile -Value $StartMenuLayoutPath -Force
-
-Stop-Process -Name StartMenuExperienceHost -Force
-Start-Sleep -Seconds 3
-
-Remove-ItemProperty -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Name LockedStartLayout -Force
-Remove-ItemProperty -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Name StartLayoutFile -Force
-
-Stop-Process -Name StartMenuExperienceHost -Force
-Remove-Item -Path $StartMenuLayoutPath -Force
-
-
-
-# Setup Start Menu
+<#
 $StartMenuLayout = @"
 <LayoutModificationTemplate xmlns:defaultlayout="http://schemas.microsoft.com/Start/2014/FullDefaultLayout" xmlns:start="http://schemas.microsoft.com/Start/2014/StartLayout" Version="1" xmlns="http://schemas.microsoft.com/Start/2014/LayoutModification">
   <LayoutOptions StartTileGroupCellWidth="6" />
@@ -55,6 +33,8 @@ $StartMenuLayout = @"
   </DefaultLayoutOverride>
 </LayoutModificationTemplate>
 "@
+#>
+
 $StartMenuLayoutPath = "$env:TEMP\StartMenuLayout.xml"
 Set-Content -Value (New-Object System.Text.UTF8Encoding).GetBytes($StartMenuLayout) -Encoding Byte -Path $StartMenuLayoutPath -Force
 
@@ -74,4 +54,5 @@ Remove-ItemProperty -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Na
 Remove-ItemProperty -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Name StartLayoutFile -Force
 
 Stop-Process -Name StartMenuExperienceHost -Force
-Remove-Item -Path $StartMenuLayoutPath -Force
+# Remove-Item -Path $StartMenuLayoutPath -Force
+Get-Item -Path $StartMenuLayoutPath -Force | Remove-Item -Force
