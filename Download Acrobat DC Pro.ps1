@@ -52,7 +52,7 @@ Get-ChildItem -Path "$ExtractPath\Adobe Acrobat\AcroPro.msi extracted" -Recurse 
 Remove-Item -Path "$ExtractPath\Adobe Acrobat\AcroPro.msi extracted" -Force
 
 # Downloading the latest patch
-$URL = "http://ardownload.adobe.com/pub/adobe/acrobat/win/AcrobatDC/2000920063/AcrobatDCUpd2000920063.msp"
+$URL = "ftp://ftp.adobe.com/pub/adobe/acrobat/win/AcrobatDC/2000920067/AcrobatDCUpd2000920067.msp"
 $PatchFile = Split-Path -Path $URL -Leaf
 $Parameters = @{
 	Uri = $URL
