@@ -1,4 +1,4 @@
-﻿# Downloading Acrobat_DC_Web_WWMUI.exe
+# Downloading Acrobat_DC_Web_WWMUI.exe
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
@@ -25,7 +25,7 @@ $Parameters = @{
 Invoke-WebRequest @Parameters
 #>
 
-# Extracting Acrobat_DC_Web_WWMUI.exe to the folder "Downloads folder\AcrobatTemp"
+# Extracting Acrobat_DC_Web_WWMUI.exe to the "Downloads folder\AcrobatTemp" folder
 $ExtractPath = "$DownloadsFolder\AcrobatTemp"
 Start-Process -FilePath "$DownloadsFolder\Acrobat_DC_Web_WWMUI.exe" -ArgumentList "/d $ExtractPath /o /x /s" -Wait
 
@@ -51,10 +51,20 @@ Remove-Item -Path "$ExtractPath\Adobe Acrobat\Data1.cab" -Force
 Get-ChildItem -Path "$ExtractPath\Adobe Acrobat\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$ExtractPath\Adobe Acrobat" -Force
 Remove-Item -Path "$ExtractPath\Adobe Acrobat\AcroPro.msi extracted" -Force
 
-# Create edited setup.ini
+# Downloading the latest patch
+$URL = "http://ardownload.adobe.com/pub/adobe/acrobat/win/AcrobatDC/2000920063/AcrobatDCUpd2000920063.msp"
+$PatchFile = Split-Path -Path $URL -Leaf
+$Parameters = @{
+	Uri = $URL
+	OutFile = "$ExtractPath\Adobe Acrobat\$PatchFile"
+	Verbose = [switch]::Present
+}
+Invoke-WebRequest @Parameters
+
+# Creating edited setup.ini
 $setupini = @"
 [Product]
-PATCH=AcrobatDCUpd2000920063.msp
+PATCH=$PatchFile
 msi=AcroPro.msi
 Languages=1049
 1049=Russian
@@ -64,11 +74,3 @@ Set-Content -Path "$ExtractPath\Adobe Acrobat\setup.ini" -Value $setupini -Encod
 # Converting setup.ini to the UTF-8 encoding
 $Content = Get-Content -Path "$ExtractPath\Adobe Acrobat\setup.ini" -Raw
 Set-Content -Value (New-Object System.Text.UTF8Encoding).GetBytes($Content) -Encoding Byte -Path "$ExtractPath\Adobe Acrobat\setup.ini" -Force
-
-# Downloading the latest patch
-$Parameters = @{
-	Uri = "http://ardownload.adobe.com/pub/adobe/acrobat/win/AcrobatDC/2000920063/AcrobatDCUpd2000920063.msp"
-	OutFile = "$ExtractPath\Adobe Acrobat\AcrobatDCUpd2000920063.msp"
-	Verbose = [switch]::Present
-}
-Invoke-WebRequest @Parameters
