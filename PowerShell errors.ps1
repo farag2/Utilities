@@ -1,6 +1,7 @@
-﻿# https://gist.github.com/techthoughts2/0945276362aeebb4926a11b848844926
+# https://gist.github.com/techthoughts2/0945276362aeebb4926a11b848844926
 
-function Reset-Errors {
+function Reset-Errors
+{
     $Global:Error.Clear()
     $psISE.Options.ErrorForegroundColor = '#FFFF0000'
     $Global:ErrorView = 'NormalView'
@@ -8,23 +9,17 @@ function Reset-Errors {
 Reset-Errors
 
 #generate an error
-function Show-Error {
+function Show-Error
+{
     Get-Item c:\doesnotexist.txt
 }
-Show-Error
-
-#make errors easier to read by changing the color
-$psise.Options.ErrorBackgroundColor = [System.Windows.Media.Colors]::Chartreuse
 Show-Error
 
 #all errors are stored in:
 $Error
 
 #lets make it less overwhelming (and prioritized and actionable)
-$Error `
-    | Group-Object `
-    | Sort-Object -Property Count -Descending `
-    | Format-Table -Property Count,Name -AutoSize
+$Error | Group-Object | Sort-Object -Property Count -Descending | Format-Table -Property Count,Name -AutoSize
 
 #what about speific error details?
 $Error[0] | Format-List *
@@ -35,10 +30,8 @@ $Error[0] | Format-List * -Force
 
 #when the top level information inst' clear, go deeper
 $Error[0].Exception
-$Error[0].Exception | fl * -Force
-$Error[0].Exception.InnerException | fl * -Force
-
- 
+$Error[0].Exception | Format-List * -Force
+$Error[0].Exception.InnerException | Format-List * -Force
 
 #leverage the stack traces
 $Error[0].ScriptStackTrace #for locations in PowerShell functions/scripts
@@ -50,28 +43,33 @@ $Error.RemoveAt(0) #remove by index
 $Error.RemoveRange(0,10) #remove by index + count
 $Error.Clear() #clear the error collection
 
-
 #-------------------------------------------
 #consider ussing ThrowTerminating error
-1/0; Write-Host 'Will this run?' -ForegroundColor Cyan
+1/0
+Write-Host 'Will this run?' -ForegroundColor Cyan
 
-function Test-1 {
+function Test-1
+{
     [CmdletBinding()]
     param()
-    try{
+    try
+    {
         1/0; Write-Host 'Will this run?' -ForegroundColor Cyan
     }
-    catch{
+    catch
+    {
         $PSCmdlet.ThrowTerminatingError($_)
     }
 }
-function Test-2 {
+function Test-2
+{
     [CmdletBinding()]
     param()
     try{
         1/0; Write-Host 'Will this run?' -ForegroundColor Cyan
     }
-    catch{
+    catch
+    {
         throw
     }
 }
@@ -82,7 +80,8 @@ Test-2
 
 #-------------------------------------------------------------------------------
 #crafting a custom ErrorRecord for the purposes of properly mocking failures
-Mock Invoke-RestMethod {
+Mock Invoke-RestMethod
+{
     [System.Exception]$exception = "The remote server returned an error: (400) Bad Request."
     [System.String]$errorId = 'BadRequest'
     [Management.Automation.ErrorCategory]$errorCategory = [Management.Automation.ErrorCategory]::InvalidOperation
@@ -91,7 +90,7 @@ Mock Invoke-RestMethod {
     [System.Management.Automation.ErrorDetails]$errorDetails = '{"message":"Database could not be reached"}'
     $errorRecord.ErrorDetails = $errorDetails
     throw $errorRecord
-}#endMock
+}
 #-------------------------------------------------------------------------------
 $formatstring = "{0} : {1}`n{2}`n" +
                 "    + CategoryInfo          : {3}`n" +
