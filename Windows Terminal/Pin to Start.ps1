@@ -56,32 +56,35 @@ else
 	}
 }
 
-Remove-Item -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows Terminal*.lnk" -Force
+if ($syspin -eq $true)
+{
+	Remove-Item -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows Terminal*.lnk" -Force
 
-$PackageFullName = (Get-AppxPackage -Name Microsoft.WindowsTerminal).PackageFullName
+	$PackageFullName = (Get-AppxPackage -Name Microsoft.WindowsTerminal).PackageFullName
 
-$Shell = New-Object -ComObject Wscript.Shell
-$Shortcut = $Shell.CreateShortcut("$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows Terminal.lnk")
-$Shortcut.TargetPath = "powershell.exe"
-$ShortCut.Arguments = "-WindowStyle Hidden -Command wt"
-$ShortCut.IconLocation = "$env:ProgramFiles\WindowsApps\$PackageFullName\WindowsTerminal.exe"
-$Shortcut.Save()
+	$Shell = New-Object -ComObject Wscript.Shell
+	$Shortcut = $Shell.CreateShortcut("$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows Terminal.lnk")
+	$Shortcut.TargetPath = "powershell.exe"
+	$ShortCut.Arguments = "-WindowStyle Hidden -Command wt"
+	$ShortCut.IconLocation = "$env:ProgramFiles\WindowsApps\$PackageFullName\WindowsTerminal.exe"
+	$Shortcut.Save()
 
-# Run the Windows Terminal shortcut as Administrator
-# Запускать ярлык Windows Terminal от имени Администратора
-[byte[]]$bytes = Get-Content -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows Terminal.lnk" -Encoding Byte -Raw
-$bytes[0x15] = $bytes[0x15] -bor 0x20
-Set-Content -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows Terminal.lnk" -Value $bytes -Encoding Byte -Force
+	# Run the Windows Terminal shortcut as Administrator
+	# Запускать ярлык Windows Terminal от имени Администратора
+	[byte[]]$bytes = Get-Content -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows Terminal.lnk" -Encoding Byte -Raw
+	$bytes[0x15] = $bytes[0x15] -bor 0x20
+	Set-Content -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows Terminal.lnk" -Value $bytes -Encoding Byte -Force
 
 
-Write-Verbose -Message "The `"Windows Terminal`" shortcut is being pinned to Start" -Verbose
-$Arguments = @"
-	"$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows Terminal.lnk" "51201"
+	Write-Verbose -Message "The `"Windows Terminal`" shortcut is being pinned to Start" -Verbose
+	$Arguments = @"
+		"$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows Terminal.lnk" "51201"
 "@
-Start-Process -FilePath "$DownloadsFolder\syspin.exe" -WindowStyle Hidden -ArgumentList $Arguments -Wait
+	Start-Process -FilePath "$PSScriptRoot\syspin.exe" -WindowStyle Hidden -ArgumentList $Arguments -Wait
 
-Remove-Item -Path "$DownloadsFolder\syspin.exe" -Force
+	# Remove-Item -Path "$PSScriptRoot\syspin.exe" -Force
 
-# Restart the Start menu
-# Перезапустить меню "Пуск"
-Stop-Process -Name StartMenuExperienceHost -Force
+	# Restart the Start menu
+	# Перезапустить меню "Пуск"
+	Stop-Process -Name StartMenuExperienceHost -Force
+}
