@@ -1,11 +1,14 @@
-﻿# https://www.pdq.com/blog/capturing-screenshots-with-powershell-and-net/
+# https://www.pdq.com/blog/capturing-screenshots-with-powershell-and-net/
 function Capture-Screen
 {
-	Param(
+	[CmdletBinding()]
+	param
+	(
 		[Parameter(Mandatory = $true)]
-		[string]$Path
+		[string]
+		$Path
 	)
-	IF (-not (Test-Path -Path $Path))
+	if (-not (Test-Path -Path $Path))
 	{
 		New-Item -Path $Path -ItemType Directory -Force
 	}
@@ -19,7 +22,7 @@ function Capture-Screen
 	$Left = $Screen.Left
 	$Top = $Screen.Top
 	# Create bitmap using the top-left and bottom-right bounds
-	$bitmap = New-Object System.Drawing.Bitmap $Width, $Height
+	$bitmap = New-Object -TypeName System.Drawing.Bitmap -ArgumentList $Width, $Height
 	# Create Graphics object
 	$graphic = [System.Drawing.Graphics]::FromImage($bitmap)
 	# Capture screen
