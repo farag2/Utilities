@@ -1,4 +1,4 @@
-net stop spooler
+NET STOP spooler
 DEL /F /S /Q %SYSTEMROOT%\System32\spool\PRINTERS\*
-net start spooler
+NET START spooler
 pause
