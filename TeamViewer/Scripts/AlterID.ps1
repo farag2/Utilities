@@ -1,4 +1,4 @@
-﻿Start-Process -FilePath $PSScriptRoot\..\AlterID.exe -ArgumentList "-silent" -Wait
+﻿Start-Process -FilePath "$PSScriptRoot\..\AlterID.exe" -ArgumentList "-silent" -Wait
 
 powershell.exe -NoProfile -NoLogo -Command Start-Process powershell -WindowStyle Hidden -ArgumentList "{
 	Start-Sleep -Seconds 3
