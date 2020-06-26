@@ -4,9 +4,18 @@ $Extensions = @(
 	"ms-ceintl.vscode-language-pack-ru",
 	# Markdown
 	"DavidAnson.vscode-markdownlint",
-	"ms-vscode.PowerShell"
+	# PowerShell
+	"ms-vscode.PowerShell",
+	# Code Runner
+	"formulahendry.code-runner",
+	# Regex Previewer
+	"chrmarti.regex",
+	# SVG Viewer
+	"cssho.vscode-svgviewer",
+	# Word Count
+	"ms-vscode.wordcount"
 )
 foreach ($Extension in $Extensions)
 {
-	& "${env:ProgramFiles}\Microsoft VS Code\bin\code.cmd" --install-extension $Extension
+	 & "${env:ProgramFiles}\Microsoft VS Code\bin\code.cmd" --install-extension $Extension
 }

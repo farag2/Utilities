@@ -37,5 +37,13 @@
 	"powershell.codeFormatting.autoCorrectAliases": true,
 	"powershell.codeFormatting.useCorrectCasing": true,
 	"powershell.codeFormatting.whitespaceInsideBrace": false,
-	"powershell.codeFormatting.whitespaceBetweenParameters": true
+	"powershell.codeFormatting.whitespaceBetweenParameters": true,
+	"window.zoomLevel": 1,
+	"files.insertFinalNewline": true,
+	"files.trimFinalNewlines": true,
+	"files.trimTrailingWhitespace": true,
+	"editor.wordWrap": "on",
+	"editor.mouseWheelZoom": true,
+	"editor.fontFamily": "Fira Code",
+	"editor.fontLigatures": true
 }
