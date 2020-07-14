@@ -47,3 +47,16 @@ https://www.eventsentry.com/blog/2018/01/powershell-pw3rh311-detecting-preventin
 
 # Блоки питания
 https://docs.google.com/spreadsheets/d/1bEcFiMdLWPtPu3c1JsvsLIbcYANlLUVO1ICQdh-jxsg/edit
+
+# GitHub Actions
+https://help.github.com/en/actions/getting-started-with-github-actions
+http://hermit.no/github-actions-including-how-to-build-net-framework-projects/
+https://medium.com/@two06/building-tooling-with-github-actions-59401648e61d
+https://toastit.dev/2018/12/19/powershell-flavoured-github-actions/
+https://dynamicsuser.net/nav/b/demiliani/posts/ci-cd-for-net-with-githhub-actions?pi2732=3
+https://blog.ipswitch.com/how-to-build-your-first-github-actions-workflow
+https://medium.com/@abhijithbr/who-wants-to-fool-an-ai-anti-virus-9837877dac29
+https://stefanstranger.github.io/2020/02/28/PlayingWithGitHubActions/
+https://demiliani.com/2019/11/14/ci-cd-for-net-with-githhub-actions/
+https://abelsquidhead.com/index.php/2019/09/07/writing-my-first-custom-github-action/
+https://rustycrate.ru/обучение/2017/08/20/rust-appveyor.html
