@@ -26,8 +26,9 @@ Invoke-WebRequest @Parameters
 #>
 
 # Extracting Acrobat_DC_Web_WWMUI.exe to the "Downloads folder\AcrobatTemp" folder
+# Do not change window focus while extracting Acrobat_DC_Web_WWMUI.exe, unless the process will be running forever
 $ExtractPath = "$DownloadsFolder\AcrobatTemp"
-Start-Process -FilePath "$DownloadsFolder\Acrobat_DC_Web_WWMUI.exe" -ArgumentList "/d $ExtractPath /o /x /s" -Wait
+Start-Process -FilePath "$DownloadsFolder\Acrobat_DC_Web_WWMUI.exe" -ArgumentList "/o /s /x /d $ExtractPath" -PassThru -Wait
 
 # Extracting AcroPro.msi to the "AcroPro.msi extracted" folder
 $Arguments = @(
