@@ -1,10 +1,5 @@
 ﻿exit
 # PSScriptAnalyzer
-Install-PackageProvider -Name NuGet -Force
-Install-Module -Name PSScriptAnalyzer -Force
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Force
-Import-Module PSScriptAnalyzer
-Save-Module -Name PSScriptAnalyzer -Path D:\
 Invoke-ScriptAnalyzer -Path "D:\Программы\Прочее\ps1\*.ps1" | Where-Object -FilterScript {$_.RuleName -ne "PSAvoidUsingWriteHost"} | Sort-Object -Property ScriptName, Line
 
 # Перерегистрация всех UWP-приложений
@@ -24,8 +19,8 @@ foreach ($DamagedFile in $DamagedFiles)
 
 foreach ($Package in $($DamagedPackages | Get-Unique))
 {
-	New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package"  -Force
-	New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Name "PackageStatus" -Value "2" -PropertyType "DWORD" -Force  
+	New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Force
+	New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Name "PackageStatus" -Value "2" -PropertyType "DWORD" -Force
 }
 
 Get-CimInstance -Namespace "Root\cimv2\mdm\dmmap" -ClassName "MDM_EnterpriseModernAppManagement_AppManagement01" | Invoke-CimMethod -MethodName UpdateScanMethod
@@ -36,9 +31,8 @@ foreach ($Package in $($DamagedPackages | Get-Unique))
 }
 
 # Установка Microsoft Store из appxbundle
-# SW_DVD9_NTRL_Win_10_1903_32_64_ARM64_MultiLang_App_Update_X22-01657.ISO
+# SW_DVD9_NTRL_Win_10_2004_32_64_ARM64_MultiLang_App_Update_X22-21309.ISO
 # https://store.rg-adguard.net
-# CategoryID: 64293252-5926-453c-9494-2d4021f1c78d
 Add-AppxPackage -Path D:\Microsoft.DesktopAppInstaller.appxbundle
 Add-AppxPackage -Path D:\Microsoft.StorePurchaseApp.appxbundle
 
@@ -120,7 +114,7 @@ $WindowsPowerShell = @{
 Get-WinEvent -FilterHashtable $WindowsPowerShell | Where-Object -FilterScript {$_.Level -eq "3" -or $_.Level -eq "4"}
 #
 Get-WinEvent -LogName "Windows PowerShell" | Where-Object -FilterScript {$_.Message -match "HostApplication=(?<a>.*)"} | Format-List -Property *
-#
+# Устарело
 Get-EventLog -LogName "Windows PowerShell" -InstanceId 10 | Where-Object -FilterScript {$_.Message -match "powershell.exe"}
 #
 $Security = @{
@@ -135,7 +129,7 @@ $CommandLine = @{
 	Name = "CommandLine"
 	Expression = {$_.Properties[8].Value}
 }
-Get-WinEvent -FilterHashtable $Security | Select-Object TimeCreated, $NewProcessName, $CommandLine
+Get-WinEvent -FilterHashtable $Security | Select-Object TimeCreated, $NewProcessName, $CommandLine | Format-Table -AutoSize -Wrap
 #
 function Get-ProcessAuditEvents ([long]$MaxEvents)
 {
@@ -165,12 +159,6 @@ $ParentProcess = @{
 	Expression = {$_.Properties[13].Value}
 }
 Get-WinEvent -LogName Security | Where-Object -FilterScript {$_.Id -eq "4688"} | Where-Object -FilterScript {$_.Properties[5].Value -match 'conhost'} | Select-Object TimeCreated, $ParentProcess | Select-Object -First 10
-
-# Передача больших файлов по медленным и нестабильным сетям
-# Нагружает диск
-Import-Module BitsTransfer
-Start-BitsTransfer -Source $url -Destination $output
-# Start-BitsTransfer -Source $url -Destination $output -Asynchronous
 
 # Исполнить код по ссылке
 $url = "https://site.com/1.js"
@@ -203,6 +191,7 @@ Split-Path -Path "D:\file.mp3" -Qualifier
 
 # Получение контрольной суммы файла (MD2, MD4, MD5, SHA1, SHA256, SHA384, SHA512)
 certutil -hashfile C:\file.txt SHA1
+
 # Преобразование кодов ошибок в текстовое сообщение
 certutil -error 0xc0000409
 
@@ -235,7 +224,7 @@ Get-StringHash -String "2" -HashName SHA1
 
 # Развернуть окно с заголовком "Диспетчер задач", а остальные окна свернуть
 $Win32ShowWindowAsync = @{
-	Namespace = "Win32Functions"
+	Namespace = "WinAPI"
 	Name = "Win32ShowWindowAsync"
 	Language = "CSharp"
 	MemberDefinition = @"
@@ -243,7 +232,7 @@ $Win32ShowWindowAsync = @{
 		public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 "@
 }
-if (-not ("Win32Functions.Win32ShowWindowAsync" -as [type]))
+if (-not ("WinAPI.Win32ShowWindowAsync" -as [type]))
 {
 	Add-Type @Win32ShowWindowAsync
 }
@@ -251,11 +240,11 @@ $title = "Диспетчер задач"
 Get-Process | Where-Object -FilterScript {$_.MainWindowHandle -ne 0} | ForEach-Object -Process {
 	if ($_.MainWindowTitle -eq $title)
 	{
-		[Win32Functions.Win32ShowWindowAsync]::ShowWindowAsync($_.MainWindowHandle, 3) | Out-Null
+		[WinAPI.Win32ShowWindowAsync]::ShowWindowAsync($_.MainWindowHandle, 3) | Out-Null
 	}
 	else
 	{
-		[Win32Functions.Win32ShowWindowAsync]::ShowWindowAsync($_.MainWindowHandle, 6) | Out-Null
+		[WinAPI.Win32ShowWindowAsync]::ShowWindowAsync($_.MainWindowHandle, 6) | Out-Null
 	}
 }
 
@@ -326,11 +315,13 @@ function Get-ResolvedPath
 	[CmdletBinding()]
 	param
 	(
+		[Parameter(Mandatory = $true)]
 		[Parameter(ValueFromPipeline = 1)]
 		$Path
 	)
 
-	(Get-Disk | Where-Object -FilterScript {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object -Process {Join-Path ($_ + ":") $Path -Resolve -ErrorAction Ignore}
+	$DriveLetter = (Get-Disk | Where-Object -FilterScript {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter
+	$DriveLetter | ForEach-Object -Process {$_ + ":\" + $Path}
 }
 Get-ResolvedPath -Path "Программы\Прочее" | Copy-Item -Destination $env:SystemRoot\Cursors -Force
 
@@ -418,12 +409,16 @@ $URLs = @(
 # --username $username
 # --password $password
 # --video-password $videopassword
-$youtubedl = "D:\youtube-dl.exe"
+$youtubedl = "D:\Downloads\youtube-dl.exe"
 $output = "D:\"
-$filename = "%(title)s.mp4"
-foreach ($url in $urls)
+$title = "%(title)s.mp4"
+
+$n = 1
+foreach ($url in $URLs)
 {
-	Start-Process -FilePath $youtubedl -ArgumentList "--output `"$output\$filename`" $url"
+	# 1. FileName.mp4
+	$FileName = "{0}. {1}" -f $n++, $title
+	Start-Process -FilePath $youtubedl -ArgumentList "--output `"$output\$FileName`" --format 136+251 $url"
 }
 
 # Binary
@@ -454,10 +449,10 @@ function Get-Duration
 		$Extention
 	)
 
-	$shell = New-Object -ComObject Shell.Application
+	$Shell = New-Object -ComObject Shell.Application
 	$TotalDuration = [timespan]0
 	Get-ChildItem -Path $Path -Filter "*.$Extention" | ForEach-Object -Process {
-		$Folder = $shell.Namespace($_.DirectoryName)
+		$Folder = $Shell.Namespace($_.DirectoryName)
 		$File = $Folder.ParseName($_.Name)
 		$Duration = [timespan]$Folder.GetDetailsOf($File, 27)
 		$TotalDuration += $Duration
@@ -542,13 +537,13 @@ $str = "1234"
 $str.StartsWith("1")
 $str.EndsWith("4")
 
-# Контекстное меню файла
+# Глаголы ярлыка в контекстном меню
 $Target = Get-Item -Path "D:\folder\file.lnk"
-$shell = New-Object -ComObject Shell.Application
-$folder = $shell.NameSpace($target.DirectoryName)
-$file = $folder.ParseName($Target.Name)
-$verb = $file.Verbs() | Where-Object -FilterScript {$_.Name -like "Закрепить на начальном &экране"}
-$verb.DoIt()
+$Shell = New-Object -ComObject Shell.Application
+$Folder = $Shell.NameSpace($Target.DirectoryName)
+$file = $Folder.ParseName($Target.Name)
+$Verb = $File.Verbs() | Where-Object -FilterScript {$_.Name -like "Закрепить на начальном &экране"}
+$Verb.DoIt()
 
 # Конвертировать хэш-таблицу в объекты
 $hash = @{
@@ -694,6 +689,21 @@ $Lelevs = @{
 }
 $JSON | Add-Member -MemberType NoteProperty -Name Level1 -Value $Lelevs
 $JSON | ConvertTo-Json -Depth 4
+#
+$edge = Get-Content -Path "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Preferences" | ConvertFrom-Json
+$alternate_urls = @(
+	"{google:baseURL}#q={searchTerms}",
+	"{google:baseURL}search#q={searchTerms}",
+)
+$Google = @{
+	template_url_data = @{
+		"alternate_urls" = $alternate_urls
+		"contextual_search_url" = "{google:baseURL}_/contextualsearch?{google:contextualSearchVersion}{google:contextualSearchContextData}"
+	}
+}
+$edge | Add-Member -MemberType NoteProperty -Name default_search_provider_data -Value $Google -Force
+
+ConvertTo-Json -InputObject $edge | Set-Content -Path "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Preferences" -Force
 
 # Сбросить пароль локального пользователя через WinPE
 # WinPE
@@ -822,7 +832,7 @@ do
 	if ($Process)
 	{
 		Write-Host "Running: $($Process.Name)"
-		Start-Sleep 1
+		Start-Sleep -Milliseconds 500
 	}
 }
 until (-not ($Process))
@@ -833,7 +843,7 @@ while ($true)
 	if ($Process)
 	{
 		Write-Host "Running: $($Process.Name)"
-		Start-Sleep 1
+		Start-Sleep -Milliseconds 500
 	}
 }
 #
@@ -869,39 +879,14 @@ do
 }
 while ($Prompt -ne "N")
 
-# Unpin all Start menu tiles
-# Открепеить все плитки от начального экрана
-$StartMenuLayout = @"
-<LayoutModificationTemplate xmlns:defaultlayout="http://schemas.microsoft.com/Start/2014/FullDefaultLayout" xmlns:start="http://schemas.microsoft.com/Start/2014/StartLayout" Version="1" xmlns:taskbar="http://schemas.microsoft.com/Start/2014/TaskbarLayout" xmlns="http://schemas.microsoft.com/Start/2014/LayoutModification">
-<LayoutOptions StartTileGroupCellWidth="6" />
-	<DefaultLayoutOverride>
-		<StartLayoutCollection>
-			<defaultlayout:StartLayout GroupCellWidth="6" />
-		</StartLayoutCollection>
-	</DefaultLayoutOverride>
-</LayoutModificationTemplate>
-"@
-$StartMenuLayoutPath = "$env:TEMP\StartMenuLayout.xml"
-Set-Content -Path $StartMenuLayoutPath -Value $StartMenuLayout -Encoding OEM -Force
-
-if (-not (Test-Path -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer))
-{
-	New-Item -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Force
-}
-# Temporarily disable changing Start layout
-# Временно выключаем возможность редактировать начальный экран
-New-ItemProperty -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Name LockedStartLayout -Value 1 -Force
-New-ItemProperty -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Name StartLayoutFile -Value $StartMenuLayoutPath -Force
-
-Stop-Process -Name StartMenuExperienceHost -Force
-Start-Sleep -Seconds 3
-
-Remove-ItemProperty -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Name LockedStartLayout -Force
-Remove-ItemProperty -Path HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer -Name StartLayoutFile -Force
-
-Stop-Process -Name StartMenuExperienceHost -Force
-Remove-Item -Path $StartMenuLayoutPath -Force
-
 # Сравнить бинарные значения
 ((Get-ItemPropertyValue -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer -Name link) -join " ") -ne ([byte[]](00, 00, 00, 00) -join " ")
 
+# Ключ из UEFI
+(Get-CimInstance -ClassName SoftwareLicensingService).OA3xOriginalProductKey
+
+# 8.3
+New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem -Name NtfsDisable8dot3NameCreation -PropertyType DWord -Value 3 -Force
+fsutil behavior set disable8dot3 1
+fsutil 8dot3name set 1
+fsutil 8dot3name strip /f /s %SystemDrive%
