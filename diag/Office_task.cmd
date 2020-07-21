@@ -60,7 +60,7 @@ call :convert %1
 set ProduUpdaGuid=%guid%
 set /A cc=%cc%+1
 echo.
-echo ì§†´Ô•‚·Ô %cc% ®ß %Count% - %ProduUpdaName%
+echo –£–¥–∞–ª—è–µ—Ç—Å—è %cc% –∏–∑ %Count% - %ProduUpdaName%
 start "" /wait msiexec.exe /package {%ProduGuid%} /uninstall {%ProduUpdaGuid%} /qn
 goto :eof
 
