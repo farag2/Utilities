@@ -10,7 +10,7 @@ $Parameters = @{
 }
 Invoke-WebRequest @Parameters
 
-# Extracting AFirefox.msi to the "Downloads folder\Firefox" folder
+# Extracting Firefox.msi to the "Downloads\Firefox" folder
 $ExtractPath = "$DownloadsFolder\Firefox"
 Start-Process -FilePath "$DownloadsFolder\Firefox.msi" -ArgumentList "EXTRACT_DIR=$ExtractPath" -Wait
 
