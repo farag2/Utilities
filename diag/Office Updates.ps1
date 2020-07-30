@@ -1,4 +1,4 @@
-# http://www.bifido.net/tweaks-and-scripts/7-script-of-additional-cleanup-of-windows-updates.html
+﻿# http://www.bifido.net/tweaks-and-scripts/7-script-of-additional-cleanup-of-windows-updates.html
 
 $RegProducts = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products"
 $RegPatches = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Patches"
@@ -53,10 +53,8 @@ function Get-OfficeUpdate
 	[System.Collections.Hashtable]$ProductsUpdates = @{}
 	[System.Collections.Hashtable]$ProductsPatches = @{}
 
-	[string[]]
-	$Updates = $null
-	[string[]]
-	$Patches = $null
+	[string[]]$Updates = $null
+	[string[]]$Patches = $null
 
 	foreach ($r in (Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products))
 	{
@@ -98,7 +96,7 @@ function Get-OfficeUpdate
 				Get-UpdatesResult $Title $Updates
 			}
 		}
-		pause
+		# pause
 
 		foreach ($Key in $ProductsNames.Keys)
 		{
