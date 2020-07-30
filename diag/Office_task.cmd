@@ -1,21 +1,12 @@
 :: http://forum.ru-board.com/topic.cgi?forum=5&topic=39544&start=981&limit=1&m=1#1
-
+:: "CP 866" encoding needed
 @echo off
 
 set RegKey=HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products\
 set OfficeKey=*000000F01FEC
 set Count=0
 
-if /i "%1"=="yes" (
-set Count=%2
-goto :Yes
-)
-
 FOR /f "tokens=10 delims=\" %%i IN ('reg query %RegKey% /f %OfficeKey% /k') DO call :ProduList %%i
-
-if %Count% == 0 (
-goto :eof	
-)
 
 :Yes
 set cc=0
@@ -60,7 +51,7 @@ call :convert %1
 set ProduUpdaGuid=%guid%
 set /A cc=%cc%+1
 echo.
-echo –£–¥–∞–ª—è–µ—Ç—Å—è %cc% –∏–∑ %Count% - %ProduUpdaName%
+echo ì§†´Ô•‚·Ô %cc% ®ß %Count% - %ProduUpdaName%
 start "" /wait msiexec.exe /package {%ProduGuid%} /uninstall {%ProduUpdaGuid%} /qn
 goto :eof
 
