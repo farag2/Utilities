@@ -1,4 +1,5 @@
-﻿# Install VS Code extensions
+# https://github.com/tonsky/FiraCode/releases
+# Install VS Code extensions
 $Extensions = @(
 	# Локализация
 	"ms-ceintl.vscode-language-pack-ru",
