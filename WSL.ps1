@@ -95,7 +95,7 @@ swap=0
 		}
 		else
 		{
-			Add-Content -Path "$env:HOMEPATH\.wslconfig" -Value "swap=0" -Force
+			Add-Content -Path "$env:HOMEPATH\.wslconfig" -Value "`r`nswap=0" -Force
 		}
 	}
 }
