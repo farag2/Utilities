@@ -1,19 +1,35 @@
 {
+	// Disable Telemetry
 	"telemetry.enableTelemetry": false,
+	// Disable Crash Reporter
 	"telemetry.enableCrashReporter": false,
+	// Format On Type
 	"editor.formatOnType": true,
+	// Auto Save Dealy
 	"files.autoSaveDelay": 10000,
+	// Auto Save
 	"files.autoSave": "afterDelay",
+	// Encoding
 	"files.encoding": "utf8",
+	// Always Show Providers
 	"scm.alwaysShowProviders": true,
+	// Minimap
 	"editor.minimap.enabled": false,
+	// Color Theme
 	"workbench.colorTheme": "Visual Studio Light",
+	// Tab Completion
 	"editor.tabCompletion": "on",
+	// Focus Console On Execute
 	"powershell.integratedConsole.focusConsoleOnExecute": true,
+	// Show On Startup
 	"powershell.integratedConsole.showOnStartup": false,
+	// Default Language
 	"files.defaultLanguage": "powershell",
+	// Render Whitespaces
 	"editor.renderWhitespace": "all",
+	// Auto Guess Encoding
 	"files.autoGuessEncoding": true,
+
 	"[powershell]": {
 		"files.encoding": "utf8bom",
 		"files.autoGuessEncoding": true

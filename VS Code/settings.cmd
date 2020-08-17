@@ -1,0 +1,1 @@
+robocopy "%~dp0." %APPDATA%\Code\User settings.json

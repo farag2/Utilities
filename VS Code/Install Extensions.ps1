@@ -1,5 +1,4 @@
-# https://github.com/tonsky/FiraCode/releases
-# Install VS Code extensions
+﻿# Install VS Code extensions
 $Extensions = @(
 	# Локализация
 	"ms-ceintl.vscode-language-pack-ru",
@@ -13,8 +12,6 @@ $Extensions = @(
 	"chrmarti.regex",
 	# SVG Viewer
 	"cssho.vscode-svgviewer",
-	# Word Count
-	"ms-vscode.wordcount"
 )
 foreach ($Extension in $Extensions)
 {
