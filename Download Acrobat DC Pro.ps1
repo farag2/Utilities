@@ -55,6 +55,7 @@ Remove-Item -Path "$ExtractPath\Adobe Acrobat\AcroPro.msi extracted" -Force
 # Downloading the latest patch
 # https://supportdownloads.adobe.com/product.jsp?product=ac&platform=Windows
 # ftp://ftp.adobe.com/pub/adobe/acrobat/win/AcrobatDC
+# https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html
 $URL = "ftp://ftp.adobe.com/pub/adobe/acrobat/win/AcrobatDC/2000920067/AcrobatDCUpd2000920067.msp"
 $PatchFile = Split-Path -Path $URL -Leaf
 $Parameters = @{
