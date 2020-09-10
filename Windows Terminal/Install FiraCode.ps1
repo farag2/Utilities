@@ -37,5 +37,5 @@ foreach ($Font in $Fonts)
 	(New-Object -ComObject Shell.Application).NameSpace($ssfFONTS).CopyHere($Font.FullName, $CopyOptions)
 }
 
-Remove-Item "$DownloadsFolder\Fira_Code_v$Tag.zip" -Force
-Remove-Item "$DownloadsFolder\Fira_Code" -Recurse -Force 
+Remove-Item -Path "$DownloadsFolder\Fira_Code_v$Tag.zip" -Force
+Remove-Item -Path "$DownloadsFolder\Fira_Code" -Recurse -Force
