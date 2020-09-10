@@ -1,4 +1,4 @@
-# Downloading the latest FiraCode version within GitHub API
+﻿# Downloading the latest FiraCode version within GitHub API
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $Tag = (Invoke-WebRequest -Uri "https://api.github.com/repos/tonsky/FiraCode/releases" -UseBasicParsing | ConvertFrom-Json)[0].tag_name
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
