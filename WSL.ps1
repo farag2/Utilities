@@ -1,13 +1,18 @@
-﻿# Install the Windows Subsystem for Linux (WSL)
-# Установить подсистему Windows для Linux (WSL)
+# https://github.com/farag2/Windows-10-Setup-Script/issues/43
+# https://github.com/microsoft/WSL/issues/5437
+
+# Install the Windows Subsystem for Linux (WSL2)
+# Установить подсистему Windows для Linux (WSL2)
 if ($RU)
 {
-	$Message = "Чтобы установить Windows Subsystem for Linux, введите необходимую букву"
+	$Title = "Windows Subsystem for Linux"
+	$Message = "Установить Windows Subsystem для Linux (WSL)?"
 	$Options = "&Установить", "&Пропустить"
 }
 else
 {
-	$Message = "To install the Windows Subsystem for Linux enter the required letter"
+	$Title = "Windows Subsystem for Linux"
+	$Message = "Would you like to install Windows Subsystem for Linux (WSL)?"
 	$Options = "&Install", "&Skip"
 }
 $DefaultChoice = 1
@@ -17,12 +22,16 @@ switch ($Result)
 {
 	"0"
 	{
-		# Enable the Windows Subsystem for Linux
-		# Включить подсистему Windows для Linux
-		Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
-		# Enable Virtual Machine Platform
-		# Включить поддержку платформы для виртуальных машин
-		Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+		$WSLFeatures = @(
+			# Enable the Windows Subsystem for Linux
+			# Включить подсистему Windows для Linux
+			"Microsoft-Windows-Subsystem-Linux",
+
+			# Enable Virtual Machine Platform
+			# Включить поддержку платформы для виртуальных машин
+			"VirtualMachinePlatform"
+		)
+		Enable-WindowsOptionalFeature -Online -FeatureName $WSLFeatures -NoRestart
 
 		# Downloading the Linux kernel update package
 		# Скачиваем пакет обновления ядра Linux
@@ -56,14 +65,7 @@ switch ($Result)
 	}
 	"1"
 	{
-		if ($RU)
-		{
-			Write-Verbose -Message "Пропущено" -Verbose
-		}
-		else
-		{
-			Write-Verbose -Message "Skipped" -Verbose
-		}
+		Write-Verbose -Message "Skipped" -Verbose
 	}
 }
 
@@ -75,7 +77,6 @@ if (Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-
 
 	# Configuring .wslconfig
 	# Настраиваем .wslconfig
-	# https://github.com/microsoft/WSL/issues/5437
 	if (-not (Test-Path -Path "$env:HOMEPATH\.wslconfig"))
 	{
 		$wslconfig = @"
