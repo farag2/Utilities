@@ -2,7 +2,7 @@
 # Run the script after every app update
 # Запускать UWP-приложение от имени администратора по умолчанию и закрепить на начальном экране
 # Запускайте скрипт после каждого обновления приложения
-# Inspired by https://lennybacon.com/post/Create-a-link-to-a-UWP-app-to-run-as-administrator/
+# Inspired by https://lennybacon.com/posts/create-a-link-to-a-UWP-app-to-run-as-administrator/
 
 Clear-Host
 
