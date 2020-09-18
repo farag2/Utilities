@@ -808,18 +808,6 @@ while ($Prompt -ne "N")
 # Ключ из UEFI
 (Get-CimInstance -ClassName SoftwareLicensingService).OA3xOriginalProductKey
 
-# Получить скрытые URI для Параметров
-[xml]$XML = Get-Content -Path "$env:SystemRoot\ImmersiveControlPanel\Settings\AllSystemSettings_{253E530E-387D-4BC2-959D-E6F86122E5F2}.xml"
-$String = "Defender"
-$Protocols = $XML.PCSettings.SearchableContent | Where-Object -FilterScript {$_.FileName -match $String} | Where-Object -FilterScript {$_.ApplicationInformation.DeepLink}
-foreach ($Protocol in $Protocols)
-{
-	[PSCustomObject]@{
-		FileName = $Protocol.FileName
-		DeepLink = $Protocol.ApplicationInformation.DeepLink
-	}
-}
-
 # Активация Windows
 slmgr.vbs /skms <servername>
 slmgr.vbs /ato
