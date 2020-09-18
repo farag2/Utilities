@@ -1,7 +1,4 @@
 ﻿exit
-# PSScriptAnalyzer
-Invoke-ScriptAnalyzer -Path "D:\Программы\Прочее\ps1\*.ps1" | Where-Object -FilterScript {$_.RuleName -ne "PSAvoidUsingWriteHost"} | Sort-Object -Property ScriptName, Line
-
 # Перерегистрация всех UWP-приложений
 (Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\InboxApplications | Get-ItemProperty).Path | Add-AppxPackage -Register -DisableDevelopmentMode
 
@@ -20,7 +17,7 @@ foreach ($DamagedFile in $DamagedFiles)
 foreach ($Package in $($DamagedPackages | Get-Unique))
 {
 	New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Force
-	New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Name "PackageStatus" -Value "2" -PropertyType "DWORD" -Force
+	New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Name PackageStatus -Value 2 -PropertyType DWORD -Force
 }
 
 Get-CimInstance -Namespace "Root\cimv2\mdm\dmmap" -ClassName "MDM_EnterpriseModernAppManagement_AppManagement01" | Invoke-CimMethod -MethodName UpdateScanMethod
@@ -165,26 +162,22 @@ $url = "https://site.com/1.js"
 Invoke-Expression (New-Object -TypeName System.Net.WebClient).DownloadString($url)
 
 # Скачать и отобразить текстовый файл
-(Invoke-WebRequest -Uri "https://site.com/1.js" -OutFile D:\1.js -PassThru).Content
+(Invoke-WebRequest -Uri "https://site.com/1.js" -OutFile D:\1.js -PassThru -UseBasicParsing).Content
 
 # Прочитать содержимое текстового файла
-(Invoke-WebRequest -Uri "https://site.com/1.js").Content
-
-# Подсчет времени
-$start_time = Get-Date
-Write-Output "Time taken: $((Get-Date).Subtract($start_time).Milliseconds) second(s)"
+(Invoke-WebRequest -Uri "https://site.com/1.js" -UseBasicParsing).Content
 
 # Создать архив
 Get-ChildItem -Path D:\folder -Filter *.ps1 -Recurse | Compress-Archive -DestinationPath D:\folder2 -CompressionLevel Optimal
 
 # Разархивировать архив
-$HT = @{
+$Parameters = @{
 	Path = "D:\1.zip"
 	DestinationPath = "D:\1"
 	Force = [switch]::Present
 	Verbose = [switch]::Present
 }
-Expand-Archive @HT
+Expand-Archive @Parameters
 
 # Вычленить букву диска
 Split-Path -Path "D:\file.mp3" -Qualifier
@@ -308,23 +301,26 @@ function WindowState
 $MainWindowHandle = (Get-Process -Name notepad | Where-Object -FilterScript {$_.MainWindowHandle -ne 0}).MainWindowHandle
 $MainWindowHandle | WindowState -State HIDE
 
-# Установить бронзовый курсор из Windows XP
 # Функция для нахождения буквы диска, когда файл находится в известной папке, но не известна буква диска. Подходит, когда файл располагается на USB-носителе
 function Get-ResolvedPath
 {
 	[CmdletBinding()]
 	param
 	(
-		[Parameter(Mandatory = $true)]
-		[Parameter(ValueFromPipeline = 1)]
+		[Parameter(
+			Mandatory = $true,
+			ValueFromPipeline = $true
+		)]
+		[string]
 		$Path
 	)
 
 	$DriveLetter = (Get-Disk | Where-Object -FilterScript {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter
-	$DriveLetter | ForEach-Object -Process {$_ + ":\" + $Path}
+	$DriveLetter | ForEach-Object -Process {[string]$_ + ":\" + $Path}
 }
 Get-ResolvedPath -Path "Программы\Прочее" | Copy-Item -Destination $env:SystemRoot\Cursors -Force
 
+# Установить бронзовый курсор из Windows XP
 New-ItemProperty -Path "HKCU:\Control Panel\Cursors" -Name Arrow -Type ExpandString -Value "%SystemRoot%\cursors\bronze.cur" -Force
 $Signature = @{
 	Namespace = "SystemParamInfo"
@@ -357,42 +353,45 @@ $file = "file.ext"
 (Get-ChildItem -Path ([System.IO.DriveInfo]::GetDrives() | Where-Object {$_.DriveType -ne "Network"}).Name -Recurse -ErrorAction SilentlyContinue | Where-Object -FilterScript {$_.Name -like "$file"}).FullName
 
 # Создать ini-файл с кодировкой UCS-2 LE BOM
-$rarregkey = @"
+$Key = @"
 RAR registration data
 "@
-Set-Content -Path "$env:ProgramFiles\WinRAR\rarreg.key" -Value $rarregkey -Encoding Unicode -Force
+Set-Content -Path $Path -Value $Key -Encoding Unicode -Force
 
 # Удалить первые $c буквы в названиях файлов в папке
-$path = "D:\folder"
-$e = "flac"
-$c = 4
-(Get-ChildItem -LiteralPath $path -Filter *.$e) | Rename-Item -NewName {$_.Name.Substring($c)}
+$Path = "D:\folder"
+$Extension = "flac"
+$Characters = 4
+(Get-ChildItem -LiteralPath $Path -Filter *.$Extension) | Rename-Item -NewName {$_.Name.Substring($Characters)}
 
 # Удалить последние $c буквы в названиях файлов в папке
-$path = "D:\folder"
-$e = "flac"
-$c = 4
-Get-ChildItem -LiteralPath $path -Filter *.$e | Rename-Item -NewName {$_.Name.Substring(0,$_.BaseName.Length-$c) + $_.Extension}
+$Path = "D:\folder"
+$Extension = "flac"
+$Characters = 4
+Get-ChildItem -LiteralPath $Path -Filter *.$Extension | Rename-Item -NewName {$_.Name.Substring(0,$_.BaseName.Length-$Characters) + $_.Extension}
 
 # Найти файлы, в названии которых каждое слово не написано с заглавной буквы
-$path = "D:\folder"
-(Get-ChildItem -LiteralPath $path -File -Recurse | Where-Object -FilterScript {($_.BaseName -replace "'|``") -cmatch "\b\p{Ll}\w*"}).FullName
+$Path = "D:\folder"
+(Get-ChildItem -LiteralPath $Path -File -Recurse | Where-Object -FilterScript {($_.BaseName -replace "'|``") -cmatch "\b\p{Ll}\w*"}).FullName
 
 # Записать прописными буквами первую букву каждого слова в названии каждого файла в папке
-$path = "D:\folder"
-$e = "flac"
-Get-ChildItem -Path $path -Filter *.$e | Rename-Item -NewName {(Get-Culture).TextInfo.ToTitleCase($_.BaseName) + $_.Extension}
+$Path = "D:\folder"
+$Extension = "flac"
+Get-ChildItem -Path $Path -Filter *.$Extension | Rename-Item -NewName {(Get-Culture).TextInfo.ToTitleCase($_.BaseName) + $_.Extension}
 
 # Перевод первых букв в верхний регистр (капитализация)
-$text = "аа аа аа"
-(Get-Culture).TextInfo.ToTitleCase($text.ToLower())
+$String = "аа аа аа"
+(Get-Culture).TextInfo.ToTitleCase($String.ToLower())
+
+# Подсчитать количество символов в строке
+("string" | Measure-Object -Character).Characters
 
 # Заменить слово в названии файлов в папке
 Get-ChildItem -Path "D:\folder" | Rename-Item -NewName {$_.Name.Replace("abc","cba")}
 
 # Переименовать расширения в папке
-$path = "D:\folder"
-Get-ChildItem -Path $path | Rename-Item -NewName {$_.FullName.Replace(".txt1",".txt")}
+$Path = "D:\folder"
+Get-ChildItem -Path $Path | Rename-Item -NewName {$_.FullName.Replace(".txt1",".txt")}
 
 # Добавить REG_NONE
 New-ItemProperty -Path HKCU:\Software -Name Name -PropertyType None -Value ([byte[]]@()) -Force
@@ -414,7 +413,7 @@ $output = "D:\"
 $title = "%(title)s.mp4"
 
 $n = 1
-foreach ($url in $URLs)
+foreach ($URL in $URLs)
 {
 	# 1. FileName.mp4
 	$FileName = "{0}. {1}" -f $n++, $title
@@ -466,62 +465,6 @@ function Get-Duration
 # (Get-Duration -Path D:\folder -Extention mp4 | Sort-Object Duration | Out-String).Trim()
 
 
-# Изменить переменные среды на C:\Temp
-setx /M TEMP "%SystemDrive%\Temp"
-setx /M TMP "%SystemDrive%\Temp"
-setx TEMP "%SystemDrive%\Temp"
-setx TMP "%SystemDrive%\Temp"
-
-# Отобразить форму с выпадающим списком накопителей
-Add-Type -AssemblyName System.Windows.Forms
-# Создать графическую форму
-$window_form = New-Object -TypeName System.Windows.Forms.Form
-$window_form.Text ="Пример"
-$window_form.Width = 600
-$window_form.Height = 400
-$window_form.AutoSize = $true
-# Создать надпись
-$Label = New-Object -TypeName System.Windows.Forms.Label
-$Label.Text = "Label"
-$Label.Location = New-Object -TypeName System.Drawing.Point(0,10)
-$Label.AutoSize = $true
-$window_form.Controls.Add($Label)
-# Выпадающий список дисков
-$ComboBox = New-Object -TypeName System.Windows.Forms.ComboBox
-$ComboBox.Width = 250
-$Disks = Get-PhysicalDisk
-foreach ($Disk in $Disks)
-{
-	$ComboBox.Items.Add($Disk.FriendlyName);
-}
-$ComboBox.Location = New-Object -TypeName System.Drawing.Point(60,10)
-$window_form.Controls.Add($ComboBox)
-# Надпись
-$Label2 = New-Object -TypeName System.Windows.Forms.Label
-$Label2.Text = "Disk size:"
-$Label2.Location = New-Object -TypeName System.Drawing.Point(0,40)
-$Label2.AutoSize = $true
-$window_form.Controls.Add($Label2)
-$Label3 = New-Object -TypeName System.Windows.Forms.Label
-$Label3.Text = ""
-$Label3.Location = New-Object -TypeName System.Drawing.Point(110,40)
-$Label3.AutoSize = $true
-$window_form.Controls.Add($Label3)
-# Кнопка
-$Button = New-Object -TypeName System.Windows.Forms.Button
-$Button.Location = New-Object System.Drawing.Size(400,10)
-$Button.Size = New-Object -TypeName System.Drawing.Size(120,23)
-$Button.Text = "Check"
-$window_form.Controls.Add($Button)
-# Расчет
-$Button.Add_Click(
-	{
-		$Label3.Text = [math]::round(($Disks | Where-Object -FilterScript {$_.FriendlyName -eq $ComboBox.SelectedItem}).Size/1GB,2)
-	}
-)
-# Отобразить форму
-$window_form.ShowDialog()
-
 # Найти неустановленные обновления
 $UpdateSession = New-Object -ComObject Microsoft.Update.Session
 $UpdateSearcher = $UpdateSession.CreateupdateSearcher()
@@ -533,9 +476,9 @@ $FolderName = "D:\folder"
 (New-Object -ComObject "Shell.Application").Windows() | Where-Object {$_.Document.Folder.Self.Path -eq $FolderName} | ForEach-Object -Process {$_.Quit()}
 
 # StartsWith/EndsWith
-$str = "1234"
-$str.StartsWith("1")
-$str.EndsWith("4")
+$String = "1234"
+$String.StartsWith("1")
+$String.EndsWith("4")
 
 # Глаголы ярлыка в контекстном меню
 $Target = Get-Item -Path "D:\folder\file.lnk"
@@ -619,17 +562,12 @@ Test-FileCatalog @HT
 # Vertical tab`v
 # Stop parsing --%
 
-# Оператор -f
-$proc = Get-Process | Sort-Object -Property CPU -Descending | Select-Object -First 10
-foreach ($p in $proc)
+# Оператор -format
+$Processes = Get-Process | Sort-Object -Property CPU -Descending | Select-Object -First 10
+foreach ($Process in $Processes)
 {
-	"{0,-10} {1,10}" -f $p.ProcessName, $p.CPU
+	"{0,-10} {1,10}" -f $Process.ProcessName, $Process.CPU
 }
-
-# Без escape ("`"$FileName`"")
-$Folder = "${env:ProgramFiles}\Folder\SubFolder"
-$Argument = '"{0}"' -f $Folder
-Start-Process -FilePath utility.exe -ArgumentList $Argument
 
 # JSON
 # Список
@@ -640,6 +578,7 @@ $basket = @(
 )
 $JSON | Add-Member -MemberType NoteProperty -Name Data -Value $basket -Force
 $JSON | ConvertTo-Json
+
 # Массив
 $JSON = @{}
 $array = @{}
@@ -651,6 +590,7 @@ $array.Add("Person",$person)
 #$array | Add-Member -MemberType NoteProperty -Name Person -Value $person -Force
 $JSON | Add-Member -MemberType NoteProperty -Name Data -Value $array -Force
 $JSON | ConvertTo-Json -Depth 4
+
 # Комбинирование списка с массивом
 $JSON = @{}
 $basket = @{
@@ -658,6 +598,7 @@ $basket = @{
 }
 $JSON | Add-Member -MemberType NoteProperty -Name Data -Value $basket -Force
 $JSON | ConvertTo-Json
+
 # Список содержит массив
 $JSON = @{}
 $list = New-Object -TypeName System.Collections.ArrayList
@@ -676,6 +617,7 @@ $customers = @{
 }
 $JSON | Add-Member -MemberType NoteProperty -Name Data -Value $customers -Force
 $JSON | ConvertTo-Json -Depth 4
+
 # Вложенные уровени
 $JSON = @{}
 $Lelevs = @{
@@ -693,7 +635,7 @@ $JSON | ConvertTo-Json -Depth 4
 $edge = Get-Content -Path "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Preferences" | ConvertFrom-Json
 $alternate_urls = @(
 	"{google:baseURL}#q={searchTerms}",
-	"{google:baseURL}search#q={searchTerms}",
+	"{google:baseURL}search#q={searchTerms}"
 )
 $Google = @{
 	template_url_data = @{
@@ -722,15 +664,19 @@ RENAME C:\Windows\system32\utilman.exe.bak utilman.exe
 
 # Восстановление компонентов хранилища
 DISM /Online /Cleanup-Image /RestoreHealth
+
 # Восстановление компонентов хранилища локально
 DISM /Get-WimInfo /WimFile:E:\sources\install.wim
 DISM /Online /Cleanup-Image /RestoreHealth /Source:E:\sources\install.wim:3 /LimitAccess
+# Восстановление системных файлов
+sfc /scannow
+
 # Восстановление компонентов хранилища в среде Windows PE
 DISM /Get-WimInfo /WimFile:E:\sources\install.wim
 DISM /Image:C:\ /Cleanup-Image /RestoreHealth /Source:E:\sources\install.wim:3 /ScratchDir:C:\mnt
-# Восстановление системных файлов
-sfc /scannow
+# Восстановление системных файлов в среде Windows PE
 sfc /scannow /offbootdir=C:\ /offwindir=C:\Windows
+
 # Очистка папки WinSxS
 DISM /Online /Cleanup-Image /StartComponentCleanup /ResetBase
 
@@ -775,29 +721,6 @@ foreach ($AppxPackage in $AppxPackages)
 	Get-AppxPackage -PackageTypeFilter Bundle -AllUsers | Where-Object -FilterScript {$_.Name -cmatch $AppxPackage} | Remove-AppxPackage -AllUsers
 }
 Write-Progress -Activity "Uninstalling UWP apps" -Completed
-
-# Включить режим питания
-$PowerPlan = Get-CimInstance -Namespace root\cimv2\power -ClassName Win32_PowerPlan | Where-Object -FilterScript {$_.Elementname -eq "Высокая производительность"}
-Invoke-CimMethod -InputObject $PowerPlan -MethodName Activate
-
-# Выключить режим гибернации ###
-$ActivePowerPlanInstanceID = (Get-CimInstance -Namespace root\cimv2\power -ClassName Win32_PowerPlan | Where-Object -FilterScript {$_.IsActive -eq $true}).InstanceID.Split("\")[1]
-$HibernateAfterInstanceID = (Get-CimInstance -Namespace root\cimv2\power -ClassName Win32_PowerSetting | Where-Object -FilterScript {$_.Elementname -eq "Hibernate after"}).InstanceID.Split("\")[1]
-Get-CimInstance -Namespace root\cimv2\power -ClassName Win32_PowerSettingDataIndex | Where-Object -FilterScript {$_.InstanceID -eq "Microsoft:PowerSettingDataIndex\$ActivePowerPlanInstanceID\AC\$HibernateAfterInstanceID"} | Set-CimInstance -Property @{SettingIndexValue = 0}
-
-# Функция исключить папку из сканирования Microsoft Defender
-function ExclusionPath
-{
-	[CmdletBinding()]
-	param
-	(
-		[Parameter(Mandatory = $true)]
-		[string[]]$Paths
-	)
-
-	$Paths = $Paths.Replace("`"", "").Split(",").Trim()
-	Add-MpPreference -ExclusionPath $Paths -Force
-}
 
 #
 $Fruits = "Apple","Pear","Banana","Orange"
@@ -885,8 +808,18 @@ while ($Prompt -ne "N")
 # Ключ из UEFI
 (Get-CimInstance -ClassName SoftwareLicensingService).OA3xOriginalProductKey
 
-# 8.3
-New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem -Name NtfsDisable8dot3NameCreation -PropertyType DWord -Value 3 -Force
-fsutil behavior set disable8dot3 1
-fsutil 8dot3name set 1
-fsutil 8dot3name strip /f /s %SystemDrive%
+# Получить скрытые URI для Параметров
+[xml]$XML = Get-Content -Path "$env:SystemRoot\ImmersiveControlPanel\Settings\AllSystemSettings_{253E530E-387D-4BC2-959D-E6F86122E5F2}.xml"
+$String = "Defender"
+$Protocols = $XML.PCSettings.SearchableContent | Where-Object -FilterScript {$_.FileName -match $String} | Where-Object -FilterScript {$_.ApplicationInformation.DeepLink}
+foreach ($Protocol in $Protocols)
+{
+	[PSCustomObject]@{
+		FileName = $Protocol.FileName
+		DeepLink = $Protocol.ApplicationInformation.DeepLink
+	}
+}
+
+# Активация Windows
+slmgr.vbs /skms <servername>
+slmgr.vbs /ato
