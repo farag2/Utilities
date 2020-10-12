@@ -61,7 +61,7 @@ Languages=1049
 "@
 Set-Content -Path "$ExtractPath\Adobe Acrobat\setup.ini" -Value $setupini -Encoding Unicode -Force
 
-# Converting setup.ini to the UTF-8 encoding
+# Converting setup.ini to the "UTF-8 without BOM" encoding
 $Content = Get-Content -Path "$ExtractPath\Adobe Acrobat\setup.ini" -Raw
 Set-Content -Value (New-Object System.Text.UTF8Encoding).GetBytes($Content) -Encoding Byte -Path "$ExtractPath\Adobe Acrobat\setup.ini" -Force
 
