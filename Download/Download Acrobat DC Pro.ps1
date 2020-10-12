@@ -42,7 +42,6 @@ Start-Process "msiexec" -ArgumentList $Arguments -Wait
 Get-ChildItem -Path $ExtractPath -Filter *.htm | ForEach-Object -Process {Remove-Item -Path $_.FullName}
 Remove-Item -Path "$ExtractPath\GB18030" -Recurse -Force
 
-Get-ChildItem -Path "$ExtractPath\Adobe Acrobat\Transforms" -Exclude 1049.mst | ForEach-Object -Process {Remove-Item -Path $_.FullName}
 Remove-Item -Path "$ExtractPath\Adobe Acrobat\VCRT_x64" -Recurse -Force
 Remove-Item -Path "$ExtractPath\Adobe Acrobat\AcrobatDCUpd*.msp" -Force
 Remove-Item -Path "$ExtractPath\Adobe Acrobat\WindowsInstaller-KB893803-v2-x86.exe" -Force
