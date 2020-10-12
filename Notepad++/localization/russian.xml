@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <!--
-	Russian localization for Notepad++ 7.8.3
-	last modified: 2020-01-16 by wvxwxvw (ru-board)
+	Russian localization for Notepad++ 7.8.9
+	last modified: 2020.07.21 by wvxwxvw (ru-board)
 	Модифицировал под себя и доперевел официальный языковой файл.
 	Отличие от других переводов:
 	Нет раздражающего сКаКаНиЯ ТеКсТа и лишних символов.
@@ -12,7 +12,7 @@
 
 
 <NotepadPlus>
-	<Native-Langue name="Русский" filename="russian.xml" version="7.8.1">
+	<Native-Langue name="Русский" filename="russian.xml" version="7.8.7">
 		<Menu>
 			<Main>
 				<!-- Main Menu Entries -->
@@ -69,6 +69,8 @@
 					<Item subMenuId="search-markAll" name="Пометить выделенное"/>
 					<Item subMenuId="search-unmarkAll" name="Убрать пометки"/>
 					<Item subMenuId="settings-import"  name="Импортировать"/>
+					<Item subMenuId="tools-md5" name="MD5"/>
+					<Item subMenuId="tools-sha256" name="SHA-256"/>
 					<Item subMenuId="view-collapseLevel" name="Свернуть уровень"/>
 					<Item subMenuId="view-currentFileIn" name="Открыть текущий файл в"/>
 					<Item subMenuId="view-moveCloneDocument"  name="Операции с документом"/>
@@ -77,8 +79,6 @@
 					<Item subMenuId="view-tab"  name="Перейти к вкладке..."/>
 					<Item subMenuId="view-uncollapseLevel" name="Развернуть уровень"/>
 					<Item subMenuId="view-zoom"  name="Масштаб текста"/>
-					<Item subMenuId="tools-md5" name="MD5"/>
-					<Item subMenuId="tools-sha256" name="SHA-256"/>
 				</SubEntries>
 
 			<!-- all menu item -->
@@ -736,9 +736,7 @@
 					<Item id="6206" name="Отображать нумерацию строк"/>
 					<Item id="6207" name="Отображать поле закладок"/>
 					<Item id="6208" name="Отображать границу"/>
-					<Item id="6209" name="Столбец: "/>
 					<Item id="6211" name="Вертикальная граница справа"/>
-					<Item id="6212" name="Линия"/>
 					<Item id="6213" name="Фон за границей"/>
 					<Item id="6214" name="Подсветка текущей строки"/>
 					<Item id="6215" name="Сглаживание шрифтов"/>
@@ -758,6 +756,7 @@
 					<Item id="6234" name="Отключить доп. функции прокрутки&#x0A; (при проблемах с тачпадом)"/>
 					<Item id="6235" name="Без рамки"/>
 					<Item id="6236" name="Прокрутка за пределы посл. строки"/>
+					<Item id="6237" name="Добавьте маркер столбца, указав его положение с десятичным числом. Вы можете определить несколько маркеров, используя пробел для разделения чисел."/>
 				</Scintillas>
 
 				<NewDoc title="Новый документ">
@@ -780,7 +779,7 @@
 					<Item id="6413" name="Папка по умолчанию (открыть/сохранить)"/>
 					<Item id="6414" name="Текущего документа"/>
 					<Item id="6415" name="Запоминать последнюю папку"/>
-					<Item id="6430" name="Новый диалог сохранения файла (без запроса расширения файла)"/>
+					<Item id="6430" name="Новый диалог сохранения файла (без пути в стиле Unix)"/>
 					<Item id="6431" name="Открывать все файлы в папке при перетаскивании в NP++"/>
 				</DefaultDir>
 
@@ -952,6 +951,7 @@
 					<Item id="6345" name="Миниатюра под вкладкой"/>
 					<Item id="6346" name="Отображать в карте документа"/>
 					<Item id="6348" name="Не заполнять поле поиска выбранным словом"/>
+					<Item id="6349" name="Использовать DirectWrite (может улучшить рендер спец.символов, требуется перезапуск)"/>
 				</MISC>
 			</Preference>
 			<MultiMacro title="Многократный макрос...">
@@ -1009,57 +1009,57 @@
 		<MessageBox> <!-- $INT_REPLACE$ is a place holder, don't translate it -->
 			<BufferInvalidWarning title="Ошибка сохранения" message="Не удается сохранить: недопустимый буфер."/>
 			<CannotMoveDoc title="Переход к новому экземпляру Notepad++" message="Документ был изменен, сохраните его и повторите попытку."/>
-			<ColumnModeTip title="Подсказка режима столбца" message="Используйте &quot;ALT+выбор мышью&quot; или &quot;Alt+Shift+стрелки&quot;&#x0A;для переключения в режим столбца."/>
+			<ColumnModeTip title="Подсказка режима столбца" message="Используйте &quot;ALT+выбор мышью&quot; или &quot;Alt+Shift+стрелки&quot; для переключения в режим столбца."/>
 			<ContextMenuXmlEditWarning title="Редактирование контекстного меню" message="Редактирование contextMenu.xml позволяет настроить свое контекстное меню в Notepad++.&#x0A;Требуется перезапустить Notepad++, чтобы изменения вступили в силу."/>
 			<CreateNewFileError title="Создать новый файл" message="Не удается создать файл &quot;$STR_REPLACE$&quot;."/>
-			<CreateNewFileOrNot title="Создать новый файл" message="&quot;$STR_REPLACE$&quot; не существует. Создать его?"/>
+			<CreateNewFileOrNot title="Создать новый файл" message="&quot;$STR_REPLACE$&quot; не существует.&#x0A;Создать его?"/>
 			<DeleteFileFailed title="Удаление файла" message="Не удалось удалить файл"/>
 			<DoCloseOrNot title="Сохранить несуществующий файл" message="Файл &quot;$STR_REPLACE$&quot; больше не существует.&#x0A;Сохранить этот файл в редакторе?"/>
 			<DocNoExistToMonitor title="Мониторинг проблем" message="Файл должен существовать для мониторинга."/>
 			<DocReloadWarning title="Перезагрузка" message="Все внесенные изменения будут потеряны!&#x0A;Продолжить?"/>
-			<DocTooDirtyToMonitor title="Мониторинг проблем" message="Файл неочищен. Сохраните изменения перед его мониторингом."/>
+			<DocTooDirtyToMonitor title="Мониторинг проблем" message="Файл не очищен. Сохраните изменения перед его мониторингом."/>
 			<DoDeleteOrNot title="Удалить файл" message="Файл &quot;$STR_REPLACE$&quot;&#x0A;будет перемещен в корзину, а документ закрыт.&#x0A;Продолжить?"/>
 			<DoReloadOrNot title="Обновить" message="&quot;$STR_REPLACE$&quot;&#x0A;&#x0A;Этот файл был изменен другой программой.&#x0A;Переоткрыть его?"/>
 			<DoReloadOrNotAndLooseChange title="Обновить" message="&quot;$STR_REPLACE$&quot;&#x0A;&#x0A;Этот файл был изменен другой программой.&#x0A;Вы хотите переоткрыть его и потерять изменения, сделанные в Notepad++?"/>
 			<DroppingFolderAsProjectModeWarning title="Недопустимое действие" message="В режиме проекта можно перемещать файлы или каталоги, но не оба одновременно.&#x0A;Что бы это изменить нужно включить &quot;Открывать все файлы в своем каталоге вместо стартового&quot; в параметре настроек &quot;Каталог по умолчанию&quot;."/>
-			<ExitToUpdatePlugins title="Notepad++ нужен перезапуск" message="Если вы нажмете Да, Notepad++ завершится. Notepad++ будет перезапущен после завершения всех операций. Продолжить?"/>
-			<FileAlreadyOpenedInNpp title="" message="Файл уже открыт в Notepad++."/>
+			<ExitToUpdatePlugins title="Notepad++ нужен перезапуск" message="Если вы нажмете Да, Notepad++ завершится. Notepad++ будет перезапущен после завершения всех операций.&#x0A;Продолжить?"/>
+			<FileAlreadyOpenedInNpp title="Файл уже открыт" message="Файл уже открыт в Notepad++."/>
 			<FileBackupFailed title="Ошибка создания резервной копии" message="Резервная копия файла не может быть сохранена в папке резервных копий в &quot;$STR_REPLACE$&quot;.&#x0A;&#x0A;Сохранить текущий файл в любом случае?"/>
 			<FileLockedWarning title="Сохранение не удалось" message="Проверьте открыт ли этот файл в другом приложении."/>
 			<FilePathNotFoundWarning title="Открытие Файла" message="Файл, который вы пытаетесь открыть, не существует."/>
 			<FileTooBigToOpen title="Проблема размера файла" message="Файл слишком большой для открытия в Notepad++"/>
 			<FindCharRangeValueError title="Проблема значения диапазона" message="Вы должны ввести между 0 и 255."/>
-			<FolderAsWorspaceSubfolderExists title="Проблема с 'Папка как рабочая область'" message="Подпапка папки, которую вы хотите добавить, существует.&#x0A;Удалите ее корень с панели, прежде чем добавлять &quot;$STR_REPLACE$&quot;."/>
+			<FolderAsWorspaceSubfolderExists title="Проблема с 'Папка как пакет проектов'" message="Подпапка папки, которую вы хотите добавить, существует.&#x0A;Удалите ее корень с панели, прежде чем добавлять &quot;$STR_REPLACE$&quot;."/>
 			<GUpProxyConfNeedAdminMode title="Настройки прокси" message="Перезапустите Notepad++ от администратора, чтобы настроить прокси"/>
-			<LoadLangsFailed title="Конфигуратор" message="Ошибка загрузки langs.xml!&#x0A;Восстановить свой langs.xml?"/>
+			<LoadLangsFailed title="Конфигуратор" message="Ошибка загрузки langs.xml!&#x0A;Восстановить langs.xml?"/>
 			<LoadLangsFailedFinal title="Конфигуратор" message="Ошибка загрузки langs.xml!"/>
 			<LoadStylersFailed title="Ошибка загрузки stylers.xml" message="Ошибка загрузки &quot;$STR_REPLACE$&quot; !"/>
-			<LoseUndoAbilityWarning title="Потеря возможности отката" message="Вы должны сохранить текущие изменения.&#x0A;Все сохраненные изменения не смогут быть отменены.&#x0A;&#x0A;Продолжить?"/>
+			<LoseUndoAbilityWarning title="Потеря возможности отмены" message="Вы должны сохранить текущие изменения.&#x0A;Отменить все сохраненные изменения будет невозможно.&#x0A;&#x0A;Продолжить?"/>
 			<NbFileToOpenImportantWarning title="Очень большое количество файлов" message="$INT_REPLACE$ файла(ов) будут открыты.&#x0A;Продолжить?"/>
 			<NeedToRestartToLoadPlugins title="Notepad++ нужен перезапуск" message="Вы должны перезапустить Notepad++, чтобы активировать плагины."/>
 			<NoBackupDoSaveFile title="Сохранить" message="Не удается найти файл резервной копии (удален извне).&#x0A;Сохраните его, иначе ваши данные будут потеряны.&#x0A;Сохранить файл &quot;$STR_REPLACE$&quot; ?"/>
-			<NppHelpAbsentWarning title="Файла не существует" message="&#x0A;не существует. Пожалуйста, загрузите его с сайта Notepad++."/>
+			<NppHelpAbsentWarning title="Файл не существует" message="&#x0A;не существует.&#x0A;Загрузите его с сайта Notepad++."/>
 			<OpenFileError title="ОШИБКА" message="Не удается открыть файл &quot;$STR_REPLACE$&quot;."/>
-			<OpenInAdminMode title="Ошибка сохранения" message="Не удается сохранить файл, он может быть защищен.&#x0A;Запустить Notepad++ от администратора?"/>
+			<OpenInAdminMode title="Ошибка сохранения" message="Не удается сохранить файл, возможно он защищен.&#x0A;Запустить Notepad++ от администратора?"/>
 			<OpenInAdminModeFailed title="Не удалось запустить от администратора" message="Notepad++ не удаётся запустить от имени администратора."/>
-			<OpenInAdminModeWithoutCloseCurrent title="Ошибка сохранения" message="Не удается сохранить файл, он может быть защищен.&#x0A;Запустить Notepad++ от администратора?"/>
+			<OpenInAdminModeWithoutCloseCurrent title="Ошибка сохранения" message="Не удается сохранить файл, возможно он защищен.&#x0A;Запустить Notepad++ от администратора?"/>
 			<PrehistoricSystemDetected title="Обнаружена доисторическая система" message="Кажется, вы все еще используете доисторическую ОС. Эта функция работать не будет."/>
-			<ProjectPanelChanged title="$STR_REPLACE$" message="Рабочая область была изменена. Вы хотите сохранить ее?"/>
-			<ProjectPanelChangedSaveError title="$STR_REPLACE$" message="Рабочая область НЕ сохранена."/>
-			<ProjectPanelNewDoSaveDirtyWsOrNot title="Новая рабочая область" message="Текущая рабочая область была изменена. Сохранить текущий проект?"/>
-			<ProjectPanelOpenDoSaveDirtyWsOrNot title="Открыть рабочую область" message="Текущая рабочая область была изменена. Сохранить текущий проект?"/>
-			<ProjectPanelOpenFailed title="Открыть рабочую область" message="Не удалось открыть рабочую область.&#x0A;Похоже, что файл для открытия не является допустимым файлом проекта."/>
-			<ProjectPanelReloadDirty title="Перезагрузить рабочую область" message="Текущая рабочая область была изменена. Перезагрузка отменит все изменения.&#x0A;Продолжить?"/>
-			<ProjectPanelReloadError title="Перезагрузить рабочую область" message="Не удается найти файл для перезагрузки."/>
+			<ProjectPanelChanged title="$STR_REPLACE$" message="Пакет проектов был изменен.&#x0A;Хотите сохранить его?"/>
+			<ProjectPanelChangedSaveError title="$STR_REPLACE$" message="Пакет проектов НЕ сохранен."/>
+			<ProjectPanelNewDoSaveDirtyWsOrNot title="Новый пакет проектов" message="Текущий пакет проектов был изменен. Сохранить текущий проект?"/>
+			<ProjectPanelOpenDoSaveDirtyWsOrNot title="Открыть пакет проектов" message="Текущий пакет проектов был изменен. Сохранить текущий проект?"/>
+			<ProjectPanelOpenFailed title="Открыть пакет проектов" message="Не удалось открыть рабочую область.&#x0A;Похоже, что файл для открытия не является допустимым файлом проекта."/>
+			<ProjectPanelReloadDirty title="Перезагрузить пакет проектов" message="Текущий пакет проектов был изменен. Перезагрузка отменит все изменения.&#x0A;Продолжить?"/>
+			<ProjectPanelReloadError title="Перезагрузить пакет проектов" message="Не найден файл для перезагрузки."/>
 			<ProjectPanelRemoveFileFromProject title="Удалить файл из проекта" message="Вы действительно хотите удалить этот файл из проекта?"/>
 			<ProjectPanelRemoveFolderFromProject title="Удалить папку из проекта" message="Все подпункты будут удалены.&#x0A;Вы действительно хотите удалить эту папку из проекта?"/>
-			<SaveCurrentModifWarning title="Сохранение текущих изменений" message="Вы должны сохранить текущие изменения.&#x0A;Все сохраненные изменения не смогут быть отменены.&#x0A;&#x0A;Продолжить?"/>
+			<SaveCurrentModifWarning title="Сохранение текущих изменений" message="Вы должны сохранить текущие изменения.&#x0A;Отменить все сохраненные изменения будет невозможно.&#x0A;&#x0A;Продолжить?"/>
 			<SCMapperDoDeleteOrNot title="Вы уверены?" message="Вы действительно хотите удалить этот ярлык?"/>
 			<SessionFileInvalidError title="Не удалось загрузить сессию" message="Файл сессии поврежден или недействителен."/>
 			<SettingsOnCloudError title="Параметры облака" message="Похоже, что путь для облака указан на диск или папку с пометкой только для чтения.&#x0A;Вам необходимо открыть доступ или получить права на запись.&#x0A;Ваши параметры облака будут отменены. Пожалуйста сбросьте значение в окне настроек..."/>
 			<SortingError title="Ошибка сортировки" message="Не удается выполнить числовую сортировку из-за строки $INT_REPLACE$ ."/>
-			<UDLNewNameError title="Ошибка UDL" message="Это имя используется другим языком,&#x0A;придумайте другое."/>
-			<UDLRemoveCurrentLang title="Удалить текущий язык" message="Вы уверены?"/>
+			<UDLNewNameError title="Ошибка UDL" message="Это имя используется другим языком.&#x0A;Придумайте другое."/>
+			<UDLRemoveCurrentLang title="Удалить текущий язык" message="Действительно удалить?"/>
 			<ViewInBrowser title="Открыть текущий файл в браузере" message="Приложение не найдено в вашей системе."/>
 			<XpUpdaterProblem title="Система обновления Notepad++" message="Система обновления Notepad++ не совместима с XP из-за устаревшего уровня безопасности последней.&#x0A;Перейти на страницу Notepad++, чтобы загрузить последнюю версию?"/>
 		</MessageBox>
@@ -1074,6 +1074,7 @@
 		<WindowsDlg>
 			<ColumnName name="Имя"/>
 			<ColumnPath name="Путь"/>
+			<ColumnSize name="Размер"/>
 			<ColumnType name="Тип"/>
 		</WindowsDlg>
 		<AsciiInsertion>
@@ -1093,8 +1094,8 @@
 			<SortTip name="Упорядочить" />
 		</FunctionList>
 		<FolderAsWorkspace>
-			<PanelTitle name="Папка как рабочая область"/>
-			<SelectFolderFromBrowserString name="Выберите папку для добавления на панель &quot;Папка как рабочая область&quot;"/>
+			<PanelTitle name="Папка как пакет проектов"/>
+			<SelectFolderFromBrowserString name="Выберите папку для добавления на панель &quot;Папка как пакет проектов&quot;"/>
 			<Menus>
 				<Item id="3511" name="Удалить"/>
 				<Item id="3512" name="Удалить все"/>
@@ -1104,7 +1105,7 @@
 				<Item id="3516" name="Копировать путь"/>
 				<Item id="3517" name="Найти в файлах..."/>
 				<Item id="3518" name="Проводник отсюда"/>
-				<Item id="3519" name="CMD отсюда"/>
+				<Item id="3519" name="Ком.строка отсюда"/>
 				<Item id="3520" name="Копировать имя файла"/>
 			</Menus>
 		</FolderAsWorkspace>
@@ -1112,17 +1113,17 @@
 			<NewFolderName name="Имя папки"/>
 			<NewProjectName name="Имя проекта"/>
 			<PanelTitle name="Проект"/>
-			<WorkspaceRootName name="Рабочая область"/>
+			<WorkspaceRootName name="Пакет проектов"/>
 			<Menus>
 				<Entries>
-					<Item id="0" name="Проект"/>
+					<Item id="0" name="Пакет проектов"/>
 					<Item id="1" name="Правка"/>
 				</Entries>
 				<WorkspaceMenu>
 					<Item id="3121" name="Добавить новый проект"/>
-					<Item id="3122" name="Новый проект"/>
-					<Item id="3123" name="Открыть проект"/>
-					<Item id="3124" name="Перезагрузить проект"/>
+					<Item id="3122" name="Новый пакет проектов"/>
+					<Item id="3123" name="Открыть пакет проектов"/>
+					<Item id="3124" name="Перезагрузить пакет проектов"/>
 					<Item id="3125" name="Сохранить"/>
 					<Item id="3126" name="Сохранить как..."/>
 					<Item id="3127" name="Сохранить копию как..."/>
@@ -1164,12 +1165,18 @@
 			<common-name value="Имя: "/>
 			<common-ok value="OK"/>
 			<edit-verticaledge-nb-col value="К-во столбцов:"/>
-			<find-in-files-filter-tip value="Искать в cpp, cxx, h, hxx &amp;&amp; hpp:
+			<find-in-files-filter-tip value="Искать только в cpp, cxx, h, hxx &amp;&amp; hpp:
 *.cpp *.cxx *.h *.hxx *.hpp
 
 Искать во всех файлах, кроме exe, obj &amp;&amp; log:
 *.* !*.exe !*.obj !*.log"/>
-
+			<find-regex-zero-length-match value="соответствие нулевой длины" />
+			<find-result-caption value="Результаты поиска"/>
+			<find-result-hits value="($INT_REPLACE$ вхождений)"/>
+			<find-result-title value="Поиск"/>
+			<find-result-title-info value="($INT_REPLACE1$ вхождений, в $INT_REPLACE2$ файлах из $INT_REPLACE3$)"/>
+			<find-result-title-info-extra value=" - Режим фильтра строк: отображать только с вхождениями"/>
+			<find-result-title-info-selections value="($INT_REPLACE1$ совпадений в $INT_REPLACE2$ выбранных из $INT_REPLACE3$ найденных)"/>
 			<find-status-cannot-find value="Поиск: Не удается найти текст &quot;$STR_REPLACE$&quot;"/>
 			<find-status-count-1-match value="Итог: 1 совпадение"/>
 			<find-status-count-nb-matches value="Итог: $INT_REPLACE$ совпадений"/>
@@ -1188,7 +1195,7 @@
 			<find-status-replaceall-re-malformed value="Заменить все: Неверное регулярное выражение"/>
 			<find-status-replaceall-readonly value="Заменить все: Не удается заменить текст. Текущий документ доступен только для чтения."/>
 			<find-status-replaced-next-found value="Замена: 1 вхождение заменено. Найденно следующее вхождение."/>
-			<find-status-replaced-next-not-found value="Замена: 1 вхождение заменено. Следующее вхождение не найдено."/>
+			<find-status-replaced-next-not-found value="Замена: 1 вхождение заменено. Других вхождений не найдено."/>
 			<find-status-replaceinfiles-1-replaced value="Замена в файлах: 1 вхождение заменено"/>
 			<find-status-replaceinfiles-nb-replaced value="Замена в файлах: $INT_REPLACE$ вхождений заменено"/>
 			<find-status-replaceinfiles-re-malformed value="Замена в открытых файлах: Неверное регулярное выражение"/>
@@ -1205,6 +1212,11 @@
 			<finder-uncollapse-all value="Развернуть все"/>
 			<language-tabsize value="Размер вкладки: "/>
 			<recent-file-history-maxfile value="Макс. файл: "/>
+			<replace-in-files-confirm-directory value="Вы уверены, что хотите заменить все вхождения в :"/>
+			<replace-in-files-confirm-filetype value="Для типов файлов :"/>
+			<replace-in-files-confirm-title value="Вы уверены?"/>
+			<replace-in-open-docs-confirm-message value="Вы уверены, что хотите заменить все вхождения во всех открытых документах?"/>
+			<replace-in-open-docs-confirm-title value="Вы уверены?"/>
 			<shift-change-direction-tip value="Используйте Shift+Enter для поиска в обратном направлении."/>
 			<summary value="Сводка"/>
 			<summary-filecreatetime value="Создан: "/>
