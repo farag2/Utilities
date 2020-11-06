@@ -1,17 +1,22 @@
-﻿# Install VS Code extensions
+# Install VS Code extensions
 $Extensions = @(
 	# Локализация
 	"ms-ceintl.vscode-language-pack-ru",
+
 	# Markdown
 	"DavidAnson.vscode-markdownlint",
+
 	# PowerShell
 	"ms-vscode.PowerShell",
+
 	# Code Runner
 	"formulahendry.code-runner",
+
 	# Regex Previewer
 	"chrmarti.regex",
+
 	# SVG Viewer
-	"cssho.vscode-svgviewer",
+	"cssho.vscode-svgviewer"
 )
 foreach ($Extension in $Extensions)
 {
