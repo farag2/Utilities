@@ -14,7 +14,7 @@ $PSReadLine = @{
 	ModuleName = "PSReadLine"
 	ModuleVersion = "2.0.0"
 }
-Remove-Module -FullyQualifiedName $PSReadLine
+Remove-Module -FullyQualifiedName $PSReadLine -Force
 Get-InstalledModule -Name PSReadline -AllVersions | Where-Object -FilterScript {$_.Version -eq "2.0.0"} | Uninstall-Module
 Remove-Item -Path $env:ProgramFiles\WindowsPowerShell\Modules\PSReadline\2.0.0 -Recurse -Force -ErrorAction Ignore
 
