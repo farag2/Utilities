@@ -1,13 +1,13 @@
-﻿# https://docs.microsoft.com/en-us/windows/terminal/
+# https://docs.microsoft.com/en-us/windows/terminal/
 # https://github.com/microsoft/terminal/issues/1555#issuecomment-505157311
 
-# Intall PSReadLine 2.0.4
+# Intall PSReadLine 2.1.0
 # https://github.com/PowerShell/PSReadLine/releases
 if (-not (Get-Package -Name NuGet -Force -ErrorAction Ignore))
 {
 	Install-Package -Name NuGet -Force
 }
-Install-Module -Name PSReadLine -RequiredVersion 2.0.4 -Force
+Install-Module -Name PSReadLine -RequiredVersion 2.1.0 -Force
 
 # Remove the old PSReadLine 2.0.0
 $PSReadLine = @{
