@@ -47,7 +47,10 @@ https://www.eventsentry.com/blog/2018/01/powershell-p0wrh11-securing-powershell.
 https://www.eventsentry.com/blog/2018/01/powershell-pw3rh311-detecting-preventing-powershell-attacks.html
 
 # Блоки питания
-https://docs.google.com/spreadsheets/d/1bEcFiMdLWPtPu3c1JsvsLIbcYANlLUVO1ICQdh-jxsg/edit
+https://docs.google.com/spreadsheets/d/1bEcFiMdLWPtPu3c1JsvsLIbcYANlLUVO1ICQdh-jxsg/htmlview
+
+# Мониторы
+https://docs.google.com/spreadsheets/d/1Ej9mOe5NamLldpfyFfXrqvLMZP-aG2Zi1su7QzPRNJY/htmlview
 
 # GitHub Actions
 https://help.github.com/en/actions/getting-started-with-github-actions
