@@ -28,8 +28,9 @@ foreach ($Package in $($DamagedPackages | Get-Unique))
 }
 
 # Установка Microsoft Store из appxbundle
-# SW_DVD9_NTRL_Win_10_2004_32_64_ARM64_MultiLang_App_Update_X22-21309.ISO
+# SW_DVD9_NTRL_Win_10_20H2_32_64_ARM64_MultiLang_Inbox_Apps_X22-36106.ISO
 # https://store.rg-adguard.net
+# https://yadi.sk/d/10Ttj2IVOKQ0Og
 Add-AppxPackage -Path D:\Microsoft.DesktopAppInstaller.appxbundle
 Add-AppxPackage -Path D:\Microsoft.StorePurchaseApp.appxbundle
 
@@ -64,7 +65,7 @@ Register-ScheduledTask @Params -Force
 
 # Добавление доменов в hosts
 $hostfile = "$env:SystemRoot\System32\drivers\etc\hosts"
-$domains = @("site.com","site2.com")
+$domains = @("site.com", "site2.com")
 foreach ($hostentry in $domains)
 {
 	if (-not (Get-Content -Path $hostfile | Select-String "0.0.0.0 `t $hostentry"))
