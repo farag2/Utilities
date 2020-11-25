@@ -357,7 +357,7 @@ $file = "file.ext"
 $Key = @"
 RAR registration data
 "@
-Set-Content -Path $Path -Value $Key -Encoding Unicode -Force
+Set-Content -Path $Path\file.ini -Value $Key -Encoding Unicode -Force
 
 # Удалить первые $c буквы в названиях файлов в папке
 $Path = "D:\folder"
