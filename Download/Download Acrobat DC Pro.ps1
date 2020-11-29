@@ -68,9 +68,9 @@ Set-Content -Value (New-Object System.Text.UTF8Encoding).GetBytes($Content) -Enc
 # Downloading the latest patch
 # https://supportdownloads.adobe.com/product.jsp?product=ac&platform=Windows
 # https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html
-$PatchFile = Split-Path -Path "ftp://ftp.adobe.com/pub/adobe/acrobat/win/AcrobatDC/2000920067/AcrobatDCUpd2000920067.msp" -Leaf
+$PatchFile = Split-Path -Path "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/2001320064/AcrobatDCUpd2001320064.msp" -Leaf
 $Parameters = @{
-	Uri = $URL
+	Uri = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/2001320064/AcrobatDCUpd2001320064.msp"
 	OutFile = "$ExtractPath\Adobe Acrobat\$PatchFile"
 	Verbose = [switch]::Present
 }
