@@ -1,6 +1,18 @@
 # https://docs.microsoft.com/en-us/windows/terminal/
 # https://github.com/microsoft/terminal/issues/1555#issuecomment-505157311
 
+# Remove the old PSReadLine 2.0.0
+if ((Get-Module -Name PSReadline).Version -eq "2.0.0")
+{
+	$PSReadLine = @{
+		ModuleName = "PSReadLine"
+		ModuleVersion = "2.1.0"
+	}
+	Remove-Module -FullyQualifiedName $PSReadLine -Force
+}
+Get-InstalledModule -Name PSReadline -AllVersions | Where-Object -FilterScript {$_.Version -eq "2.0.0"} | Uninstall-Module
+Remove-Item -Path $env:ProgramFiles\WindowsPowerShell\Modules\PSReadline\2.0.0 -Recurse -Force -ErrorAction Ignore
+
 # Intall PSReadLine 2.1.0
 # https://github.com/PowerShell/PSReadLine/releases
 if (-not (Get-Package -Name NuGet -Force -ErrorAction Ignore))
@@ -8,15 +20,6 @@ if (-not (Get-Package -Name NuGet -Force -ErrorAction Ignore))
 	Install-Package -Name NuGet -Force
 }
 Install-Module -Name PSReadLine -RequiredVersion 2.1.0 -Force
-
-# Remove the old PSReadLine 2.0.0
-$PSReadLine = @{
-	ModuleName = "PSReadLine"
-	ModuleVersion = "2.0.0"
-}
-Remove-Module -FullyQualifiedName $PSReadLine -Force
-Get-InstalledModule -Name PSReadline -AllVersions | Where-Object -FilterScript {$_.Version -eq "2.0.0"} | Uninstall-Module
-Remove-Item -Path $env:ProgramFiles\WindowsPowerShell\Modules\PSReadline\2.0.0 -Recurse -Force -ErrorAction Ignore
 
 # Download Windows95.gif
 # https://github.com/farag2/Utilities/tree/master/Windows%20Terminal
@@ -39,40 +42,48 @@ if (Get-Content -Path $JsonPath | Select-String -Pattern "//" -SimpleMatch)
 # Delete all blank lines from JSON file
 (Get-Content -Path $JsonPath) | Where-Object -FilterScript {$_.Trim(" `t")} | Set-Content -Path $JsonPath -Force
 
-$Terminal = Get-Content -Path $JsonPath | ConvertFrom-Json
+try
+{
+	$Terminal = Get-Content -Path $JsonPath | ConvertFrom-Json
+}
+catch [System.Exception]
+{
+	Write-Verbose "JSON is not valid!" -Verbose
+	break
+}
 
 # Close tab
-if (-not ($Terminal.keybindings | Where-Object -FilterScript {$_.command -eq "closeTab"} | Where-Object -FilterScript {$_.keys -eq "ctrl+w"}))
+if (-not ($Terminal.actions | Where-Object -FilterScript {$_.command -eq "closeTab"} | Where-Object -FilterScript {$_.keys -eq "ctrl+w"}))
 {
 	$closeTab = [PSCustomObject]@{
 		"command" = "closeTab"
 		"keys" = "ctrl+w"
 	}
-	$Terminal.keybindings += $closeTab
+	$Terminal.actions += $closeTab
 }
 
 # New tab
-if (-not ($Terminal.keybindings | Where-Object -FilterScript {$_.command -eq "newTab"} | Where-Object -FilterScript {$_.keys -eq "ctrl+t"}))
+if (-not ($Terminal.actions | Where-Object -FilterScript {$_.command -eq "newTab"} | Where-Object -FilterScript {$_.keys -eq "ctrl+t"}))
 {
 	$newTab = [PSCustomObject]@{
 		"command" = "newTab"
 		"keys" = "ctrl+t"
 	}
-	$Terminal.keybindings += $newTab
+	$Terminal.actions += $newTab
 }
 
 # Find
-if (-not ($Terminal.keybindings | Where-Object -FilterScript {$_.command -eq "find"} | Where-Object -FilterScript {$_.keys -eq "ctrl+f"}))
+if (-not ($Terminal.actions | Where-Object -FilterScript {$_.command -eq "find"} | Where-Object -FilterScript {$_.keys -eq "ctrl+f"}))
 {
 	$find = [PSCustomObject]@{
 		"command" = "find"
 		"keys" = "ctrl+f"
 	}
-	$Terminal.keybindings += $find
+	$Terminal.actions += $find
 }
 
 # Split pane
-if (-not ($Terminal.keybindings | Where-Object -FilterScript {$_.command.action -eq "splitPane"} | Where-Object -FilterScript {$_.command.split -eq "auto"} | Where-Object -FilterScript {$_.command.splitMode -eq "duplicate"}))
+if (-not ($Terminal.actions | Where-Object -FilterScript {$_.command.action -eq "splitPane"} | Where-Object -FilterScript {$_.command.split -eq "auto"} | Where-Object -FilterScript {$_.command.splitMode -eq "duplicate"}))
 {
 	$split = [PSCustomObject]@{
 		"action" = "splitPane"
@@ -83,7 +94,7 @@ if (-not ($Terminal.keybindings | Where-Object -FilterScript {$_.command.action 
 		"command" = $split
 		"keys" = "ctrl+shift+d"
 	}
-	$Terminal.keybindings += $splitPane
+	$Terminal.actions += $splitPane
 }
 
 # No confirmation when closing all tabs
