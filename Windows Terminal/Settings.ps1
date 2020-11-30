@@ -6,12 +6,12 @@ if ((Get-Module -Name PSReadline).Version -eq "2.0.0")
 {
 	$PSReadLine = @{
 		ModuleName = "PSReadLine"
-		ModuleVersion = "2.1.0"
+		ModuleVersion = "2.0.0"
 	}
 	Remove-Module -FullyQualifiedName $PSReadLine -Force
+	Get-InstalledModule -Name PSReadline -AllVersions | Where-Object -FilterScript {$_.Version -eq "2.0.0"} | Uninstall-Module
+	Remove-Item -Path $env:ProgramFiles\WindowsPowerShell\Modules\PSReadline\2.0.0 -Recurse -Force -ErrorAction Ignore
 }
-Get-InstalledModule -Name PSReadline -AllVersions | Where-Object -FilterScript {$_.Version -eq "2.0.0"} | Uninstall-Module
-Remove-Item -Path $env:ProgramFiles\WindowsPowerShell\Modules\PSReadline\2.0.0 -Recurse -Force -ErrorAction Ignore
 
 # Intall PSReadLine 2.1.0
 # https://github.com/PowerShell/PSReadLine/releases
@@ -19,7 +19,10 @@ if (-not (Get-Package -Name NuGet -Force -ErrorAction Ignore))
 {
 	Install-Package -Name NuGet -Force
 }
-Install-Module -Name PSReadLine -RequiredVersion 2.1.0 -Force
+if ((Get-Module -Name PSReadline).Version -ge "2.1.0")
+{
+	Install-Module -Name PSReadLine -RequiredVersion 2.1.0 -Force
+}
 
 # Download Windows95.gif
 # https://github.com/farag2/Utilities/tree/master/Windows%20Terminal
