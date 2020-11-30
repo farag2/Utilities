@@ -812,3 +812,10 @@ while ($Prompt -ne "N")
 # Активация Windows
 slmgr.vbs /skms <servername>
 slmgr.vbs /ato
+
+
+# Получить имя исключения при ошибке
+$Error[0].Exception.GetType().FullName
+
+# Закрыть все папки, не убивая процесс explorer.exe
+(New-Object -ComObject Shell.Application).Windows() | Where-Object {$null -ne $_.FullName} | Where-Object {$_.FullName.EndsWith("\explorer.exe") } | ForEach-Object -Process {$_.Quit()}
