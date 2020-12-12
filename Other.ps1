@@ -820,12 +820,13 @@ $Error[0].Exception.GetType().FullName
 # Закрыть все папки, не убивая процесс explorer.exe
 (New-Object -ComObject Shell.Application).Windows() | Where-Object {$null -ne $_.FullName} | Where-Object {$_.FullName.EndsWith("\explorer.exe") } | ForEach-Object -Process {$_.Quit()}
 
-# Вывести таблицу с количеством строк и названием файлов в подпапке
+# Вывести таблицу с количеством строк и названием файлов в подпапке. -Raw читает файл с пустыми строками
+$FullName = @{
 	Name = "File"
 	Expression = {$_.FullName}
 }
 $Lines = @{
 	Name = "Lines"
-	Expression = {Get-Content -Path $_ | Measure-Object -Line | Select-Object -ExpandProperty Lines}
+	Expression = {Get-Content -Path $_ -Raw | Measure-Object -Line | Select-Object -ExpandProperty Lines}
 }
-Get-ChildItem -Path "D:\Path\*\*" -File -Filter *.psd1 -Force | ForEach-Object -Process {$_ | Select-Object -Property $FullName, $Lines} | Format-Table -AutoSize
+Get-ChildItem -Path "D:\Sophia\*\*" -File -Filter *.psd1 -Force | ForEach-Object -Process {$_ | Select-Object -Property $FullName, $Lines} | Format-Table -AutoSize
