@@ -17,4 +17,4 @@ Add-MpPreference -ThreatIDDefaultAction_Ids 2147593794 -ThreatIDDefaultAction_Ac
 Write-Host "AutoCAD"; ^
 Add-MpPreference -ThreatIDDefaultAction_Ids 2147648291 -ThreatIDDefaultAction_Actions Allow -Force; ^
 Add-MpPreference -ThreatIDDefaultAction_Ids 2147726780 -ThreatIDDefaultAction_Actions Allow -Force;
-START powershell -NoExit -NoLogo NoProfile -Command %ThreatID%
+START powershell -NoExit -NoLogo -NoProfile -Command %ThreatID%
