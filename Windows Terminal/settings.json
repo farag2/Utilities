@@ -16,20 +16,20 @@
                                       "backgroundImageAlignment":  "bottomRight",
                                       "backgroundImageOpacity":  0.3,
                                       "backgroundImageStretchMode":  "none",
-                                      "startingDirectory":  "C:\\Desktop",
+                                      "startingDirectory":  "D:\\Desktop",
                                       "useAcrylic":  true,
                                       "acrylicOpacity":  0.75,
                                       "backgroundImage":  "ms-appdata:///roaming/Windows95.gif"
                                   },
                                   {
                                       "guid":  "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
-                                      "name":  "Командная строка",
+                                      "name":  "Command Prompt",
                                       "commandline":  "cmd.exe",
                                       "hidden":  false,
                                       "backgroundImageAlignment":  "bottomRight",
                                       "backgroundImageOpacity":  0.3,
                                       "backgroundImageStretchMode":  "none",
-                                      "startingDirectory":  "C:\\Desktop",
+                                      "startingDirectory":  "D:\\Desktop",
                                       "useAcrylic":  true,
                                       "acrylicOpacity":  0.75,
                                       "backgroundImage":  "ms-appdata:///roaming/Windows95.gif"
@@ -39,49 +39,62 @@
                                       "name":  "Azure Cloud Shell",
                                       "source":  "Windows.Terminal.Azure",
                                       "hidden":  true
+                                  },
+                                  {
+                                      "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
+                                      "hidden": false,
+                                      "name": "PowerShell",
+                                      "source": "Windows.Terminal.PowershellCore",
+                                      "backgroundImageAlignment":  "bottomRight",
+                                      "backgroundImageOpacity":  0.3,
+                                      "backgroundImageStretchMode":  "none",
+                                      "startingDirectory":  "D:\\Desktop",
+                                      "useAcrylic":  true,
+                                      "acrylicOpacity":  0.75,
+                                      "backgroundImage":  "ms-appdata:///roaming/Windows95.gif"
                                   }
                               ]
                  },
     "schemes":  [
 
                 ],
-    "keybindings":  [
-                        {
-                            "command":  {
-                                            "action":  "copy",
-                                            "singleLine":  false
-                                        },
-                            "keys":  "ctrl+c"
-                        },
-                        {
-                            "command":  "paste",
-                            "keys":  "ctrl+v"
-                        },
-                        {
-                            "command":  "find",
-                            "keys":  "ctrl+shift+f"
-                        },
-                        {
-                            "command":  {
-                                            "action":  "splitPane",
-                                            "split":  "auto",
-                                            "splitMode":  "duplicate"
-                                        },
-                            "keys":  "alt+shift+d"
-                        },
-                        {
-                            "command":  "closeTab",
-                            "keys":  "ctrl+w"
-                        },
-                        {
-                            "command":  "newTab",
-                            "keys":  "ctrl+t"
-                        },
-                        {
-                            "command":  "find",
-                            "keys":  "ctrl+f"
-                        }
-                    ],
+    "actions":  [
+                    {
+                        "command":  {
+                                        "action":  "copy",
+                                        "singleLine":  false
+                                    },
+                        "keys":  "ctrl+c"
+                    },
+                    {
+                        "command":  "paste",
+                        "keys":  "ctrl+v"
+                    },
+                    {
+                        "command":  "find",
+                        "keys":  "ctrl+shift+f"
+                    },
+                    {
+                        "command":  {
+                                        "action":  "splitPane",
+                                        "split":  "auto",
+                                        "splitMode":  "duplicate"
+                                    },
+                        "keys":  "alt+shift+d"
+                    },
+                    {
+                        "command":  "closeTab",
+                        "keys":  "ctrl+w"
+                    },
+                    {
+                        "command":  "newTab",
+                        "keys":  "ctrl+t"
+                    },
+                    {
+                        "command":  "find",
+                        "keys":  "ctrl+f"
+                    }
+                ],
     "confirmCloseAllTabs":  false,
     "showTabsInTitlebar":  false
 }
