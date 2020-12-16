@@ -1,27 +1,32 @@
 # https://docs.microsoft.com/en-us/windows/terminal/
 # https://github.com/microsoft/terminal/issues/1555#issuecomment-505157311
 
-# Remove the old PSReadLine 2.0.0
-if ((Get-Module -Name PSReadline).Version -eq "2.0.0")
+# Get the latest PSReadLine version number
+$Releases = Invoke-WebRequest -Uri "https://api.github.com/repos/PowerShell/PSReadLine/releases" -UseBasicParsing | ConvertFrom-Json
+$LatestRelease = ($Releases | Where-Object -FilterScript {$_.prerelease -eq $false})[0].tag_name.Replace("v","")
+
+$CurrentVersion = (Get-Module -Name PSReadline).Version.ToString()
+if ($CurrentVersion -ne $LatestRelease)
 {
+	# Intalling the latest PSReadLine
+	# https://github.com/PowerShell/PSReadLine/releases
+	if (-not (Get-Package -Name NuGet -Force -ErrorAction Ignore))
+	{
+		Install-Package -Name NuGet -Force
+	}
+	Install-Module -Name PSReadLine -RequiredVersion $LatestRelease -Force
+
+	# Removing the old PSReadLine
 	$PSReadLine = @{
 		ModuleName = "PSReadLine"
-		ModuleVersion = "2.0.0"
+		ModuleVersion = $CurrentVersion
 	}
 	Remove-Module -FullyQualifiedName $PSReadLine -Force
-	Get-InstalledModule -Name PSReadline -AllVersions | Where-Object -FilterScript {$_.Version -eq "2.0.0"} | Uninstall-Module -Force
-	Remove-Item -Path $env:ProgramFiles\WindowsPowerShell\Modules\PSReadline\2.0.0 -Recurse -Force -ErrorAction Ignore
-}
+	Get-InstalledModule -Name PSReadline -AllVersions | Where-Object -FilterScript {$_.Version -eq $CurrentVersion} | Uninstall-Module -Force
+	Remove-Item -Path $env:ProgramFiles\WindowsPowerShell\Modules\PSReadline\$CurrentVersion -Recurse -Force -ErrorAction Ignore
 
-# Intall PSReadLine 2.1.0
-# https://github.com/PowerShell/PSReadLine/releases
-if (-not (Get-Package -Name NuGet -Force -ErrorAction Ignore))
-{
-	Install-Package -Name NuGet -Force
-}
-if ((Get-Module -Name PSReadline).Version -ge "2.1.0")
-{
-	Install-Module -Name PSReadLine -RequiredVersion 2.1.0 -Force
+	Get-InstalledModule -Name PSReadline -AllVersions
+	Write-Verbose -Message "Restart the session" -Verbose
 }
 
 # Download Windows95.gif
