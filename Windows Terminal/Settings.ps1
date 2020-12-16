@@ -29,9 +29,10 @@ if ($CurrentVersion -ne $LatestRelease)
 	Write-Verbose -Message "Restart the session" -Verbose
 }
 
-# Download Windows95.gif
+# Downloading Windows95.gif
 # https://github.com/farag2/Utilities/tree/master/Windows%20Terminal
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 $Parameters = @{
 	Uri = "https://github.com/farag2/Utilities/raw/master/Windows%20Terminal/Windows95.gif"
 	OutFile = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\Windows95.gif"
@@ -41,18 +42,18 @@ Invoke-WebRequest @Parameters
 
 $JsonPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 
-# Remove all comments to parse JSON file
+# Removing all comments to parse JSON file
 if (Get-Content -Path $JsonPath | Select-String -Pattern "//" -SimpleMatch)
 {
 	Set-Content -Path $JsonPath -Value (Get-Content -Path $JsonPath | Select-String -Pattern "//" -NotMatch) -Force
 }
 
-# Delete all blank lines from JSON file
+# Deleting all blank lines from JSON file
 (Get-Content -Path $JsonPath) | Where-Object -FilterScript {$_.Trim(" `t")} | Set-Content -Path $JsonPath -Force
 
 try
 {
-	$Terminal = Get-Content -Path $JsonPath | ConvertFrom-Json
+	$Terminal = Get-Content -Path $JsonPath -Force | ConvertFrom-Json
 }
 catch [System.Exception]
 {
@@ -60,6 +61,7 @@ catch [System.Exception]
 	break
 }
 
+#region General
 # Close tab
 if (-not ($Terminal.actions | Where-Object -FilterScript {$_.command -eq "closeTab"} | Where-Object -FilterScript {$_.keys -eq "ctrl+w"}))
 {
@@ -112,7 +114,7 @@ if ($Terminal.confirmCloseAllTabs)
 }
 else
 {
-	$Terminal | Add-Member -MemberType NoteProperty -Name confirmCloseAllTabs -Value $false -Force
+	$Terminal | Add-Member -Name confirmCloseAllTabs -MemberType NoteProperty -Value $false -Force
 }
 
 # Show tabs in title bar
@@ -122,10 +124,11 @@ if ($Terminal.showTabsInTitlebar)
 }
 else
 {
-	$Terminal | Add-Member -MemberType NoteProperty -Name showTabsInTitlebar -Value $false -Force
+	$Terminal | Add-Member -Name showTabsInTitlebar -MemberType NoteProperty -Value $false -Force
 }
+#endregion General
 
-# The PowerShell profile settings
+#region PowerShell
 # Set Windows95.gif as a background image
 if ($Terminal.profiles.list[0].backgroundImage)
 {
@@ -133,7 +136,7 @@ if ($Terminal.profiles.list[0].backgroundImage)
 }
 else
 {
-	$Terminal.profiles.list[0] | Add-Member -MemberType NoteProperty -Name backgroundImage -Value "ms-appdata:///roaming/Windows95.gif" -Force
+	$Terminal.profiles.list[0] | Add-Member -Name backgroundImage -MemberType NoteProperty -Value "ms-appdata:///roaming/Windows95.gif" -Force
 }
 
 # Background image alignment
@@ -143,7 +146,7 @@ if ($Terminal.profiles.list[0].backgroundImageAlignment)
 }
 else
 {
-	$Terminal.profiles.list[0] | Add-Member -MemberType NoteProperty -Name backgroundImageAlignment -Value bottomRight -Force
+	$Terminal.profiles.list[0] | Add-Member -Name backgroundImageAlignment -MemberType NoteProperty -Value bottomRight -Force
 }
 
 # Background image opacity
@@ -154,7 +157,7 @@ if ($Terminal.profiles.list[0].backgroundImageOpacity)
 }
 else
 {
-	$Terminal.profiles.list[0] | Add-Member -MemberType NoteProperty -Name backgroundImageOpacity -Value 0.3 -Force
+	$Terminal.profiles.list[0] | Add-Member -Name backgroundImageOpacity -MemberType NoteProperty -Value 0.3 -Force
 }
 
 # Background image stretch mode
@@ -164,7 +167,7 @@ if ($Terminal.profiles.list[0].backgroundImageStretchMode)
 }
 else
 {
-	$Terminal.profiles.list[0] | Add-Member -MemberType NoteProperty -Name backgroundImageStretchMode -Value none -Force
+	$Terminal.profiles.list[0] | Add-Member -Name backgroundImageStretchMode -MemberType NoteProperty -Value none -Force
 }
 
 # Starting directory
@@ -175,7 +178,7 @@ if ($Terminal.profiles.list[0].startingDirectory)
 }
 else
 {
-	$Terminal.profiles.list[0] | Add-Member -MemberType NoteProperty -Name startingDirectory -Value $DownloadsFolder -Force
+	$Terminal.profiles.list[0] | Add-Member -Name startingDirectory -MemberType NoteProperty -Value $DownloadsFolder -Force
 }
 
 # Use acrylic
@@ -185,7 +188,7 @@ if ($Terminal.profiles.list[0].useAcrylic)
 }
 else
 {
-	$Terminal.profiles.list[0] | Add-Member -MemberType NoteProperty -Name useAcrylic -Value $true -Force
+	$Terminal.profiles.list[0] | Add-Member -Name useAcrylic -MemberType NoteProperty -Value $true -Force
 }
 
 # Acrylic opacity
@@ -196,10 +199,11 @@ if ($Terminal.profiles.list[0].acrylicOpacity)
 }
 else
 {
-	$Terminal.profiles.list[0] | Add-Member -MemberType NoteProperty -Name acrylicOpacity -Value 0.75 -Force
+	$Terminal.profiles.list[0] | Add-Member -Name acrylicOpacity -MemberType NoteProperty -Value 0.75 -Force
 }
+#endregion PowerShell
 
-# The CMD profile settings
+#region CMD
 # Set Windows95.gif as a background image
 if ($Terminal.profiles.list[1].backgroundImage)
 {
@@ -207,7 +211,7 @@ if ($Terminal.profiles.list[1].backgroundImage)
 }
 else
 {
-	$Terminal.profiles.list[1] | Add-Member -MemberType NoteProperty -Name backgroundImage -Value "ms-appdata:///roaming/Windows95.gif" -Force
+	$Terminal.profiles.list[1] | Add-Member -Name backgroundImage -MemberType NoteProperty -Value "ms-appdata:///roaming/Windows95.gif" -Force
 }
 
 # Background image alignment
@@ -217,7 +221,7 @@ if ($Terminal.profiles.list[1].backgroundImageAlignment)
 }
 else
 {
-	$Terminal.profiles.list[1] | Add-Member -MemberType NoteProperty -Name backgroundImageAlignment -Value bottomRight -Force
+	$Terminal.profiles.list[1] | Add-Member -Name backgroundImageAlignment -MemberType NoteProperty -Value bottomRight -Force
 }
 
 # Background image opacity
@@ -228,7 +232,7 @@ if ($Terminal.profiles.list[1].backgroundImageOpacity)
 }
 else
 {
-	$Terminal.profiles.list[1] | Add-Member -MemberType NoteProperty -Name backgroundImageOpacity -Value 0.3 -Force
+	$Terminal.profiles.list[1] | Add-Member -Name backgroundImageOpacity -MemberType NoteProperty -Value 0.3 -Force
 }
 
 # Background image stretch mode
@@ -238,7 +242,7 @@ if ($Terminal.profiles.list[1].backgroundImageStretchMode)
 }
 else
 {
-	$Terminal.profiles.list[1] | Add-Member -MemberType NoteProperty -Name backgroundImageStretchMode -Value none -Force
+	$Terminal.profiles.list[1] | Add-Member -Name backgroundImageStretchMode -MemberType NoteProperty -Value none -Force
 }
 
 # Starting directory
@@ -249,7 +253,7 @@ if ($Terminal.profiles.list[1].startingDirectory)
 }
 else
 {
-	$Terminal.profiles.list[1] | Add-Member -MemberType NoteProperty -Name startingDirectory -Value $DownloadsFolder -Force
+	$Terminal.profiles.list[1] | Add-Member -Name startingDirectory -MemberType NoteProperty -Value $DownloadsFolder -Force
 }
 
 # Use acrylic
@@ -259,7 +263,7 @@ if ($Terminal.profiles.list[1].useAcrylic)
 }
 else
 {
-	$Terminal.profiles.list[1] | Add-Member -MemberType NoteProperty -Name useAcrylic -Value $true -Force
+	$Terminal.profiles.list[1] | Add-Member -Name useAcrylic -MemberType NoteProperty -Value $true -Force
 }
 
 # Acrylic opacity
@@ -270,17 +274,98 @@ if ($Terminal.profiles.list[1].acrylicOpacity)
 }
 else
 {
-	$Terminal.profiles.list[1] | Add-Member -MemberType NoteProperty -Name acrylicOpacity -Value 0.75 -Force
+	$Terminal.profiles.list[1] | Add-Member -Name acrylicOpacity -MemberType NoteProperty -Value 0.75 -Force
 }
+#endregion CMD
 
-# Hide Azure Cloud Shell profile
-if ($Terminal.profiles.list[2].hidden)
+#region Azure
+# Hide
+if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{b453ae62-4e3d-5e58-b989-0a998ec441b8}"}).hidden)
 {
-	$Terminal.profiles.list[2].hidden = $true
+	($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{b453ae62-4e3d-5e58-b989-0a998ec441b8}"}).hidden = $true
 }
 else
 {
-	$Terminal.profiles.list[2] | Add-Member -MemberType NoteProperty -Name hidden -Value $true -Force
+	$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{b453ae62-4e3d-5e58-b989-0a998ec441b8}"} | Add-Member -MemberType NoteProperty -Name hidden -Value $true -Force
 }
+#endregion Azure
+
+#region Powershell Core
+if (Test-Path -Path "$env:ProgramFiles\PowerShell\7")
+{
+	# Background image stretch mode
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).backgroundImageAlignment)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).backgroundImageAlignment = "bottomRight"
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name backgroundImageAlignment -Value bottomRight -Force
+	}
+
+	# Background image opacity
+	$Value = 0.3
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).backgroundImageOpacity)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).backgroundImageOpacity = $Value
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name backgroundImageOpacity -Value 0.3 -Force
+	}
+
+	# Background image stretch mode
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).backgroundImageStretchMode)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).backgroundImageStretchMode = "none"
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name backgroundImageStretchMode -Value none -Force
+	}
+
+	# Starting directory
+	$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name Desktop
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).startingDirectory)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).startingDirectory = $DownloadsFolder
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name startingDirectory -Value $DownloadsFolder -Force
+	}
+
+	# Use acrylic
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).useAcrylic)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).useAcrylic = $true
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name useAcrylic -Value $true -Force
+	}
+
+	# Acrylic opacity
+	$Value = 0.75
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).acrylicOpacity)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).acrylicOpacity = $Value
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name acrylicOpacity -Value 0.75 -Force
+	}
+
+	# Set Windows95.gif as a background image
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).backgroundImage)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).backgroundImage = "ms-appdata:///roaming/Windows95.gif"
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name backgroundImage -Value "ms-appdata:///roaming/Windows95.gif" -Force
+	}
+}
+#endregion Powershell Core
 
 ConvertTo-Json -InputObject $Terminal -Depth 4 | Set-Content -Path $JsonPath -Force
