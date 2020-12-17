@@ -3,7 +3,7 @@
 
 # Get the latest PSReadLine version number
 # ((Invoke-WebRequest -Uri "https://api.github.com/repos/PowerShell/PSReadLine/releases" -UseBasicParsing | ConvertFrom-Json) | Where-Object -FilterScript {$_.prerelease -eq $false})[0].tag_name.Replace("v","")
-$LatestRelease = ((Invoke-RestMethod -Uri "https://api.github.com/repos/PowerShell/PSReadLine/releases" -UseBasicParsing) | Where-Object -FilterScript {$_.prerelease -eq $false}).tag_name.Replace("v","")[0]
+$LatestRelease = ((Invoke-RestMethod -Uri "https://api.github.com/repos/PowerShell/PSReadLine/releases") | Where-Object -FilterScript {$_.prerelease -eq $false}).tag_name.Replace("v","")[0]
 
 $CurrentVersion = (Get-Module -Name PSReadline).Version.ToString()
 if ($CurrentVersion -ne $LatestRelease)
