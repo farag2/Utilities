@@ -33,27 +33,30 @@ if ($CurrentVersion -ne $LatestRelease)
 # https://github.com/farag2/Utilities/tree/master/Windows%20Terminal
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-$Parameters = @{
-	Uri = "https://github.com/farag2/Utilities/raw/master/Windows%20Terminal/Windows95.gif"
-	OutFile = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\Windows95.gif"
-	Verbose = [switch]::Present
+if (-not (Test-Path -Path "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\Windows95.gif"))
+{
+	$Parameters = @{
+		Uri = "https://github.com/farag2/Utilities/raw/master/Windows%20Terminal/Windows95.gif"
+		OutFile = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\Windows95.gif"
+		Verbose = [switch]::Present
+	}
+	Invoke-WebRequest @Parameters
 }
-Invoke-WebRequest @Parameters
 
-$JsonPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+$settings = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 
 # Removing all comments to parse JSON file
-if (Get-Content -Path $JsonPath | Select-String -Pattern "//" -SimpleMatch)
+if (Get-Content -Path $settings | Select-String -Pattern "//" -SimpleMatch)
 {
-	Set-Content -Path $JsonPath -Value (Get-Content -Path $JsonPath | Select-String -Pattern "//" -NotMatch) -Force
+	Set-Content -Path $settings -Value (Get-Content -Path $settings | Select-String -Pattern "//" -NotMatch) -Force
 }
 
 # Deleting all blank lines from JSON file
-(Get-Content -Path $JsonPath) | Where-Object -FilterScript {$_.Trim(" `t")} | Set-Content -Path $JsonPath -Force
+(Get-Content -Path $settings) | Where-Object -FilterScript {$_.Trim(" `t")} | Set-Content -Path $settings -Force
 
 try
 {
-	$Terminal = Get-Content -Path $JsonPath -Force | ConvertFrom-Json
+	$Terminal = Get-Content -Path $settings -Force | ConvertFrom-Json
 }
 catch [System.Exception]
 {
@@ -294,6 +297,16 @@ else
 if (Test-Path -Path "$env:ProgramFiles\PowerShell\7")
 {
 	# Background image stretch mode
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).namet)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).name = "PowerShell 7"
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name name -Value "PowerShell 7" -Force
+	}
+
+	# Background image stretch mode
 	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).backgroundImageAlignment)
 	{
 		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).backgroundImageAlignment = "bottomRight"
@@ -366,6 +379,82 @@ if (Test-Path -Path "$env:ProgramFiles\PowerShell\7")
 		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name backgroundImage -Value "ms-appdata:///roaming/Windows95.gif" -Force
 	}
 }
+
+if (Test-Path -Path "$env:ProgramFiles\PowerShell\7-preview")
+{
+	# Background image stretch mode
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).backgroundImageAlignment)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).backgroundImageAlignment = "bottomRight"
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"} | Add-Member -MemberType NoteProperty -Name backgroundImageAlignment -Value bottomRight -Force
+	}
+
+	# Background image opacity
+	$Value = 0.3
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).backgroundImageOpacity)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).backgroundImageOpacity = $Value
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"} | Add-Member -MemberType NoteProperty -Name backgroundImageOpacity -Value 0.3 -Force
+	}
+
+	# Background image stretch mode
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).backgroundImageStretchMode)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).backgroundImageStretchMode = "none"
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"} | Add-Member -MemberType NoteProperty -Name backgroundImageStretchMode -Value none -Force
+	}
+
+	# Starting directory
+	$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name Desktop
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).startingDirectory)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).startingDirectory = $DownloadsFolder
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"} | Add-Member -MemberType NoteProperty -Name startingDirectory -Value $DownloadsFolder -Force
+	}
+
+	# Use acrylic
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).useAcrylic)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).useAcrylic = $true
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"} | Add-Member -MemberType NoteProperty -Name useAcrylic -Value $true -Force
+	}
+
+	# Acrylic opacity
+	$Value = 0.75
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).acrylicOpacity)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).acrylicOpacity = $Value
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"} | Add-Member -MemberType NoteProperty -Name acrylicOpacity -Value 0.75 -Force
+	}
+
+	# Set Windows95.gif as a background image
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).backgroundImage)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).backgroundImage = "ms-appdata:///roaming/Windows95.gif"
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"} | Add-Member -MemberType NoteProperty -Name backgroundImage -Value "ms-appdata:///roaming/Windows95.gif" -Force
+	}
+}
 #endregion Powershell Core
 
-ConvertTo-Json -InputObject $Terminal -Depth 4 | Set-Content -Path $JsonPath -Force
+ConvertTo-Json -InputObject $Terminal -Depth 4 | Set-Content -Path $settings -Force
