@@ -1,6 +1,7 @@
 ﻿# Downloading the latest FiraCode version within GitHub API
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$Tag = (Invoke-WebRequest -Uri "https://api.github.com/repos/tonsky/FiraCode/releases" -UseBasicParsing | ConvertFrom-Json)[0].tag_name
+# (Invoke-WebRequest -Uri "https://api.github.com/repos/tonsky/FiraCode/releases" -UseBasicParsing | ConvertFrom-Json)[0].tag_name
+$Tag = ((Invoke-RestMethod -Uri "https://api.github.com/repos/tonsky/FiraCode/releases") | Where-Object -FilterScript {$_.prerelease -eq $false}).tag_name.Replace("v","")[0]
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
 	Uri = "https://github.com/tonsky/FiraCode/releases/download/$Tag/Fira_Code_v$Tag.zip"
