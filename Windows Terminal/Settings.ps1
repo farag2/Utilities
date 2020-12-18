@@ -6,7 +6,33 @@
 $LatestRelease = ((Invoke-RestMethod -Uri "https://api.github.com/repos/PowerShell/PSReadLine/releases") | Where-Object -FilterScript {$_.prerelease -eq $false}).tag_name.Replace("v","")[0]
 
 $CurrentVersion = (Get-Module -Name PSReadline).Version.ToString()
-if ($CurrentVersion -ne $LatestRelease)
+
+if ($null -ne (Get-Module -Name PSReadline))
+{
+	if ($CurrentVersion -ne $LatestRelease)
+	{
+		# Intalling the latest PSReadLine
+		# https://github.com/PowerShell/PSReadLine/releases
+		if (-not (Get-Package -Name NuGet -Force -ErrorAction Ignore))
+		{
+			Install-Package -Name NuGet -Force
+		}
+		Install-Module -Name PSReadLine -RequiredVersion $LatestRelease -Force
+
+		# Removing the old PSReadLine
+		$PSReadLine = @{
+			ModuleName = "PSReadLine"
+			ModuleVersion = $CurrentVersion
+		}
+		Remove-Module -FullyQualifiedName $PSReadLine -Force
+		Get-InstalledModule -Name PSReadline -AllVersions | Where-Object -FilterScript {$_.Version -eq $CurrentVersion} | Uninstall-Module -Force
+		Remove-Item -Path $env:ProgramFiles\WindowsPowerShell\Modules\PSReadline\$CurrentVersion -Recurse -Force -ErrorAction Ignore
+
+		Get-InstalledModule -Name PSReadline -AllVersions
+		Write-Verbose -Message "Restart the session" -Verbose
+	}
+}
+else
 {
 	# Intalling the latest PSReadLine
 	# https://github.com/PowerShell/PSReadLine/releases
@@ -15,18 +41,6 @@ if ($CurrentVersion -ne $LatestRelease)
 		Install-Package -Name NuGet -Force
 	}
 	Install-Module -Name PSReadLine -RequiredVersion $LatestRelease -Force
-
-	# Removing the old PSReadLine
-	$PSReadLine = @{
-		ModuleName = "PSReadLine"
-		ModuleVersion = $CurrentVersion
-	}
-	Remove-Module -FullyQualifiedName $PSReadLine -Force
-	Get-InstalledModule -Name PSReadline -AllVersions | Where-Object -FilterScript {$_.Version -eq $CurrentVersion} | Uninstall-Module -Force
-	Remove-Item -Path $env:ProgramFiles\WindowsPowerShell\Modules\PSReadline\$CurrentVersion -Recurse -Force -ErrorAction Ignore
-
-	Get-InstalledModule -Name PSReadline -AllVersions
-	Write-Verbose -Message "Restart the session" -Verbose
 }
 
 # Downloading Windows95.gif
