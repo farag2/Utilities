@@ -218,6 +218,19 @@ else
 {
 	$Terminal.profiles.list[0] | Add-Member -Name acrylicOpacity -MemberType NoteProperty -Value 0.75 -Force
 }
+
+# Set "Fira Code" as a default font
+if ((New-Object -TypeName System.Drawing.Text.InstalledFontCollection).Families.Name -contains "Fira Code")
+{
+	if ($Terminal.profiles.list[0].fontFace)
+	{
+		$Terminal.profiles.list[0].fontFace = "Fira Code"
+	}
+	else
+	{
+		$Terminal.profiles.list[0] | Add-Member -Name fontFace -MemberType NoteProperty -Value "Fira Code" -Force
+	}
+}
 #endregion PowerShell
 
 #region CMD
@@ -292,6 +305,19 @@ if ($Terminal.profiles.list[1].acrylicOpacity)
 else
 {
 	$Terminal.profiles.list[1] | Add-Member -Name acrylicOpacity -MemberType NoteProperty -Value 0.75 -Force
+}
+
+# Set "Fira Code" as a default font
+if ((New-Object -TypeName System.Drawing.Text.InstalledFontCollection).Families.Name -contains "Fira Code")
+{
+	if ($Terminal.profiles.list[1].fontFace)
+	{
+		$Terminal.profiles.list[1].fontFace = "Fira Code"
+	}
+	else
+	{
+		$Terminal.profiles.list[1] | Add-Member -Name fontFace -MemberType NoteProperty -Value "Fira Code" -Force
+	}
 }
 #endregion CMD
 
@@ -392,6 +418,19 @@ if (Test-Path -Path "$env:ProgramFiles\PowerShell\7")
 	{
 		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name backgroundImage -Value "ms-appdata:///roaming/Windows95.gif" -Force
 	}
+
+	# Set "Fira Code" as a default font
+	if ((New-Object -TypeName System.Drawing.Text.InstalledFontCollection).Families.Name -contains "Fira Code")
+	{
+		if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).fontFace)
+		{
+			($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).fontFace = "Fira Code"
+		}
+		else
+		{
+			$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -Name fontFace -MemberType NoteProperty -Value "Fira Code" -Force
+		}
+	}
 }
 
 if (Test-Path -Path "$env:ProgramFiles\PowerShell\7-preview")
@@ -467,6 +506,19 @@ if (Test-Path -Path "$env:ProgramFiles\PowerShell\7-preview")
 	else
 	{
 		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"} | Add-Member -MemberType NoteProperty -Name backgroundImage -Value "ms-appdata:///roaming/Windows95.gif" -Force
+	}
+
+	# Set "Fira Code" as a default font
+	if ((New-Object -TypeName System.Drawing.Text.InstalledFontCollection).Families.Name -contains "Fira Code")
+	{
+		if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).fontFace)
+		{
+			($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).fontFace = "Fira Code"
+		}
+		else
+		{
+			$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"} | Add-Member -Name fontFace -MemberType NoteProperty -Value "Fira Code" -Force
+		}
 	}
 }
 #endregion Powershell Core
