@@ -3,18 +3,9 @@
 
 # Install the Windows Subsystem for Linux (WSL2)
 # Установить подсистему Windows для Linux (WSL2)
-if ($RU)
-{
-	$Title = "Windows Subsystem for Linux"
-	$Message = "Установить Windows Subsystem для Linux (WSL)?"
-	$Options = "&Установить", "&Пропустить"
-}
-else
-{
-	$Title = "Windows Subsystem for Linux"
-	$Message = "Would you like to install Windows Subsystem for Linux (WSL)?"
-	$Options = "&Install", "&Skip"
-}
+$Title = "Windows Subsystem for Linux"
+$Message = "Would you like to install Windows Subsystem for Linux (WSL)?"
+$Options = "&Install", "&Skip"
 $DefaultChoice = 1
 $Result = $Host.UI.PromptForChoice($Title, $Message, $Options, $DefaultChoice)
 
@@ -53,14 +44,7 @@ switch ($Result)
 		}
 		catch [Exception]
 		{
-			if ($RU)
-			{
-				Write-Warning -Message "Отсутствует интернет-соединение" -ErrorAction SilentlyContinue
-			}
-			else
-			{
-				Write-Warning -Message "No Internet connection" -ErrorAction SilentlyContinue
-			}
+			Write-Warning -Message "No Internet connection" -ErrorAction SilentlyContinue
 		}
 	}
 	"1"
