@@ -33,6 +33,7 @@ http://www.systanddeploy.com/search?max-results=10&q=+
 https://petri.com/category/powershell
 https://evotec.xyz/category/powershell
 https://sid-500.com/category/powershell/
+https://get-powershellblog.blogspot.com/search/label/PowerShell
 
 # CheetSheets
 https://packetlife.net/library/cheat-sheets/
