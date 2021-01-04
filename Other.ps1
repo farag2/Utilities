@@ -830,3 +830,12 @@ $Lines = @{
 	Expression = {Get-Content -Path $_ -Raw | Measure-Object -Line | Select-Object -ExpandProperty Lines}
 }
 Get-ChildItem -Path "D:\Sophia\*\*" -File -Filter *.psd1 -Force | ForEach-Object -Process {$_ | Select-Object -Property $FullName, $Lines} | Format-Table -AutoSize
+
+# Вывести описание ошибки
+function Convert-Error ([int]$ErrorCode)
+{
+	CertUtil -error $ErrorCode
+	"`n"
+	New-Object -TypeName System.ComponentModel.Win32Exception($ErrorCode)
+}
+CertUtil -error -2147287037
