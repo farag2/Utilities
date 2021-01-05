@@ -2,6 +2,7 @@
 
 # Get the associations table
 # https://www.pstips.net/assoc-ftype.html
+<#
 $ftypeMap = @{}
 & cmd.exe /c ftype | ForEach-Object -Process {
 	$FileType, $Executable = $_.split("=")
@@ -16,6 +17,7 @@ $ftypeMap = @{}
 		Executable = $ftypeMap[$FileType]
 	}
 }
+#>
 
 $Extensions = @(
 	".cfg",
