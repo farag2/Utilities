@@ -839,3 +839,6 @@ function Convert-Error ([int]$ErrorCode)
 	New-Object -TypeName System.ComponentModel.Win32Exception($ErrorCode)
 }
 CertUtil -error -2147287037
+
+# Удалить строки в файле, начинающиеся с "//", удалив также оставшиеся пустые строки
+Get-Content -Path $settings | Where-Object -FilterScript {$_ -notmatch "//"} | Where-Object -FilterScript {$_.Trim(" `t")} | Set-Content -Path $settings -Force
