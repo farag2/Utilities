@@ -65,3 +65,7 @@ https://stefanstranger.github.io/2020/02/28/PlayingWithGitHubActions/
 https://demiliani.com/2019/11/14/ci-cd-for-net-with-githhub-actions/
 https://abelsquidhead.com/index.php/2019/09/07/writing-my-first-custom-github-action/
 https://rustycrate.ru/обучение/2017/08/20/rust-appveyor.html
+
+# rutracker.org
+https://rutracker.org/forum/viewtopic.php?t=5134313
+https://rutracker.org/forum/viewtopic.php?p=75274766#75274766
