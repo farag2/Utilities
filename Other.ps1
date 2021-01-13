@@ -842,3 +842,6 @@ CertUtil -error -2147287037
 
 # Удалить строки в файле, начинающиеся с "//", удалив также оставшиеся пустые строки
 Get-Content -Path $settings | Where-Object -FilterScript {$_ -notmatch "//"} | Where-Object -FilterScript {$_.Trim(" `t")} | Set-Content -Path $settings -Force
+
+# Поставить кавычки на каждом элементе
+Get-Content -Path D:\file.txt -Force | ForEach-Object -Process {"'$_'"} | Set-Content -Path D:\file.txt -Force
