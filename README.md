@@ -46,6 +46,7 @@
 
 <details>
   <summary>List</summary>
+  
 * <https://packetlife.net/library/cheat-sheets/>
 * <https://www.malwarearchaeology.com/cheat-sheets>
 </details>
@@ -54,6 +55,7 @@
 
 <details>
   <summary>List</summary>
+  
 * <https://xz.aliyun.com/t/6498>
 * <https://www.malwarearchaeology.com/logging>
 * <https://schneegans.de/windows/process-audit/>
@@ -74,6 +76,7 @@
 
 <details>
   <summary>List</summary>
+  
 * <https://help.github.com/en/actions/getting-started-with-github-actions>
 * <http://hermit.no/github-actions-including-how-to-build-net-framework-projects/>
 * <https://medium.com/@two06/building-tooling-with-github-actions-59401648e61d>
