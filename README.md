@@ -1,14 +1,27 @@
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Q5Q51QUJC)
 
+
+<details>
+  <summary>Click to expand!</summary>
+  
+  ## Heading
+  1. A numbered
+  2. list
+     * With some
+     * Sub bullets
+</details>
+
+
+
 # PowerShell
 
 <details>
   <summary>List</summary>
   
-* <https://4sysops.com/tag/powershell>
-* <https://arcanecode.com>
-* <https://foxdeploy.com>
-* <https://www.gngrninja.com>
+*<https://4sysops.com/tag/powershell>
+*<https://arcanecode.com>
+*<https://foxdeploy.com>
+*<https://www.gngrninja.com>
 * <https://www.itprotoday.com>
 * <https://www.madwithpowershell.com>
 * <http://www.outsidethebox.ms>
