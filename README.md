@@ -1,5 +1,10 @@
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Q5Q51QUJC)
+
 # PowerShell
 
+<details>
+  <summary>List</summary>
+  
 * <https://4sysops.com/tag/powershell>
 * <https://arcanecode.com>
 * <https://foxdeploy.com>
@@ -35,21 +40,28 @@
 * <https://evotec.xyz/category/powershell>
 * <https://sid-500.com/category/powershell/>
 * <https://get-powershellblog.blogspot.com/search/label/PowerShell>
+</details>
 
 # CheetSheets
 
+<details>
+  <summary>List</summary>
 * <https://packetlife.net/library/cheat-sheets/>
 * <https://www.malwarearchaeology.com/cheat-sheets>
+</details>
 
 # Penetration
 
+<details>
+  <summary>List</summary>
 * <https://xz.aliyun.com/t/6498>
 * <https://www.malwarearchaeology.com/logging>
 * <https://schneegans.de/windows/process-audit/>
 * <https://pennprovenance.net/index.php?n=Tracker.Config>
 * <https://www.eventsentry.com/blog/2018/01/powershell-p0wrh11-securing-powershell.html>
 * <https://www.eventsentry.com/blog/2018/01/powershell-pw3rh311-detecting-preventing-powershell-attacks.html>
-
+</details>
+  
 # Блоки питания
 
 * <https://docs.google.com/spreadsheets/d/1bEcFiMdLWPtPu3c1JsvsLIbcYANlLUVO1ICQdh-jxsg/htmlview>
@@ -60,6 +72,8 @@
 
 # GitHub Actions
 
+<details>
+  <summary>List</summary>
 * <https://help.github.com/en/actions/getting-started-with-github-actions>
 * <http://hermit.no/github-actions-including-how-to-build-net-framework-projects/>
 * <https://medium.com/@two06/building-tooling-with-github-actions-59401648e61d>
@@ -71,7 +85,8 @@
 * <https://demiliani.com/2019/11/14/ci-cd-for-net-with-githhub-actions/>
 * <https://abelsquidhead.com/index.php/2019/09/07/writing-my-first-custom-github-action/>
 * <https://rustycrate.ru/обучение/2017/08/20/rust-appveyor.html>
-
+</details>
+  
 # rutracker.org
 
 * <https://rutracker.org/forum/viewtopic.php?t=5134313>
