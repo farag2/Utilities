@@ -1,0 +1,66 @@
+"menubar"
+{
+	Steam
+	{
+		text=""
+		SkinVersion
+		{
+			text="Metro for Steam 4.4"
+			shellcmd="steam://openurl/https://metroforsteam.com"
+		}
+		SkinVersionMod
+		{
+			text="Unofficial Patch 9"
+			shellcmd="steam://openurl/https://github.com/redsigma/UPMetroSkin"
+		}
+		Divider {}
+		ActivateRetail
+		{
+			text="#Steam_RegisterProductCode"
+			command="ActivateRetail"
+		}
+		RedeemWalletVoucher
+		{
+			text="#Steam_RedeemWalletVoucher"
+			shellcmd="steam://url/RedeemWalletVoucher"
+		}
+		Divider {}
+		CheckForUpdates
+		{
+			text="#steam_menu_checkforupdates"
+			command="CheckForUpdates"
+		}
+		Settings
+		{
+			text="#steam_menu_settings"
+			command="Settings"
+		}
+		Divider {}
+		ChangeUser
+		{
+			text="#steam_menu_changeuser"
+			command="ChangeUser"
+		}
+		GoOnline
+		{
+			text="#SteamUI_OfflineMode_GoOnline"
+			command="goonline"
+		}
+		GoOffline
+		{
+			text="#SteamUI_OfflineMode_GoOffline"
+			command="gooffline"
+		}
+		Restart
+		{
+			text="#Steam_MustRestart_Button"
+			command="RestartSteam"
+		}
+		Divider {}
+		Exit
+		{
+			text="#Steam_ExitSteam"
+			command="Exit"
+		}
+	}
+}
