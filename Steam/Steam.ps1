@@ -33,9 +33,9 @@ $Parameters = @{
 }
 Expand-Archive @Parameters
 
-Move-Item -LiteralPath "$DownloadsFolder\Metro\UPMetroSkin-master\Unofficial 4.x Patch\Main Files [Install First]" -Destination "$DownloadsFolder\Metro\metro-for-steam-4.4" -Force
+Get-ChildItem -LiteralPath "$DownloadsFolder\Metro\UPMetroSkin-master\Unofficial 4.x Patch\Main Files [Install First]" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\Metro\metro-for-steam-4.4" -Force
+<#
 Get-ChildItem -Path "$DownloadsFolder\Metro\metro-for-steam-4.4" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\Metro" -Force
 Remove-Item -Path "$DownloadsFolder\metro-for-steam.zip", "$DownloadsFolder\UPMetroSkin.zip" -Force
 Get-ChildItem -Path "$DownloadsFolder\Metro\UPMetroSkin-master", "$DownloadsFolder\Metro\metro-for-steam-4.4" -Recurse -Force | Remove-Item -Recurse -Force
-
-# Get-ChildItem -Path "$DownloadsFolder\Metro" -Recurse -Force | Move-Item -Destination "$env:ProgramFiles\Steam\Skins" -Force
+#>
