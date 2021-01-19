@@ -46,7 +46,7 @@ function Move-Recursively ($a,$b)
 	{
 		$arr = $_.directoryname -split "($splt)"
 		$c = -join $arr[2..$arr.length]
-		$fdst = $b+$c 
+		$fdst = $b+$c
 
 		if (-not (Test-Path -LiteralPath $fdst))
 		{
