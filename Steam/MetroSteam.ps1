@@ -36,11 +36,8 @@ $Parameters = @{
 Expand-Archive @Parameters
 
 # Function to move files in their corresponding folders
-param
-(
-	$Source = "$DownloadsFolder\Metro\UPMetroSkin-master\Unofficial 4.x Patch\Main Files [Install First]",
-	$Destination = "$DownloadsFolder\Metro\metro-for-steam-4.4"
-) 
+$Source = "$DownloadsFolder\Metro\UPMetroSkin-master\Unofficial 4.x Patch\Main Files [Install First]",
+$Destination = "$DownloadsFolder\Metro\metro-for-steam-4.4"
 
 function Move-Recursively ($a,$b)
 {
