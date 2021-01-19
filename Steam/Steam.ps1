@@ -2,6 +2,7 @@
 
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 
+# Main archive
 $Tag = ((Invoke-RestMethod -Uri "https://api.github.com/repos/minischetti/metro-for-steam/releases") | Where-Object -FilterScript {$_.prerelease -eq $false}).tag_name
 $Parameters = @{
 	Uri = "https://github.com/minischetti/metro-for-steam/archive/v4.4.zip"
@@ -18,6 +19,7 @@ $Parameters = @{
 }
 Expand-Archive @Parameters
 
+# Patch
 $Parameters = @{
 	Uri = "https://github.com/redsigma/UPMetroSkin/archive/master.zip"
 	OutFile = "$DownloadsFolder\UPMetroSkin.zip"
@@ -33,9 +35,46 @@ $Parameters = @{
 }
 Expand-Archive @Parameters
 
-Get-ChildItem -LiteralPath "$DownloadsFolder\Metro\UPMetroSkin-master\Unofficial 4.x Patch\Main Files [Install First]" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\Metro\metro-for-steam-4.4" -Force
-<#
-Get-ChildItem -Path "$DownloadsFolder\Metro\metro-for-steam-4.4" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\Metro" -Force
+# Function
+function Move-Recursively ($a,$b)
+{
+	begin
+	{
+		$split = (Get-Item -LiteralPath $a).Name
+	}
+	process
+	{
+		$fdst = $b + $(-join ($arr = $_.directoryname -split "($split)")[2..$arr.length])
+
+		if (-not (Test-Path -LiteralPath $fdst))
+		{
+			New-Item -Path "$fdst" -ItemType Directory -Force
+		}
+		Move-Item -LiteralPath $_.FullName -Destination $fdst -Force
+	}
+}
+
+$Source = "$DownloadsFolder\Metro\UPMetroSkin-master\Unofficial 4.x Patch\Main Files [Install First]"
+$Destination = "$DownloadsFolder\Metro\metro-for-steam-4.4"
+
+$Source = Get-Item -LiteralPath $Source
+$Destination = Get-Item -LiteralPath $Destination
+
+# Moving files saving structure
+Get-ChildItem -LiteralPath $Source.FullName -Recurse -File -Force | Move-Recursively $Source.FullName $Destination.FullName
+
+# Removing unnecessary files and folders
 Remove-Item -Path "$DownloadsFolder\metro-for-steam.zip", "$DownloadsFolder\UPMetroSkin.zip" -Force
-Get-ChildItem -Path "$DownloadsFolder\Metro\UPMetroSkin-master", "$DownloadsFolder\Metro\metro-for-steam-4.4" -Recurse -Force | Remove-Item -Recurse -Force
-#>
+Remove-Item -LiteralPath "$DownloadsFolder\Metro\metro-for-steam-4.4\.gitattributes", "$DownloadsFolder\Metro\metro-for-steam-4.4\.gitignore" -Force
+Remove-Item -LiteralPath "$DownloadsFolder\Metro\UPMetroSkin-master" -Recurse -Force
+
+Get-ChildItem -LiteralPath "$DownloadsFolder\Metro\metro-for-steam-4.4" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\Metro" -Force
+Remove-Item -LiteralPath "$DownloadsFolder\Metro\metro-for-steam-4.4" -Force
+
+# Custom menu
+$Parameters = @{
+	Uri = "https://github.com/farag2/Utilities/blob/master/Steam/steam.menu"
+	OutFile = "$DownloadsFolder\Metro\resource\menus\steam.menu"
+	Verbose = [switch]::Present
+}
+Invoke-WebRequest @Parameters
