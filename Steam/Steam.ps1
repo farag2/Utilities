@@ -78,3 +78,12 @@ $Parameters = @{
 	Verbose = [switch]::Present
 }
 Invoke-WebRequest @Parameters
+
+if (Test-Path -Path ${env:ProgramFiles(x86)}\Steam)
+{
+	Move-Item -Path "$DownloadsFolder\Metro" -Destination "${env:ProgramFiles(x86)}\Steam\Skins" -Force
+}
+else
+{
+	Write-Warning -Message "No Steam installed"
+}
