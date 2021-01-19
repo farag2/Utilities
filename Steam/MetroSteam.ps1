@@ -47,7 +47,7 @@ function Move-Recursively ($a,$b)
 	}
 	process
 	{
-		$arr = $_.DirectoryName -split "($splt)"
+		$arr = $_.DirectoryName -split "($split)"
 		$c = -join $arr[2..$arr.Length]
 		$fdst = $b + $c
 
