@@ -1,6 +1,11 @@
 # https://docs.microsoft.com/en-us/windows/terminal/
 # https://github.com/microsoft/terminal/issues/1555#issuecomment-505157311
 
+if ($psISE)
+{
+	exit
+}
+
 # Get the latest PSReadLine version number
 # ((Invoke-WebRequest -Uri "https://api.github.com/repos/PowerShell/PSReadLine/releases" -UseBasicParsing | ConvertFrom-Json) | Where-Object -FilterScript {$_.prerelease -eq $false})[0].tag_name.Replace("v","")
 $LatestRelease = ((Invoke-RestMethod -Uri "https://api.github.com/repos/PowerShell/PSReadLine/releases") | Where-Object -FilterScript {$_.prerelease -eq $false}).tag_name.Replace("v","")[0]
@@ -57,7 +62,15 @@ if (-not (Test-Path -Path "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_
 	Invoke-WebRequest @Parameters
 }
 
-$settings = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+if (Test-Path -Path "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json")
+{
+	$settings = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+}
+else
+{
+	Start-Process -FilePath wt -Wait
+	exit
+}
 
 # Removing all comments to parse JSON file
 if (Get-Content -Path $settings | Select-String -Pattern "//" -SimpleMatch)
