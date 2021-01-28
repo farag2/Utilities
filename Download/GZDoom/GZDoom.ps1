@@ -20,7 +20,7 @@ if (Test-Path "$DownloadsFolder\GZDoom_$Tag.zip")
     Expand-Archive @Parameters
 }
 
-
+Remove-Item -Path "$DownloadsFolder\GZDoom_$Tag.zip" -Force
 Remove-Item -Path "$DownloadsFolder\GZDoom_$Tag\fm_banks" -Recurse -Force
 Remove-Item -Path "D:\Downloads\GZDoom_g4.5.0\licenses.zip" -Force
 
@@ -32,6 +32,20 @@ $Parameters = @{
 Invoke-WebRequest @Parameters
 
 Get-Item -Path "$DownloadsFolder\GZDoom_$Tag\gzdoom.ini" -Force | Rename-Item -NewName "gzdoom-$env:USERNAME.ini" -Force
+
+$Parameters = @{
+	Uri = "https://github.com/farag2/Utilities/blob/master/Download/GZDoom/_pb.cmd"
+	OutFile = "$DownloadsFolder\GZDoom_$Tag\_pb.cmd"
+	Verbose = [switch]::Present
+}
+Invoke-WebRequest @Parameters
+
+$Parameters = @{
+	Uri = "https://github.com/farag2/Utilities/blob/master/Download/GZDoom/_bd.cmd"
+	OutFile = "$DownloadsFolder\GZDoom_$Tag\_bd.cmd"
+	Verbose = [switch]::Present
+}
+Invoke-WebRequest @Parameters
 
 <#
 $URLs = @(
