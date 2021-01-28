@@ -13,7 +13,7 @@ Invoke-WebRequest @Parameters
 
 $Parameters = @{
 	Path = "$DownloadsFolder\TaskbarX_v$Tag.zip"
-	DestinationPath = "$DownloadsFolder\TaskbarX"
+	DestinationPath = "$env:ProgramFiles\TaskbarX"
 	Force = [switch]::Present
 	Verbose = [switch]::Present
 }
@@ -23,7 +23,5 @@ if (Test-Path "$DownloadsFolder\TaskbarX_v$Tag.zip")
 }
 
 Remove-Item -Path "$DownloadsFolder\TaskbarX_v$Tag.zip" -Force
-
-Move-Item -Path "$DownloadsFolder\TaskbarX" -Destination $env:ProgramFiles -Force
 
 Start-Process -FilePath "$env:ProgramFiles\TaskbarX\TaskbarX Configurator.exe"
