@@ -1,8 +1,10 @@
 # Downloading Firefox.msi
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
+
 $Arch = "win64"
 $Lang = "ru"
-$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
 	Uri = "https://download.mozilla.org/?product=firefox-msi-latest-ssl&os=$Arch&lang=$Lang"
 	OutFile = "$DownloadsFolder\Firefox.msi"
