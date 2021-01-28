@@ -113,4 +113,3 @@ function Search-MSStore
 	}
 	((Invoke-WebRequest -UseBasicParsing -Uri ($Base + $Parameters)).Content | ConvertFrom-Json -AsHashtable).Payload.Cards | Select-Object -Property Title, Price, ProductId, $URL
 }
-}
