@@ -444,6 +444,16 @@ if (Test-Path -Path "$env:ProgramFiles\PowerShell\7")
 			$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -Name fontFace -MemberType NoteProperty -Value "Fira Code" -Force
 		}
 	}
+
+	# Set the icon that displays within the tab, dropdown menu, jumplist, and tab switcher
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).icon)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).icon = "🏆"
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name icon -Value "🏆" -Force
+	}
 }
 
 if (Test-Path -Path "$env:ProgramFiles\PowerShell\7-preview")
