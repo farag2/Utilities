@@ -5,16 +5,16 @@
 <details>
   <summary>List</summary>
   
-*  <https://4sysops.com/tag/powershell>
-*  <https://arcanecode.com>
-*  <https://foxdeploy.com>
-*  <https://www.gngrninja.com>
-*  <https://www.itprotoday.com>
-*  <https://www.madwithpowershell.com>
-*  <http://www.outsidethebox.ms>
-*  <https://p0w3rsh3ll.wordpress.com>
-*  <https://powershellexplained.com>
-*  <https://vmblog.ru>
+* <https://4sysops.com/tag/powershell>
+* <https://arcanecode.com>
+* <https://foxdeploy.com>
+* <https://www.gngrninja.com>
+* <https://www.itprotoday.com>
+* <https://www.madwithpowershell.com>
+* <http://www.outsidethebox.ms>
+* <https://p0w3rsh3ll.wordpress.com>
+* <https://powershellexplained.com>
+* <https://vmblog.ru>
 * <https://windowsnotes.ru>
 * <http://winitpro.ru>
 * <https://kazunposh.wordpress.com>
@@ -40,6 +40,7 @@
 * <https://evotec.xyz/category/powershell>
 * <https://sid-500.com/category/powershell/>
 * <https://get-powershellblog.blogspot.com/search/label/PowerShell>
+* https://info.sapien.com/index.php/scripting/scripting-classes/creating-objects-in-windows-powershell
 </details>
 
 # CheetSheets
