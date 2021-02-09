@@ -28,7 +28,7 @@ try
 
 		[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 		$Parameters = @{
-			Uri = "https://github.com/farag2/Windows-10-Setup-Script/raw/master/Start%20menu%20pinning/syspin.exe"
+			Uri = "https://github.com/farag2/Windows-10-Sophia-Script/raw/master/syspin/syspin.exe"
 			OutFile = "$DownloadsFolder\syspin.exe"
 			Verbose = [switch]::Present
 		}
