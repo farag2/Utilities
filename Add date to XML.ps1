@@ -14,7 +14,7 @@
 
 <#
 	.SYNOPSIS
-	write data to an xml file
+	Write data to an xml file
 
 	.EXAMPLE
 	AddEntryInConfig -Selector "//tutorials[@name='tutorial:start']" -Path "C:\Desktop\test.xml" -NewNode "PowerShell"
