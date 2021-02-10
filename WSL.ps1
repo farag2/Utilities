@@ -1,86 +1,129 @@
-# https://github.com/farag2/Windows-10-Setup-Script/issues/43
-# https://github.com/microsoft/WSL/issues/5437
-
-# Install the Windows Subsystem for Linux (WSL2)
-# Установить подсистему Windows для Linux (WSL2)
-$Title = "Windows Subsystem for Linux"
-$Message = "Would you like to install Windows Subsystem for Linux (WSL)?"
-$Options = "&Install", "&Skip"
-$DefaultChoice = 1
-$Result = $Host.UI.PromptForChoice($Title, $Message, $Options, $DefaultChoice)
-
-switch ($Result)
+<#
+	.SYNOPSIS
+	Install/uninstall the Windows Subsystem for Linux (WSL)
+	Установить/удалить подсистему Windows для Linux (WSL)
+	.PARAMETER Enable
+	Install the Windows Subsystem for Linux (WSL)
+	Установить подсистему Windows для Linux (WSL)
+	.PARAMETER Disable
+	Uninstall the Windows Subsystem for Linux (WSL)
+	Удалить подсистему Windows для Linux (WSL)
+	.EXAMPLE
+	WSL -Enable
+	.EXAMPLE
+	WSL -Disable
+#>
+function WSL
 {
-	"0"
+	param
+	(
+		[Parameter(
+			Mandatory = $true,
+			ParameterSetName = "Enable"
+		)]
+		[switch]
+		$Enable,
+
+		[Parameter(
+			Mandatory = $true,
+			ParameterSetName = "Disable"
+		)]
+		[switch]
+		$Disable
+	)
+
+	$WSLFeatures = @(
+		# Windows Subsystem for Linux
+		# Подсистема Windows для Linux
+		"Microsoft-Windows-Subsystem-Linux",
+
+		# Virtual Machine Platform
+		# Поддержка платформы для виртуальных машин
+		"VirtualMachinePlatform"
+	)
+
+	switch ($PSCmdlet.ParameterSetName)
 	{
-		$WSLFeatures = @(
-			# Enable the Windows Subsystem for Linux
-			# Включить подсистему Windows для Linux
-			"Microsoft-Windows-Subsystem-Linux",
-
-			# Enable Virtual Machine Platform
-			# Включить поддержку платформы для виртуальных машин
-			"VirtualMachinePlatform"
-		)
-		Enable-WindowsOptionalFeature -Online -FeatureName $WSLFeatures -NoRestart
-
-		# Downloading the Linux kernel update package
-		# Скачиваем пакет обновления ядра Linux
-		try
+		"Enable"
 		{
-			[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-			if ((Invoke-WebRequest -Uri https://www.google.com -UseBasicParsing -DisableKeepAlive -Method Head).StatusDescription)
-			{
-				$Parameters = @{
-					Uri = "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi"
-					OutFile = "$PSScriptRoot\wsl_update_x64.msi"
-					Verbose = [switch]::Present
-				}
-				Invoke-WebRequest @Parameters
+			Enable-WindowsOptionalFeature -Online -FeatureName $WSLFeatures -NoRestart
 
-				Start-Process -FilePath $PSScriptRoot\wsl_update_x64.msi -ArgumentList "/passive" -Wait
-				Remove-Item -Path $PSScriptRoot\wsl_update_x64.msi -Force
-			}
+			Write-Warning -Message $Localization.RestartWarning
 		}
-		catch [Exception]
+		"Disable"
 		{
-			Write-Warning -Message "No Internet connection" -ErrorAction SilentlyContinue
+			Disable-WindowsOptionalFeature -Online -FeatureName $WSLFeatures -NoRestart
+
+			Uninstall-Package -Name "Windows Subsystem for Linux Update" -Force -ErrorAction SilentlyContinue
+			Remove-Item -Path "$env:USERPROFILE\.wslconfig" -Force -ErrorAction Ignore
+
+			Write-Warning -Message $Localization.RestartWarning
 		}
-	}
-	"1"
-	{
-		Write-Verbose -Message "Skipped" -Verbose
 	}
 }
 
-if (Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux)
+<#
+	.SYNOPSIS
+	Download, install the Linux kernel update package and set WSL 2 as the default version when installing a new Linux distribution
+	Скачать, установить пакет обновления ядра Linux и установить WSL 2 как версию по умолчанию при установке нового дистрибутива Linux
+	.NOTES
+	To receive kernel updates, enable the Windows Update setting: "Receive updates for other Microsoft products when you update Windows"
+	Чтобы получать обновления ядра, включите параметр Центра обновления Windows: "Получение обновлений для других продуктов Майкрософт при обновлении Windows"
+#>
+function EnableWSL2
 {
-	# Set WSL 2 as your default version. Run the command only after restart
-	# Установить WSL 2 как версию по умолчанию. Выполните команду только после перезагрузки
-	wsl --set-default-version 2
+	$WSLFeatures = @(
+		# Windows Subsystem for Linux
+		# Подсистема Windows для Linux
+		"Microsoft-Windows-Subsystem-Linux",
 
-	# Configuring .wslconfig
-	# Настраиваем .wslconfig
-	if (-not (Test-Path -Path "$env:HOMEPATH\.wslconfig"))
+		# Virtual Machine Platform
+		# Поддержка платформы для виртуальных машин
+		"VirtualMachinePlatform"
+	)
+	$WSLFeaturesDisabled = Get-WindowsOptionalFeature -Online | Where-Object {($_.FeatureName -in $WSLFeatures) -and ($_.State -eq "Disabled")}
+
+	if ($null -eq $WSLFeaturesDisabled)
 	{
-		$wslconfig = @"
-[wsl2]
-swap=0
-"@
-		# Saving .wslconfig in UTF-8 encoding
-		# Сохраняем .wslconfig в кодировке UTF-8
-		Set-Content -Path "$env:HOMEPATH\.wslconfig" -Value (New-Object System.Text.UTF8Encoding).GetBytes($wslconfig) -Encoding Byte -Force
-	}
-	else
-	{
-		$String = Get-Content -Path "$env:HOMEPATH\.wslconfig" | Select-String -Pattern "swap=" -SimpleMatch
-		if ($String)
+		if ((Get-Package -Name "Windows Subsystem for Linux Update" -ProviderName msi -Force -ErrorAction Ignore).Status -ne "Installed")
 		{
-			(Get-Content -Path "$env:HOMEPATH\.wslconfig").Replace("swap=1", "swap=0") | Set-Content -Path "$env:HOMEPATH\.wslconfig" -Force
+			# Downloading and installing the Linux kernel update package
+			# Скачивание и установка пакета обновления ядра Linux
+			try
+			{
+				if ((Invoke-WebRequest -Uri https://www.google.com -UseBasicParsing -DisableKeepAlive -Method Head).StatusDescription)
+				{
+					Write-Verbose -Message $Localization.WSLUpdateDownloading -Verbose
+
+					[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+					$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
+					$Parameters = @{
+						Uri = "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi"
+						OutFile = "$DownloadsFolder\wsl_update_x64.msi"
+						Verbose = [switch]::Present
+					}
+					Invoke-WebRequest @Parameters
+
+					Write-Verbose -Message $Localization.WSLUpdateInstalling -Verbose
+					Start-Process -FilePath "$DownloadsFolder\wsl_update_x64.msi" -ArgumentList "/passive" -Wait
+
+					Remove-Item -Path "$DownloadsFolder\wsl_update_x64.msi" -Force
+
+					Write-Warning -Message $Localization.RestartWarning
+				}
+			}
+			catch [System.Net.WebException]
+			{
+				Write-Warning -Message $Localization.NoInternetConnection
+				Write-Error -Message $Localization.NoInternetConnection -ErrorAction SilentlyContinue
+				return
+			}
 		}
 		else
 		{
-			Add-Content -Path "$env:HOMEPATH\.wslconfig" -Value "`r`nswap=0" -Force
+			# Set WSL 2 as the default architecture when installing a new Linux distribution
+			# Установить WSL 2 как архитектуру по умолчанию при установке нового дистрибутива Linux
+			wsl --set-default-version 2
 		}
 	}
 }
