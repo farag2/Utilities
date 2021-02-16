@@ -849,6 +849,6 @@ Get-Content -Path D:\file.txt -Force | ForEach-Object -Process {"'$_'"} | Set-Co
 # Восстановить все файлы из карантина Microsoft Defender на их родной место
 # https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-antivirus/command-line-arguments-microsoft-defender-antivirus
 (Get-MpThreat).Resources.Replace('file:_',"") | ForEach-Object -Process {
-	Start-Sleep -Seconds 3
-	Start-Process -FilePath "$env:ProgramFiles\Windows Defender\MpCmdRun.exe" -ArgumentList @("-Restore -FilePath `"$_`"")
+	# Start-Sleep -Seconds 3
+	Start-Process -FilePath "$env:ProgramFiles\Windows Defender\MpCmdRun.exe" -ArgumentList @("-Restore -FilePath `"$_`"") -Wait
 }
