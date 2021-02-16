@@ -1,5 +1,7 @@
+:: Uninstall unnecessary Office 2010—2016 updates
 :: http://forum.ru-board.com/topic.cgi?forum=5&topic=39544&start=981&limit=1&m=1#1
 :: "CP 866" encoding needed
+
 @echo off
 
 set RegKey=HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products\
