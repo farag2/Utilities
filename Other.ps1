@@ -1,4 +1,4 @@
-﻿exit
+exit
 # Перерегистрация всех UWP-приложений
 (Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\InboxApplications | Get-ItemProperty).Path | Add-AppxPackage -Register -DisableDevelopmentMode
 
@@ -189,10 +189,10 @@ certutil -hashfile C:\file.txt SHA1
 # Преобразование кодов ошибок в текстовое сообщение
 certutil -error 0xc0000409
 
-# Вычислить значение хеш-суммы файла
+# Вычислить значение хэш-суммы файла
 Get-FileHash -Path D:\1.txt -Algorithm MD5
 
-# Вычислить значение хеш-суммы строки
+# Вычислить значение хэш-суммы строки
 function Get-StringHash
 {
 	[CmdletBinding()]
