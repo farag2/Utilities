@@ -41,6 +41,8 @@
 * <https://sid-500.com/category/powershell/>
 * <https://get-powershellblog.blogspot.com/search/label/PowerShell>
 * https://info.sapien.com/index.php/scripting/scripting-classes/creating-objects-in-windows-powershell
+* https://vexx32.github.io
+* https://docs.microsoft.com/ru-ru/powershell/module/microsoft.powershell.core/about/about_functions_advanced_parameters
 </details>
 
 # CheetSheets
