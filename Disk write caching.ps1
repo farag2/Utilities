@@ -36,15 +36,16 @@ function DiskWriteCaching
 		$Enable
 	)
 
-	# Get system drive ID
-	$SystemDriveID = (Get-CimInstance -ClassName CIM_DiskDrive | Where-Object -FilterScript {$_.Index -eq 0}).PNPDeviceID
+	# Get system drive ID regardless of the port number
+	$Index = (Get-Partition | Where-Object -FilterScript {$_.DriveLetter -eq $env:SystemDrive[0]}).DiskNumber
+	$SystemDriveID = (Get-CimInstance -ClassName CIM_DiskDrive | Where-Object -FilterScript {$_.Index -eq $Index}).PNPDeviceID
 	# Get system drive instance
 	$PSPath = (Get-ChildItem -Path HKLM:\SYSTEM\CurrentControlSet\Enum\SCSI | Where-Object -FilterScript {$SystemDriveID -match $_.PSChildName}).PSPath
 	# We need to go deeper... LeonardoDiCaprio.jpg
 	$PSPath = (Get-ChildItem -Path $PSPath | Where-Object -FilterScript {$SystemDriveID -match $_.PSChildName}).PSPath
 
 	# Check whether disk write caching is enabled
-	$IsDeviceCacheEnabled = (Get-StorageAdvancedProperty -PhysicalDisk (Get-PhysicalDisk | Where-Object -FilterScript {$_.DeviceID -eq 0})).IsDeviceCacheEnabled
+	$IsDeviceCacheEnabled = (Get-StorageAdvancedProperty -PhysicalDisk (Get-PhysicalDisk | Where-Object -FilterScript {$_.DeviceID -eq $Index})).IsDeviceCacheEnabled
 
 	switch ($PSCmdlet.ParameterSetName)
 	{
