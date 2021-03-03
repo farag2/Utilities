@@ -60,8 +60,8 @@ function DiskWriteCaching
 				}
 
 				# Disable disk write caching
-				New-ItemProperty -Path "$PSPath\Device Parameters\Disk" -Name CacheIsPowerProtected -PropertyType DWord -Value 0 -Force
 				New-ItemProperty -Path "$PSPath\Device Parameters\Disk" -Name UserWriteCacheSetting -PropertyType DWord -Value 0 -Force
+				New-ItemProperty -Path "$PSPath\Device Parameters\Disk" -Name CacheIsPowerProtected -PropertyType DWord -Value 0 -Force
 			}
 		}
 		"Enable"
@@ -75,7 +75,6 @@ function DiskWriteCaching
 				}
 
 				# Enable disk write caching
-				New-ItemProperty -Path "$PSPath\Device Parameters\Disk" -Name CacheIsPowerProtected -PropertyType DWord -Value 0 -Force
 				New-ItemProperty -Path "$PSPath\Device Parameters\Disk" -Name UserWriteCacheSetting -PropertyType DWord -Value 1 -Force
 			}
 		}
