@@ -142,6 +142,10 @@ Start-Sleep -Seconds 3
 # Restart the Start menu
 Stop-Process -Name StartMenuExperienceHost -Force -ErrorAction Ignore
 
+# Open the Start menu to load the new layout
+$wshell = New-Object -ComObject WScript.Shell
+$wshell.SendKeys("^{ESC}")
+
 Start-Sleep -Seconds 3
 
 # Enable changing the Start menu layout
@@ -153,3 +157,7 @@ Remove-Item -Path $StartLayout -Force
 Stop-Process -Name StartMenuExperienceHost -Force -ErrorAction Ignore
 
 Start-Sleep -Seconds 3
+
+# Open the Start menu to load the new layout
+$wshell = New-Object -ComObject WScript.Shell
+$wshell.SendKeys("^{ESC}")
