@@ -7,6 +7,10 @@
 
 Clear-Host
 
+if (-not (Get-AppxPackage -Name Microsoft.WindowsTerminal))
+{
+	exit
+}
 Remove-Item -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows Terminal*.lnk" -Force
 
 $PackageFullName = (Get-AppxPackage -Name Microsoft.WindowsTerminal).PackageFullName
