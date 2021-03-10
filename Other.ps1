@@ -852,3 +852,32 @@ Get-Content -Path D:\file.txt -Force | ForEach-Object -Process {"'$_'"} | Set-Co
 	# Start-Sleep -Seconds 3
 	Start-Process -FilePath "$env:ProgramFiles\Windows Defender\MpCmdRun.exe" -ArgumentList @("-Restore -FilePath `"$_`"") -Wait
 }
+
+# Вставить XML в XML
+[xml]$XML1 = @"
+<toast duration="$ToastDuration" scenario="reminder">
+    <visual>
+        <binding template="ToastGeneric">
+            <group>
+                <subgroup>
+                    <text hint-style="body" hint-wrap="true" >$EventText</text>
+                </subgroup>
+            </group>
+        </binding>
+    </visual>
+</toast>
+"@
+
+[xml]$XML2 = @"
+<toast>
+    <actions>
+        <input id="SnoozeTimer" type="selection" title="Select a Snooze Interval" defaultInput="1">
+            <selection id="1" content="1 Minute"/>
+        </input>
+        <action activationType="system" arguments="snooze" hint-inputId="SnoozeTimer" content="$SnoozeTitle" id="test-snooze"/>
+    </actions>
+</toast>
+"@
+
+$XML1.toast.AppendChild($XML1.ImportNode($XML2.toast.actions, $true))
+$XML1.Save("C:\1.xml")
