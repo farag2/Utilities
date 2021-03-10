@@ -829,7 +829,19 @@ $Lines = @{
 	Name = "Lines"
 	Expression = {Get-Content -Path $_ -Raw | Measure-Object -Line | Select-Object -ExpandProperty Lines}
 }
-Get-ChildItem -Path "D:\Sophia\*\*" -File -Filter *.psd1 -Force | ForEach-Object -Process {$_ | Select-Object -Property $FullName, $Lines} | Format-Table -AutoSize
+Get-ChildItem -Path "D:\Folder" -Depth 0 -File -Filter *.psd1 -Recurse -Force | ForEach-Object -Process {$_ | Select-Object -Property $FullName, $Lines} | Format-Table -AutoSize
+
+# Вывести таблицу с количеством строк и названием файлов в подпапке, исключая сканирование конкретной папки
+$FullName = @{
+	Name = "File"
+	Expression = {$_.FullName}
+}
+$Lines = @{
+	Name = "Lines"
+	Expression = {Get-Content -Path $_.FullName -Raw | Measure-Object -Line | Select-Object -ExpandProperty Lines}
+}
+Get-ChildItem -Path "D:\Folder" -Recurse -File -Force | Where-Object -FilterScript {$_.PSParentPath -notmatch "sophos"} | ForEach-Object -Process {$_ | Select-Object -Property $FullName, $Lines} | Format-Table -AutoSize
+(Get-ChildItem -Path "D:\Folder" -Recurse -File -Force | Where-Object -FilterScript {$_.PSParentPath -notmatch "sophos"} | ForEach-Object -Process {(Get-Content -Path $_.FullName).Count} | Measure-Object -Sum).Sum
 
 # Вывести описание ошибки
 function Convert-Error ([int]$ErrorCode)
