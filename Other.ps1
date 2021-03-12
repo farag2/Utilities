@@ -37,25 +37,6 @@ Add-AppxPackage -Path D:\Microsoft.StorePurchaseApp.appxbundle
 # Разрешить подключаться к одноуровневому домену
 New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters -Name AllowSingleLabelDnsDomain -Value 1 -Force
 
-# Включение в Планировщике задач удаление устаревших обновлений Office, кроме Office 2019
-$Script = '
-	(Get-Service -Name wuauserv).WaitForStatus("Stopped", "01:00:00")
-	Start-Process -FilePath D:\folder\Office_task.cmd
-'
-$EncodedScript = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($Script))
-$action = New-ScheduledTaskAction -Execute powershell.exe -Argument "-WindowStyle Hidden -EncodedCommand $EncodedScript"
-$trigger = New-ScheduledTaskTrigger -Weekly -At 9am -DaysOfWeek Thursday -WeeksInterval 4
-$settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -StartWhenAvailable
-$principal = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -RunLevel Highest
-$params = @{
-	"TaskName"	= "Office"
-	"Action"	= $action
-	"Trigger"	= $trigger
-	"Settings"	= $settings
-	"Principal"	= $principal
-}
-Register-ScheduledTask @Params -Force
-
 # Найти диски, не подключенные через USB и не являющиеся загрузочными, исключая диски с пустыми буквами (исключаются внешние жесткие диски)
 (Get-Disk | Where-Object -FilterScript {$_.BusType -ne "USB" -and $_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object -Process {Join-Path ($_ + ":") $Path}
 # Найти диски, не являющиеся загрузочными, исключая диски с пустыми буквами (не исключаются внешние жесткие диски)
