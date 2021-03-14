@@ -97,7 +97,6 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\Medieval Software\Medieval CUE Spl
 	{
 		New-Item -Path "HKCU:\Software\Medieval\CUE Splitter" -Force
 	}
-	New-ItemProperty -Path "HKCU:\Software\Medieval\CUE Splitter" -Name Name_0 -PropertyType String -Value Default -Force
 	New-ItemProperty -Path "HKCU:\Software\Medieval\CUE Splitter" -Name FirstTimeAssociation -Value 821760 -Force
 	New-ItemProperty -Path "HKCU:\Software\Medieval\CUE Splitter\Config" -Name CheckUpdates -Value 0 -Force
 	New-ItemProperty -Path "HKCU:\Software\Medieval\CUE Splitter\Config" -Name SaveStatus -Value 0 -Force
@@ -108,7 +107,8 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\Medieval Software\Medieval CUE Spl
 	New-ItemProperty -Path "HKCU:\Software\Medieval\CUE Splitter\Config" -Name Mask_Count -Value 1 -Force
 	New-ItemProperty -Path "HKCU:\Software\Medieval\CUE Splitter\Config" -Name CodePage -Value 138 -Force
 	New-ItemProperty -Path "HKCU:\Software\Medieval\CUE Splitter\Config" -Name CUE_Coding -Value 1 -Force
-	New-ItemProperty -Path "HKCU:\Software\Medieval\CUE Splitter" -Name Text_0 -PropertyType String -Value "%%t" -Force
+	New-ItemProperty -Path "HKCU:\Software\Medieval\CUE Splitter\FileMask" -Name Name_0 -PropertyType String -Value Default -Force
+	New-ItemProperty -Path "HKCU:\Software\Medieval\CUE Splitter\FileMask" -Name Text_0 -PropertyType String -Value "%%t" -Force
 
 	$Shell = New-Object -ComObject Wscript.Shell
 	$Shortcut = $Shell.CreateShortcut("$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Medieval CUE Splitter.lnk")
