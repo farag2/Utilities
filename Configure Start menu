@@ -110,7 +110,7 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\Medieval Software\Medieval CUE Spl
 
 	$Shell = New-Object -ComObject Wscript.Shell
 	$Shortcut = $Shell.CreateShortcut("$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Medieval CUE Splitter.lnk")
-	$Shortcut.TargetPath = "${env:ProgramFiles(x86)}\Medieval CUE Splitter"
+	$Shortcut.TargetPath = "${env:ProgramFiles(x86)}\Medieval CUE Splitter\CUE_Splitter.exe"
 	$ShortCut.IconLocation = "${env:ProgramFiles(x86)}\Medieval CUE Splitter\CUE_Splitter.exe,0"
 	$Shortcut.Save()
 }
