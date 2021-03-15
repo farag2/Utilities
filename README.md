@@ -67,13 +67,13 @@
 * <https://www.eventsentry.com/blog/2018/01/powershell-pw3rh311-detecting-preventing-powershell-attacks.html>
 </details>
   
-# Блоки питания
+# Power supply unit
 
-* <https://docs.google.com/spreadsheets/d/1bEcFiMdLWPtPu3c1JsvsLIbcYANlLUVO1ICQdh-jxsg/htmlview>
+* <https://docs.google.com/spreadsheets/d/1bEcFiMdLWPtPu3c1JsvsLIbcYANlLUVO1ICQdh-jxsg>
 
-# Мониторы
+# Monitors
 
-* <https://docs.google.com/spreadsheets/d/1Ej9mOe5NamLldpfyFfXrqvLMZP-aG2Zi1su7QzPRNJY/htmlview>
+* <https://docs.google.com/spreadsheets/d/1Ej9mOe5NamLldpfyFfXrqvLMZP-aG2Zi1su7QzPRNJY>
 
 # GitHub Actions
 
