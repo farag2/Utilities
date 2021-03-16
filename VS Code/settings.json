@@ -32,9 +32,8 @@
 
 	"[powershell]": {
 		"files.encoding": "utf8bom",
-		"files.autoGuessEncoding": true
+		"editor.defaultFormatter": "ms-vscode.powershell"
 	},
-	"powershell.codeFormatting.autoCorrectAliases": true,
 	"powershell.codeFormatting.useCorrectCasing": true,
 	"powershell.codeFormatting.whitespaceInsideBrace": false,
 	"powershell.codeFormatting.whitespaceBetweenParameters": true,
@@ -45,5 +44,29 @@
 	"editor.wordWrap": "on",
 	"editor.mouseWheelZoom": true,
 	"editor.fontFamily": "Fira Code",
-	"editor.fontLigatures": true
+	"editor.fontLigatures": true,
+	"extensions.ignoreRecommendations": false,
+	"powershell.powerShellDefaultVersion": "Windows PowerShell (x64)",
+	"VSCodeCounter.ignoreUnsupportedFile": false,
+	"beautify.language": {
+		"js": {
+			"type": [
+				"json"
+			],
+			"filename": [
+				".json"
+			]
+		}
+	},
+	"terminal.integrated.shell.windows": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+	"workbench.startupEditor": "newUntitledFile",
+	"powershell.codeFormatting.openBraceOnSameLine": false,
+	"powershell.codeFormatting.preset": "Allman",
+	"editor.autoIndent": "advanced",
+	"workbench.colorCustomizations": {
+	"editorWhitespace.foreground": "#FFB56A"
+	},
+	"editor.insertSpaces": false,
+	"editor.semanticHighlighting.enabled": true,
+	"powershell.codeFormatting.autoCorrectAliases": true
 }
