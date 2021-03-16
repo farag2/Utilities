@@ -1,7 +1,7 @@
-﻿# Downloading the latest FiraCode version within GitHub API
+# Downloading the latest FiraCode version within GitHub API
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 # (Invoke-WebRequest -Uri "https://api.github.com/repos/tonsky/FiraCode/releases" -UseBasicParsing | ConvertFrom-Json)[0].tag_name
-$Tag = ((Invoke-RestMethod -Uri "https://api.github.com/repos/tonsky/FiraCode/releases") | Where-Object -FilterScript {$_.prerelease -eq $false}).tag_name.Replace("v","")[0]
+$Tag = (Invoke-RestMethod -Uri "https://api.github.com/repos/tonsky/FiraCode/releases").tag_name | Select-Object -First 1
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
 	Uri = "https://github.com/tonsky/FiraCode/releases/download/$Tag/Fira_Code_v$Tag.zip"
@@ -20,6 +20,7 @@ Expand-Archive @Parameters
 
 Get-ChildItem -Path "$DownloadsFolder\Fira_Code" -Recurse -Force | Unblock-File
 
+# Installing fonts
 # https://docs.microsoft.com/en-us/windows/desktop/api/Shldisp/ne-shldisp-shellspecialfolderconstants
 # https://docs.microsoft.com/en-us/windows/win32/shell/folder-copyhere
 $ssfFONTS = 20
