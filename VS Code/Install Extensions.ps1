@@ -1,6 +1,6 @@
 # Install VS Code extensions
 $Extensions = @(
-	# Локализация
+	# Localization
 	"ms-ceintl.vscode-language-pack-ru",
 
 	# Markdown
