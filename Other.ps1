@@ -626,8 +626,21 @@ $Google = @{
 	}
 }
 $edge | Add-Member -MemberType NoteProperty -Name default_search_provider_data -Value $Google -Force
-
 ConvertTo-Json -InputObject $edge | Set-Content -Path "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Preferences" -Force
+
+# Добавить данные в JSON. Только для PowerShell 7
+$JSON = @'
+{
+	"editor.fontFamily": "'Cascadia Code',Consolas,'Courier New'",
+	"editor.tabCompletion": "on"
+}
+'@
+$JHT = ConvertFrom-Json -InputObject $JSON -AsHashtable
+
+$JHT += @{
+	"terminal.integrated.shell.windows" = "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe"
+}
+$JHT | ConvertTo-Json | Set-Content -Path "$env:APPDATA\Code\User\settings.json"
 
 # Сбросить пароль локального пользователя через WinPE
 # WinPE
@@ -846,7 +859,7 @@ Get-Content -Path D:\file.txt -Force | ForEach-Object -Process {"'$_'"} | Set-Co
 	Start-Process -FilePath "$env:ProgramFiles\Windows Defender\MpCmdRun.exe" -ArgumentList @("-Restore -FilePath `"$_`"") -Wait
 }
 
-# Вставить XML в XML
+# Вставить нод в XML
 [xml]$XML1 = @"
 <toast duration="$ToastDuration" scenario="reminder">
     <visual>
@@ -874,3 +887,10 @@ Get-Content -Path D:\file.txt -Force | ForEach-Object -Process {"'$_'"} | Set-Co
 
 $XML1.toast.AppendChild($XML1.ImportNode($XML2.toast.actions, $true))
 $XML1.Save("C:\1.xml")
+
+# Проверить валидность всех .psd1 в папках
+$Folder = Get-ChildItem -Path "D:\Desktop\Sophia Script" -Recurse -Include *.psd1
+foreach ($Item in $Folder.DirectoryName)
+{
+	Import-LocalizedData -FileName Sophia.psd1 -BaseDirectory $Item -BindingVariable Data
+}
