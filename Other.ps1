@@ -72,7 +72,7 @@ enum Level
 	Informational	= 4
 	Verbose			= 5
 }
-# [Level]::LogAlways.Value__
+# [Level]::LogAlways.value__
 # [Level]0
 
 # WinEvent
