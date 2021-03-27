@@ -1,8 +1,8 @@
 exit
-# Перерегистрация всех UWP-приложений
+# Re-register all UWP apps
 (Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\InboxApplications | Get-ItemProperty).Path | Add-AppxPackage -Register -DisableDevelopmentMode
 
-# Восстановить UWP-приложения
+# Restore all UWP apps
 $DamagedPackages = @()
 $DamagedFiles = (Get-ChildItem -Path "$env:ProgramFiles\WindowsApps\" -Recurse | Where-Object -FilterScript {$_.Length -eq 0}).FullName
 
@@ -27,50 +27,50 @@ foreach ($Package in $($DamagedPackages | Get-Unique))
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Force
 }
 
-# Установка Microsoft Store из appxbundle
+# Install Microsoft Store from appxbundle
 # SW_DVD9_NTRL_Win_10_20H2_32_64_ARM64_MultiLang_Inbox_Apps_X22-36106.ISO
 # https://store.rg-adguard.net
 # https://yadi.sk/d/10Ttj2IVOKQ0Og
 Add-AppxPackage -Path D:\Microsoft.DesktopAppInstaller.appxbundle
 Add-AppxPackage -Path D:\Microsoft.StorePurchaseApp.appxbundle
 
-# Разрешить подключаться к одноуровневому домену
+# Allow to connect to a single label domain
 New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters -Name AllowSingleLabelDnsDomain -Value 1 -Force
 
-# Найти диски, не подключенные через USB и не являющиеся загрузочными, исключая диски с пустыми буквами (исключаются внешние жесткие диски)
+# Find all non-USB & non-boot drives except nulled letter drives (external USB drives are excluded)
 (Get-Disk | Where-Object -FilterScript {$_.BusType -ne "USB" -and $_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object -Process {Join-Path ($_ + ":") $Path}
-# Найти диски, не являющиеся загрузочными, исключая диски с пустыми буквами (не исключаются внешние жесткие диски)
+# Find non-boot drives except nulled letter drives (external USB drives are not excluded)
 (Get-Disk | Where-Object -FilterScript {$_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object -Process {Join-Path ($_ + ":") $Path}
-# Найти первый диск, подключенный через USB, исключая диски с пустыми буквами
+# Find the first USB drive except nulled letter drives
 (Get-Disk | Where-Object -FilterScript {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object -Process {Join-Path ($_ + ":") $Path} | Select-Object -First 1
 
-# Добавление доменов в hosts
-$hostfile = "$env:SystemRoot\System32\drivers\etc\hosts"
-$domains = @("site.com", "site2.com")
-foreach ($hostentry in $domains)
+# Add domains to hosts
+$hosts = "$env:SystemRoot\System32\drivers\etc\hosts"
+$Domains = @("site.com", "site2.com")
+foreach ($Domain in $Domains)
 {
-	if (-not (Get-Content -Path $hostfile | Select-String "0.0.0.0 `t $hostentry"))
+	if (-not (Get-Content -Path $hosts -Force | Select-String -SimpleMatch "0.0.0.0 `t $Domain"))
 	{
-		Add-Content -Path $hostfile -Value "0.0.0.0 `t $hostentry"
+		Add-Content -Path $hosts -Value "0.0.0.0 `t $Domain" -Force
 	}
 }
 
-# Отделить название от пути
+# Split the name from the path
 Split-Path -Path file.ext -Leaf
-# Отделить путь от названия
+# Split the path from the name
 Split-Path -Path file.ext -Parent
-# Отделить от пути название последней папки
+# Split the last folder name from the path
 Get-Item -Path file.ext | Split-Path -Parent | Split-Path -Parent | Split-Path -Leaf
 
-# Получить события из журналов событий и файлов журналов отслеживания событий
+# Events categories
 enum Level
 {
-	LogAlways		= 0
-	Critical		= 1
-	Error			= 2
-	Warning			= 3
-	Informational	= 4
-	Verbose			= 5
+	LogAlways     = 0
+	Critical      = 1
+	Error         = 2
+	Warning       = 3
+	Informational = 4
+	Verbose       = 5
 }
 # [Level]::LogAlways.value__
 # [Level]0
@@ -93,7 +93,7 @@ $WindowsPowerShell = @{
 Get-WinEvent -FilterHashtable $WindowsPowerShell | Where-Object -FilterScript {$_.Level -eq "3" -or $_.Level -eq "4"}
 #
 Get-WinEvent -LogName "Windows PowerShell" | Where-Object -FilterScript {$_.Message -match "HostApplication=(?<a>.*)"} | Format-List -Property *
-# Устарело
+# Deprecated
 Get-EventLog -LogName "Windows PowerShell" -InstanceId 10 | Where-Object -FilterScript {$_.Message -match "powershell.exe"}
 #
 $Security = @{
@@ -139,20 +139,20 @@ $ParentProcess = @{
 }
 Get-WinEvent -LogName Security | Where-Object -FilterScript {$_.Id -eq "4688"} | Where-Object -FilterScript {$_.Properties[5].Value -match 'conhost'} | Select-Object TimeCreated, $ParentProcess | Select-Object -First 10
 
-# Исполнить код по ссылке
+# Invoke code
 $url = "https://site.com/1.js"
 Invoke-Expression (New-Object -TypeName System.Net.WebClient).DownloadString($url)
 
-# Скачать и отобразить текстовый файл
+# Download and show text
 (Invoke-WebRequest -Uri "https://site.com/1.js" -OutFile D:\1.js -PassThru -UseBasicParsing).Content
 
-# Прочитать содержимое текстового файла
+# Get text file content
 (Invoke-WebRequest -Uri "https://site.com/1.js" -UseBasicParsing).Content
 
-# Создать архив
+# Create a zip archive
 Get-ChildItem -Path D:\folder -Filter *.ps1 -Recurse | Compress-Archive -DestinationPath D:\folder2 -CompressionLevel Optimal
 
-# Разархивировать архив
+# Expand zip archive
 $Parameters = @{
 	Path = "D:\1.zip"
 	DestinationPath = "D:\1"
@@ -161,19 +161,16 @@ $Parameters = @{
 }
 Expand-Archive @Parameters
 
-# Вычленить букву диска
+# Split the drive letter
 Split-Path -Path "D:\file.mp3" -Qualifier
 
-# Получение контрольной суммы файла (MD2, MD4, MD5, SHA1, SHA256, SHA384, SHA512)
-certutil -hashfile C:\file.txt SHA1
-
-# Преобразование кодов ошибок в текстовое сообщение
+# Get error description
 certutil -error 0xc0000409
 
-# Вычислить значение хэш-суммы файла
+# Get file hash
 Get-FileHash -Path D:\1.txt -Algorithm MD5
 
-# Вычислить значение хэш-суммы строки
+# Get string hash
 function Get-StringHash
 {
 	[CmdletBinding()]
@@ -197,21 +194,24 @@ function Get-StringHash
 }
 Get-StringHash -String "2" -HashName SHA1
 
-# Развернуть окно с заголовком "Диспетчер задач", а остальные окна свернуть
+# Expand the window with "Task manager" title but others to minimize
 $Win32ShowWindowAsync = @{
 	Namespace = "WinAPI"
 	Name = "Win32ShowWindowAsync"
 	Language = "CSharp"
 	MemberDefinition = @"
-		[DllImport("user32.dll")]
-		public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+[DllImport("user32.dll")]
+public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 "@
 }
+
 if (-not ("WinAPI.Win32ShowWindowAsync" -as [type]))
 {
 	Add-Type @Win32ShowWindowAsync
 }
+
 $title = "Диспетчер задач"
+
 Get-Process | Where-Object -FilterScript {$_.MainWindowHandle -ne 0} | ForEach-Object -Process {
 	if ($_.MainWindowTitle -eq $title)
 	{
@@ -223,7 +223,7 @@ Get-Process | Where-Object -FilterScript {$_.MainWindowHandle -ne 0} | ForEach-O
 	}
 }
 
-# Установить состояние показа окна
+# Set a window state
 # https://docs.microsoft.com/ru-ru/windows/win32/api/winuser/nf-winuser-showwindow
 function WindowState
 {
@@ -283,7 +283,8 @@ function WindowState
 $MainWindowHandle = (Get-Process -Name notepad | Where-Object -FilterScript {$_.MainWindowHandle -ne 0}).MainWindowHandle
 $MainWindowHandle | WindowState -State HIDE
 
-# Функция для нахождения буквы диска, когда файл находится в известной папке, но не известна буква диска. Подходит, когда файл располагается на USB-носителе
+# Find drive letter when we know where file is but a drive letter is unknown
+# Suitable for situations when file is located on a USB drive
 function Get-ResolvedPath
 {
 	[CmdletBinding()]
@@ -300,85 +301,58 @@ function Get-ResolvedPath
 	$DriveLetter = (Get-Disk | Where-Object -FilterScript {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter
 	$DriveLetter | ForEach-Object -Process {[string]$_ + ":\" + $Path}
 }
-Get-ResolvedPath -Path "Программы\Прочее" | Copy-Item -Destination $env:SystemRoot\Cursors -Force
+Get-ResolvedPath -Path "Folder\folder" | Copy-Item -Destination $env:SystemRoot\Cursors -Force
 
-# Установить бронзовый курсор из Windows XP
-New-ItemProperty -Path "HKCU:\Control Panel\Cursors" -Name Arrow -Type ExpandString -Value "%SystemRoot%\cursors\bronze.cur" -Force
-$Signature = @{
-	Namespace = "SystemParamInfo"
-	Name = "WinAPICall"
-	Language = "CSharp"
-	MemberDefinition = @"
-		[DllImport("user32.dll", EntryPoint = "SystemParametersInfo")]
-		public static extern bool SystemParametersInfo(
-		uint uiAction,
-		uint uiParam,
-		uint pvParam,
-		uint fWinIni);
-"@
-}
-if (-not ("SystemParamInfo.WinAPICall" -as [type]))
-{
-	Add-Type @Signature
-}
-[SystemParamInfo.WinAPICall]::SystemParametersInfo(0x0057,0,$null,0)
-
-# Стать владельцем файла
+# Become a file owner
 takeown /F D:\file.exe
 icacls D:\file.exe /grant:r %username%:F
-# Стать владельцем папки
+# Become a folder owner
 takeown /F C:\HV\10 /R
 icacls C:\HV\10 /grant:r %username%:F /T
 
-# Найти файл на всех локальных дисках и вывести его полный путь
+# Search for a file on all local drives and its' full path
 $file = "file.ext"
 (Get-ChildItem -Path ([System.IO.DriveInfo]::GetDrives() | Where-Object {$_.DriveType -ne "Network"}).Name -Recurse -ErrorAction SilentlyContinue | Where-Object -FilterScript {$_.Name -like "$file"}).FullName
 
-# Создать ini-файл с кодировкой UCS-2 LE BOM
-$Key = @"
-RAR registration data
-"@
-Set-Content -Path $Path\file.ini -Value $Key -Encoding Unicode -Force
-
-# Удалить первые $c буквы в названиях файлов в папке
+# Remove the first $c letters in the file names in a folder
 $Path = "D:\folder"
 $Extension = "flac"
 $Characters = 4
 (Get-ChildItem -LiteralPath $Path -Filter *.$Extension) | Rename-Item -NewName {$_.Name.Substring($Characters)}
 
-# Удалить последние $c буквы в названиях файлов в папке
+# Remove the last $c letters in the file names in a folder
 $Path = "D:\folder"
 $Extension = "flac"
 $Characters = 4
 Get-ChildItem -LiteralPath $Path -Filter *.$Extension | Rename-Item -NewName {$_.Name.Substring(0,$_.BaseName.Length-$Characters) + $_.Extension}
 
-# Найти файлы, в названии которых каждое слово не написано с заглавной буквы
+# Find files in the name of which every word isn't capitalized
 $Path = "D:\folder"
 (Get-ChildItem -LiteralPath $Path -File -Recurse | Where-Object -FilterScript {($_.BaseName -replace "'|``") -cmatch "\b\p{Ll}\w*"}).FullName
 
-# Записать прописными буквами первую букву каждого слова в названии каждого файла в папке
+# Capitize the first letter for every word in the files names in a folder
 $Path = "D:\folder"
 $Extension = "flac"
 Get-ChildItem -Path $Path -Filter *.$Extension | Rename-Item -NewName {(Get-Culture).TextInfo.ToTitleCase($_.BaseName) + $_.Extension}
 
-# Перевод первых букв в верхний регистр (капитализация)
+# Capitalize the first letters
 $String = "аа аа аа"
 (Get-Culture).TextInfo.ToTitleCase($String.ToLower())
 
-# Подсчитать количество символов в строке
+# Count chars in a string
 ("string" | Measure-Object -Character).Characters
 
-# Заменить слово в названии файлов в папке
+# Replace a word in a file name in a folder
 Get-ChildItem -Path "D:\folder" | Rename-Item -NewName {$_.Name.Replace("abc","cba")}
 
-# Переименовать расширения в папке
+# Replace an extension name in a fodler
 $Path = "D:\folder"
 Get-ChildItem -Path $Path | Rename-Item -NewName {$_.FullName.Replace(".txt1",".txt")}
 
 # Добавить REG_NONE
 New-ItemProperty -Path HKCU:\Software -Name Name -PropertyType None -Value ([byte[]]@()) -Force
 
-# Скачать видео с помощью youtube-dl
+# youtube-dl
 # https://github.com/ytdl-org/youtube-dl/releases
 # https://ffmpeg.zeranoe.com/builds
 # "D:\youtube-dl.exe" --list-formats url
@@ -410,15 +384,14 @@ $bytes = [System.BitConverter]::GetBytes($int)
 $int = [System.BitConverter]::ToInt32($bytes, 0)
 '0x{0:x}' -f $int
 
-# Отключить сетевые протоколы
+# Disable net protocols
 $ComponentIDs = @(
 	"ms_tcpip6"
 	"ms_pacer"
 )
 Disable-NetAdapterBinding -Name Ethernet -ComponentID $ComponentIDs
 
-# Вычислить продолжительность видеофайлов в папке
-# http://code.avalon-zone.be/retrieve-the-extended-attibutes-of-a-file
+# Calculate videofiles' length in a folder
 function Get-Duration
 {
 	[CmdletBinding()]
@@ -432,6 +405,7 @@ function Get-Duration
 
 	$Shell = New-Object -ComObject Shell.Application
 	$TotalDuration = [timespan]0
+
 	Get-ChildItem -Path $Path -Filter "*.$Extention" | ForEach-Object -Process {
 		$Folder = $Shell.Namespace($_.DirectoryName)
 		$File = $Folder.ParseName($_.Name)
@@ -442,18 +416,19 @@ function Get-Duration
 			Duration = $Duration
 		}
 	}
+
 	"`nTotal duration $TotalDuration"
 }
-# (Get-Duration -Path D:\folder -Extention mp4 | Sort-Object Duration | Out-String).Trim()
+(Get-Duration -Path D:\folder -Extention mp4 | Sort-Object Duration | Out-String).Trim()
 
 
-# Найти неустановленные обновления
+# Find all uninstalled updates
 $UpdateSession = New-Object -ComObject Microsoft.Update.Session
 $UpdateSearcher = $UpdateSession.CreateupdateSearcher()
 $Updates = @($UpdateSearcher.Search("IsHidden=0 and IsInstalled=0").Updates)
-$Updates | Select-Object Title
+$Updates | Select-Object -ExpandProperty Title
 
-# Закрыть определенное окно Проводника
+# Closed the specific File Explorer window
 $FolderName = "D:\folder"
 (New-Object -ComObject "Shell.Application").Windows() | Where-Object {$_.Document.Folder.Self.Path -eq $FolderName} | ForEach-Object -Process {$_.Quit()}
 
@@ -462,7 +437,7 @@ $String = "1234"
 $String.StartsWith("1")
 $String.EndsWith("4")
 
-# Глаголы ярлыка в контекстном меню
+# Context menu verbs
 $Target = Get-Item -Path "D:\folder\file.lnk"
 $Shell = New-Object -ComObject Shell.Application
 $Folder = $Shell.NameSpace($Target.DirectoryName)
@@ -470,7 +445,7 @@ $file = $Folder.ParseName($Target.Name)
 $Verb = $File.Verbs() | Where-Object -FilterScript {$_.Name -like "Закрепить на начальном &экране"}
 $Verb.DoIt()
 
-# Конвертировать хэш-таблицу в объекты
+# Convert hash table into objects
 $hash = @{
 	Name = 'Tobias'
 	Age = 66
@@ -478,19 +453,19 @@ $hash = @{
 }
 New-Object -TypeName PSObject -Property $hash
 
-# Кодирование строки в Base64 и обратно
+# Encode using Base64 and vice versa
 [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("SecretMessage"))
 [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("U2VjcmV0TWVzc2FnZQ=="))
 
-# Удалить неудаляемый ключ в реестре
+# Remove unremovable registry key
 $parent = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ps1', $true)
 $parent.DeleteSubKey('UserChoice', $true)
 $parent.Close()
 
-# Показания накопителей
+# Drives properties
 Get-PhysicalDisk | Get-StorageReliabilityCounter | Select-Object -Property *
 
-# Что запускается автоматически
+# Show all autostarts. Even drivers
 Get-EventLog -LogName System -InstanceId 1073748869 | ForEach-Object {
 	[PSCustomObject]@{
 		Date = $_.TimeGenerated
@@ -521,10 +496,10 @@ function Test-Function
 Test-Function
 "Script done"
 
-# Найти все процессы notepad, сконвертировать в массив и убить процессы
+# Find all notepad.exe processes, convert into an array and kill all
 @(Get-Process -Name Notepad).ForEach({Stop-Process -InputObject $_})
 
-# Проверить, сходятся ли хэш-суммы из файла .cat с хэш-суммами файлов в папке
+# Compare hashes from .cat files
 $HT = @{
 	CatalogFilePath = "D:\file.cat"
 	Path = "D:\folder"
@@ -533,26 +508,8 @@ $HT = @{
 }
 Test-FileCatalog @HT
 
-# Спец. символы
-# Null `0
-# Alert`a
-# Backspace`b
-# Form feed`f
-# New line`n
-# Carriage return`r
-# Horizontal tab`t
-# Vertical tab`v
-# Stop parsing --%
-
-# Оператор -format
-$Processes = Get-Process | Sort-Object -Property CPU -Descending | Select-Object -First 10
-foreach ($Process in $Processes)
-{
-	"{0,-10} {1,10}" -f $Process.ProcessName, $Process.CPU
-}
-
 # JSON
-# Список
+# List
 $JSON = @{}
 $basket = @(
 	"apples",
@@ -561,7 +518,7 @@ $basket = @(
 $JSON | Add-Member -MemberType NoteProperty -Name Data -Value $basket -Force
 $JSON | ConvertTo-Json
 
-# Массив
+# Array
 $JSON = @{}
 $array = @{}
 $person = @{
@@ -573,7 +530,7 @@ $array.Add("Person",$person)
 $JSON | Add-Member -MemberType NoteProperty -Name Data -Value $array -Force
 $JSON | ConvertTo-Json -Depth 4
 
-# Комбинирование списка с массивом
+# Combining a list with an array
 $JSON = @{}
 $basket = @{
 	"Basket" = "apples","pears","oranges","strawberries"
@@ -581,7 +538,7 @@ $basket = @{
 $JSON | Add-Member -MemberType NoteProperty -Name Data -Value $basket -Force
 $JSON | ConvertTo-Json
 
-# Список содержит массив
+# A list contains an array
 $JSON = @{}
 $list = New-Object -TypeName System.Collections.ArrayList
 $list.Add(@{
@@ -600,7 +557,7 @@ $customers = @{
 $JSON | Add-Member -MemberType NoteProperty -Name Data -Value $customers -Force
 $JSON | ConvertTo-Json -Depth 4
 
-# Вложенные уровени
+# Nested levels
 $JSON = @{}
 $Lelevs = @{
 	Level2 = @{
@@ -628,7 +585,7 @@ $Google = @{
 $edge | Add-Member -MemberType NoteProperty -Name default_search_provider_data -Value $Google -Force
 ConvertTo-Json -InputObject $edge | Set-Content -Path "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Preferences" -Force
 
-# Добавить данные в JSON. Только для PowerShell 7
+# Add data to JSON. PowerShell 7 only
 $JSON = @'
 {
 	"editor.fontFamily": "'Cascadia Code',Consolas,'Courier New'",
@@ -642,8 +599,8 @@ $JHT += @{
 }
 $JHT | ConvertTo-Json | Set-Content -Path "$env:APPDATA\Code\User\settings.json"
 
-# Сбросить пароль локального пользователя через WinPE
-# WinPE
+# Reset local user password via WinPE
+# In the WinPE
 MOVE C:\Windows\system32\utilman.exe C:\Windows\system32\utilman.exe.bak
 RENAME C:\Windows\system32\utilman.exe utilman.exe.bak
 COPY C:\Windows\system32\cmd.exe C:\Windows\system32\utilman.exe
@@ -657,41 +614,25 @@ Get-LocalUser -Name $user | Set-LocalUser -Password $Password
 DEL C:\Windows\system32\utilman.exe /F
 RENAME C:\Windows\system32\utilman.exe.bak utilman.exe
 
-# Восстановление компонентов хранилища
+# Restoring components
 DISM /Online /Cleanup-Image /RestoreHealth
 
-# Восстановление компонентов хранилища локально
+# Restoring components locally
 DISM /Get-WimInfo /WimFile:E:\sources\install.wim
 DISM /Online /Cleanup-Image /RestoreHealth /Source:E:\sources\install.wim:3 /LimitAccess
-# Восстановление системных файлов
+# Restoring system files
 sfc /scannow
 
-# Восстановление компонентов хранилища в среде Windows PE
+# Restoring components in the Windows PE
 DISM /Get-WimInfo /WimFile:E:\sources\install.wim
 DISM /Image:C:\ /Cleanup-Image /RestoreHealth /Source:E:\sources\install.wim:3 /ScratchDir:C:\mnt
-# Восстановление системных файлов в среде Windows PE
+# Restoring system files in the Windows PE
 sfc /scannow /offbootdir=C:\ /offwindir=C:\Windows
 
-# Очистка папки WinSxS
+# WinSxS cleaning up
 DISM /Online /Cleanup-Image /StartComponentCleanup /ResetBase
 
-# Операторы Google
-Только на указанном сайте: site:site.ru
-В заголовке страницы: intitle:"index of"
-В тексте страницы: intext:текст
-В тексте url: inurl:текст
-В тексте ссылок: inanchor:текст
-По расширению ext:pdf
-Со схожей тематикой: related:site.ru
-Ссылки на данный ресурс: link:site.ru
-Кэш страницы: cache:site.ru
-Точная фраза: "site"
-Любой текст: *pedia.org
-Логическое ИЛИ: site1 | site2
-Логическое НЕ: error -warning
-Диапазон: cve 2006..2016
-
-# Проверка: был ли скрипт сохранен в кодировке UTF-8 c BOM, если он запускается локально
+# Check if a file is saved in UTF-8 with BOM encoding
 if ($PSCommandPath)
 {
 	$bytes = Get-Content -Path $PSCommandPath -Encoding Byte -Raw
@@ -705,7 +646,6 @@ if ($PSCommandPath)
 # Write-Progress
 $ExcludedAppxPackages = @(
 	# ...
-	# Панель управления NVidia
 	"NVIDIACorp.NVIDIAControlPanel"
 )
 $OFS = "|"
@@ -717,7 +657,7 @@ foreach ($AppxPackage in $AppxPackages)
 }
 Write-Progress -Activity "Uninstalling UWP apps" -Completed
 
-#
+# Arrays
 $Fruits = "Apple","Pear","Banana","Orange"
 $Fruits.GetType()
 
@@ -743,7 +683,7 @@ $Collection
 $Collection.Remove("Apple")
 $Collection
 
-# Ожидание процесса
+# Waiting for a process
 do
 {
 	$Process = Get-Process -Name notepad
@@ -776,8 +716,7 @@ while
 	Start-Sleep -Milliseconds 500
 }
 
-# Цикл
-Write-Host ""
+# for
 do
 {
 	$Prompt = Read-Host -Prompt " "
@@ -797,24 +736,23 @@ do
 }
 while ($Prompt -ne "N")
 
-# Сравнить бинарные значения
+# Compare binary values
 ((Get-ItemPropertyValue -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer -Name link) -join " ") -ne ([byte[]](00, 00, 00, 00) -join " ")
 
-# Ключ из UEFI
+# Get UEFI license key
 (Get-CimInstance -ClassName SoftwareLicensingService).OA3xOriginalProductKey
 
-# Активация Windows
+# Activate Windows
 slmgr.vbs /skms <servername>
 slmgr.vbs /ato
 
-
-# Получить имя исключения при ошибке
+# Get exception name
 $Error[0].Exception.GetType().FullName
 
-# Закрыть все папки, не убивая процесс explorer.exe
+# Close all windows without killing the File Explorer process
 (New-Object -ComObject Shell.Application).Windows() | Where-Object {$null -ne $_.FullName} | Where-Object {$_.FullName.EndsWith("\explorer.exe") } | ForEach-Object -Process {$_.Quit()}
 
-# Вывести таблицу с количеством строк и названием файлов в подпапке. -Raw читает файл с пустыми строками
+# Show table with files names and lines count in a folder. -Raw reads blank lines
 $FullName = @{
 	Name = "File"
 	Expression = {$_.FullName}
@@ -825,7 +763,7 @@ $Lines = @{
 }
 Get-ChildItem -Path "D:\Folder" -Depth 0 -File -Filter *.psd1 -Recurse -Force | ForEach-Object -Process {$_ | Select-Object -Property $FullName, $Lines} | Format-Table -AutoSize
 
-# Вывести таблицу с количеством строк и названием файлов в подпапке, исключая сканирование конкретной папки
+# Show table with files names and lines count in a folder except the specific folder
 $FullName = @{
 	Name = "File"
 	Expression = {$_.FullName}
@@ -837,7 +775,7 @@ $Lines = @{
 Get-ChildItem -Path "D:\Folder" -Recurse -File -Force | Where-Object -FilterScript {$_.PSParentPath -notmatch "sophos"} | ForEach-Object -Process {$_ | Select-Object -Property $FullName, $Lines} | Format-Table -AutoSize
 (Get-ChildItem -Path "D:\Folder" -Recurse -File -Force | Where-Object -FilterScript {$_.PSParentPath -notmatch "sophos"} | ForEach-Object -Process {(Get-Content -Path $_.FullName).Count} | Measure-Object -Sum).Sum
 
-# Вывести описание ошибки
+# Error description
 function Convert-Error ([int]$ErrorCode)
 {
 	CertUtil -error $ErrorCode
@@ -846,20 +784,20 @@ function Convert-Error ([int]$ErrorCode)
 }
 Convert-Error -2147287037
 
-# Удалить строки в файле, начинающиеся с "//", удалив также оставшиеся пустые строки
+# Remove lines starting with "//" and blank spaces
 Get-Content -Path $settings | Where-Object -FilterScript {$_ -notmatch "//"} | Where-Object -FilterScript {$_.Trim(" `t")} | Set-Content -Path $settings -Force
 
-# Поставить кавычки на каждом элементе
+# Quote every item
 Get-Content -Path D:\file.txt -Force | ForEach-Object -Process {"'$_'"} | Set-Content -Path D:\file.txt -Force
 
-# Восстановить все файлы из карантина Microsoft Defender на их родной место
+# Restore every files from Defender quarantine to their origin location
 # https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-antivirus/command-line-arguments-microsoft-defender-antivirus
 (Get-MpThreat).Resources.Replace('file:_',"") | ForEach-Object -Process {
 	# Start-Sleep -Seconds 3
 	Start-Process -FilePath "$env:ProgramFiles\Windows Defender\MpCmdRun.exe" -ArgumentList @("-Restore -FilePath `"$_`"") -Wait
 }
 
-# Вставить нод в XML
+# Insert an XML node
 [xml]$XML1 = @"
 <toast duration="$ToastDuration" scenario="reminder">
     <visual>
@@ -888,9 +826,26 @@ Get-Content -Path D:\file.txt -Force | ForEach-Object -Process {"'$_'"} | Set-Co
 $XML1.toast.AppendChild($XML1.ImportNode($XML2.toast.actions, $true))
 $XML1.Save("C:\1.xml")
 
-# Проверить валидность всех .psd1 в папках
+# Validate all .psd1 in all folders
 $Folder = Get-ChildItem -Path "D:\Desktop\Sophia Script" -Recurse -Include *.psd1
 foreach ($Item in $Folder.DirectoryName)
 {
 	Import-LocalizedData -FileName Sophia.psd1 -BaseDirectory $Item -BindingVariable Data
 }
+
+# Adding and Removing Items from a PowerShell Array
+$Fruits = "Apple", "Pear", "Banana", "Orange"
+$Fruits.GetType()
+$Fruits.Add("Kiwi")
+# $Fruits.Remove("Apple")
+$Fruits.IsFixedSize
+
+$Fruits = $Fruits -ne "Apple"
+$Fruits
+
+$Fruits = {$Fruits}.Invoke()
+$Fruits.GetType()
+
+$Collection.Add("Melon")
+$Collection.Remove("Apple")
+$Collection
