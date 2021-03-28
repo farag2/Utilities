@@ -209,7 +209,7 @@ if (Test-Path -Path "$env:ProgramFiles\NVIDIA Corporation")
 # Office
 if (Test-Path -Path "$env:ProgramFiles\Microsoft Office\root")
 {
-	Remove-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Средства Microsoft Office" -Recurse -Force -ErrorAction Ignore
+	Remove-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Microsoft Office Tools" -Recurse -Force -ErrorAction Ignore
 }
 
 # Paint.net
