@@ -32,7 +32,6 @@
 * <https://blog.it-kb.ru/tag/powershell/>
 * <https://michael-casey.com>
 * <https://www.itdroplets.com/category/powershell/>
-* <https://sohabr.net/habr/post/304420/>
 * <https://vimalshekar.github.io>
 * <https://smsagent.blog/category/powershell/>
 * <http://www.systanddeploy.com/search?max-results=10&q=+>
@@ -43,6 +42,8 @@
 * https://info.sapien.com/index.php/scripting/scripting-classes/creating-objects-in-windows-powershell
 * https://vexx32.github.io
 * https://docs.microsoft.com/ru-ru/powershell/module/microsoft.powershell.core/about/about_functions_advanced_parameters
+* https://www.thomasmaurer.ch/tag/powershell/
+* https://superwidgets.wordpress.com/
 </details>
 
 # CheetSheets
