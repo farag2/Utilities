@@ -788,7 +788,9 @@ Convert-Error -2147287037
 Get-Content -Path $settings | Where-Object -FilterScript {$_ -notmatch "//"} | Where-Object -FilterScript {$_.Trim(" `t")} | Set-Content -Path $settings -Force
 
 # Quote every item
-Get-Content -Path D:\file.txt -Force | ForEach-Object -Process {"'$_'"} | Set-Content -Path D:\file.txt -Force
+Get-Content -Path D:\file.txt -Force | ForEach-Object -Process {"'$_'"}
+# PowerShell 7.x
+@("1", "2", "3") | Join-String -Property $_ -DoubleQuote -Separator ', '
 
 # Restore every files from Defender quarantine to their origin location
 # https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-antivirus/command-line-arguments-microsoft-defender-antivirus
