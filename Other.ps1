@@ -352,20 +352,22 @@ Get-ChildItem -Path $Path | Rename-Item -NewName {$_.FullName.Replace(".txt1",".
 # Добавить REG_NONE
 New-ItemProperty -Path HKCU:\Software -Name Name -PropertyType None -Value ([byte[]]@()) -Force
 
-# youtube-dl
-# https://github.com/ytdl-org/youtube-dl/releases
-# https://ffmpeg.zeranoe.com/builds
-# "D:\youtube-dl.exe" --list-formats url
-$URLs = @(
-	"",
-	""
-)
-# --format 43+35 url
-# --username $username
-# --password $password
-# --video-password $videopassword
+<#
+	youtube-dl
+
+	https://github.com/ytdl-org/youtube-dl/releases
+	https://github.com/BtbN/FFmpeg-Builds
+
+	"D:\youtube-dl.exe" --list-formats url
+	Get video & audio indexes: --format 43+35 url
+
+	--username $username
+	--password $password
+	--video-password $videopassword
+#>
+$URLs = @()
 $youtubedl = "D:\Downloads\youtube-dl.exe"
-$output = "D:\"
+$output = "D:\Downloads"
 $title = "%(title)s.mp4"
 
 $n = 1
@@ -386,7 +388,7 @@ $int = [System.BitConverter]::ToInt32($bytes, 0)
 
 # Disable net protocols
 $ComponentIDs = @(
-	"ms_tcpip6"
+	"ms_tcpip6",
 	"ms_pacer"
 )
 Disable-NetAdapterBinding -Name Ethernet -ComponentID $ComponentIDs
