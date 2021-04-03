@@ -1,6 +1,11 @@
 exit
 # Re-register all UWP apps
-(Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\InboxApplications | Get-ItemProperty).Path | Add-AppxPackage -Register -DisableDevelopmentMode
+$Bundles = (Get-AppXPackage -PackageTypeFilter Framework -AllUsers).PackageFullName
+Get-ChildItem -Path "HKLM:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\PackageRepository\Packages" | ForEach-Object -Process {
+	Get-ItemProperty -Path $_.PSPath
+} | Where-Object -FilterScript {$_.Path -match "Program Files"} | Where-Object -FilterScript {$_.PSChildName -notin $Bundles} | Where-Object -FilterScript {$_.Path -match "x64"} | ForEach-Object -Process {"$($_.Path)\AppxManifest.xml"} | Add-AppxPackage -Register -ForceApplicationShutdown -ForceUpdateFromAnyVersion -DisableDevelopmentMode -Verbose
+# Check for UWP apps updates
+Get-CimInstance -Namespace "Root\cimv2\mdm\dmmap" -ClassName "MDM_EnterpriseModernAppManagement_AppManagement01" | Invoke-CimMethod -MethodName UpdateScanMethod
 
 # Restore all UWP apps
 $DamagedPackages = @()
@@ -19,7 +24,7 @@ foreach ($Package in $($DamagedPackages | Get-Unique))
 	New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Force
 	New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Name PackageStatus -Value 2 -PropertyType DWORD -Force
 }
-
+# Check for UWP apps updates
 Get-CimInstance -Namespace "Root\cimv2\mdm\dmmap" -ClassName "MDM_EnterpriseModernAppManagement_AppManagement01" | Invoke-CimMethod -MethodName UpdateScanMethod
 
 foreach ($Package in $($DamagedPackages | Get-Unique))
@@ -27,10 +32,12 @@ foreach ($Package in $($DamagedPackages | Get-Unique))
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Force
 }
 
-# Install Microsoft Store from appxbundle
-# SW_DVD9_NTRL_Win_10_20H2_32_64_ARM64_MultiLang_Inbox_Apps_X22-36106.ISO
-# https://store.rg-adguard.net
-# https://yadi.sk/d/10Ttj2IVOKQ0Og
+<#
+	Install Microsoft Store from appxbundle
+	SW_DVD9_NTRL_Win_10_20H2_32_64_ARM64_MultiLang_Inbox_Apps_X22-36106.ISO
+	https://store.rg-adguard.net
+	https://yadi.sk/d/10Ttj2IVOKQ0Og
+#>
 Add-AppxPackage -Path D:\Microsoft.DesktopAppInstaller.appxbundle
 Add-AppxPackage -Path D:\Microsoft.StorePurchaseApp.appxbundle
 
