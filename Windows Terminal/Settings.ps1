@@ -34,7 +34,10 @@ if ($null -ne (Get-Module -Name PSReadline))
 		Remove-Item -Path $env:ProgramFiles\WindowsPowerShell\Modules\PSReadline\$CurrentVersion -Recurse -Force -ErrorAction Ignore
 
 		Get-InstalledModule -Name PSReadline -AllVersions
+
 		Write-Verbose -Message "Restart the session" -Verbose
+
+		exit
 	}
 }
 else
@@ -46,6 +49,10 @@ else
 		Install-Package -Name NuGet -Force
 	}
 	Install-Module -Name PSReadLine -RequiredVersion $LatestRelease -Force
+	
+	Write-Verbose -Message "Restart the session" -Verbose
+
+	exit
 }
 
 # Downloading Windows95.gif
