@@ -208,14 +208,14 @@ else
 }
 
 # Starting directory
-$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name Desktop
+$DesktopFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name Desktop
 if ($Terminal.profiles.list[0].startingDirectory)
 {
-	$Terminal.profiles.list[0].startingDirectory = $DownloadsFolder
+	$Terminal.profiles.list[0].startingDirectory = $DesktopFolder
 }
 else
 {
-	$Terminal.profiles.list[0] | Add-Member -Name startingDirectory -MemberType NoteProperty -Value $DownloadsFolder -Force
+	$Terminal.profiles.list[0] | Add-Member -Name startingDirectory -MemberType NoteProperty -Value $DesktopFolder -Force
 }
 
 # Use acrylic
@@ -296,14 +296,14 @@ else
 }
 
 # Starting directory
-$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name Desktop
+$DesktopFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name Desktop
 if ($Terminal.profiles.list[1].startingDirectory)
 {
-	$Terminal.profiles.list[1].startingDirectory = $DownloadsFolder
+	$Terminal.profiles.list[1].startingDirectory = $DesktopFolder
 }
 else
 {
-	$Terminal.profiles.list[1] | Add-Member -Name startingDirectory -MemberType NoteProperty -Value $DownloadsFolder -Force
+	$Terminal.profiles.list[1] | Add-Member -Name startingDirectory -MemberType NoteProperty -Value $DesktopFolder -Force
 }
 
 # Use acrylic
@@ -398,14 +398,14 @@ if (Test-Path -Path "$env:ProgramFiles\PowerShell\7")
 	}
 
 	# Starting directory
-	$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name Desktop
+	$DesktopFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name Desktop
 	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).startingDirectory)
 	{
-		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).startingDirectory = $DownloadsFolder
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).startingDirectory = $DesktopFolder
 	}
 	else
 	{
-		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name startingDirectory -Value $DownloadsFolder -Force
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name startingDirectory -Value $DesktopFolder -Force
 	}
 
 	# Use acrylic
