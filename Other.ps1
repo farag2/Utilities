@@ -860,3 +860,14 @@ $Fruits.GetType()
 $Collection.Add("Melon")
 $Collection.Remove("Apple")
 $Collection
+
+# Set start-up powershell.exe location for Desktop
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
+
+if (-not (Test-Path -Path $profile))
+{
+	New-Item -Path $profile -Force
+}
+
+$Value = "Set-Location -Path (Get-ItemPropertyValue -Path `"HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders`" -Name Desktop)"
+Add-Content -Path $profile -Value $Value -Force
