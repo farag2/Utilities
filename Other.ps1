@@ -871,3 +871,15 @@ if (-not (Test-Path -Path $profile))
 
 $Value = "Set-Location -Path (Get-ItemPropertyValue -Path `"HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders`" -Name Desktop)"
 Add-Content -Path $profile -Value $Value -Force
+
+# Restart script by itself
+try
+{
+	. $PSCommandPath
+}
+catch
+{
+	$Error.Exception.Message
+
+	continue
+}
