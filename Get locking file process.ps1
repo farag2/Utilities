@@ -1,4 +1,4 @@
-﻿# https://github.com/pldmgg/misc-powershell/blob/master/MyFunctions/PowerShellCore_Compatible/Get-FileLockProcess.ps1
+# https://github.com/pldmgg/misc-powershell/blob/master/MyFunctions/PowerShellCore_Compatible/Get-FileLockProcess.ps1
 function Get-FileLockProcess
 {
 	[CmdletBinding()]
