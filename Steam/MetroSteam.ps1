@@ -136,9 +136,6 @@ $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows
 $Parameters = @{
 	Source = "$DownloadsFolder\Metro\UPMetroSkin-master\Unofficial 4.x Patch\Main Files [Install First]"
 	Destination = "$DownloadsFolder\Metro\metro-for-steam-4.4"
-	Exclude = ".gitattributes", ".gitignore"
-	# Delete = [switch]::Present
-	# DeleteEmpty = [switch]::Present
 	DeleteAll = [switch]::Present
 }
 Move-Recursively @Parameters
