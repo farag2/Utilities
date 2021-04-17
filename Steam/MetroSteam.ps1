@@ -36,51 +36,34 @@ Expand-Archive @Parameters
 
 <#
 	.SYNOPSIS
-		Копирование или псевдоперемещение файлов и каталогов с сохранением структуры
-
-	.Description
-		Скрипт предназначен для копирования или перемещения файлов из одного каталога в другой, при этом сохраняется вложенная структура каталогов
-		Фактически перемещение не выполняется, вместо него работает копирование с последующим удалением скопированнных файлов
+	Copying files and folders from one folder to another saving folders' structure
 
 	.Parameter Source
-		Необязательный: Исходный каталог для выборки элементов
-		Указывается либо относительный, либо абсолютный путь
+	Source folder to copy content from
 
 	.Parameter Destination
-		Необязательный: Целевой каталог
-		Указывается либо относительный, либо абсолютный путь
+	Destination folder to copy content to
 
 	.Parameter Include
-		Необязательный: маска(и) для включения элементов в выборку
+	Include files
 
 	.Parameter Exclude
-		Необязательный: маска(и) для исключения элементов из выборки
+	Exclude files
 
 	.Parameter Delete
-		Переключатель: если указан, то будут удалены исходные файлы, включенные в выборку, рекурсивно
+	Remove all copied items in the source folder recursively
 
 	.Parameter DeleteEmpty
-		Переключатель: если указан, то будут удалены рекурсивно пустые подкаталоги в исходном каталоге
+	Remove empty folders in the source folder recursively
+
+	.Parameter DeleteAll
+	Remove the source folder
 
 	.Example
-		.\script.ps1 -Source "D:\FOLDER1" -Destination "d:\Folder2" -Include '*.pdf', '*.txt' -Exclude '*_out.*' -Delete
-
-		Это пример перемещения файлов по маскам '*.pdf','*.txt' с исключением из выборки по маске '*_out.*'
-		с последующим удалением исходных элементов. Пустые каталоги не удаляются
-
-	.Example
-		.\script.ps1
-
-		Это пример копирования/перемещения файлов/каталогов, с сохранением структуры, но по указанным в самом скрипте параметрам
+		Move-Recursively -Source "D:\FOLDER1" -Destination "d:\Folder2" -Include '*.pdf', '*.txt' -Exclude '*_out.*' -Delete
 
 	.Link
-		https://forum.ru-board.com/topic.cgi?forum=62&topic=30859&start=3600#4
-
-	.Notes
-		Created By YuS
-
-		Version: 1.00
-		Date: 20.01.2021
+	https://forum.ru-board.com/topic.cgi?forum=62&topic=30859&start=3600#4
 #>
 function Move-Recursively
 {
@@ -94,22 +77,25 @@ function Move-Recursively
 		$Destination,
 
 		[string[]]
-		$Include = '*.*',
+		$Include = "*.*",
 
 		[string[]]
-		$Exclude = '',
+		$Exclude = "",
 
 		[switch]
 		$Delete,
 
 		[switch]
-		$DeleteEmpty
-	)
-	$src = Get-Item -LiteralPath $Source -Force
+		$DeleteEmpty,
 
-	# перемещение файлов с сохранением структуры
-	Get-ChildItem -LiteralPath $src.fullname -Include $Include -Exclude $Exclude -Recurse -Force | Copy-Item -Destination {
-		$Folder = Split-Path -Path $_.FullName.Replace("$($src.FullName)", $Destination)
+		[switch]
+		$DeleteAll
+	)
+
+	# Copying files saving folders' structure
+	# -Include & -Exclude work with -LiteralPath only in PowerShell 7
+	Get-ChildItem -LiteralPath $Source -Include $Include -Exclude $Exclude -Recurse -Force | Copy-Item -Destination {
+		$Folder = Split-Path -Path $_.FullName.Replace($Source, $Destination)
 
 		if (-not (Test-Path -LiteralPath $Folder))
 		{
@@ -121,27 +107,41 @@ function Move-Recursively
 		}
 	} -Force
 
-	if ($Delete.IsPresent)
+	# Removing all copied items
+	if ($Delete)
 	{
-		# удаляем все скопированные файлы
-		Get-ChildItem -LiteralPath $src.FullName -Include $Include -Exclude $Exclude -Recurse -File -Force | Remove-Item -Recurse -Force
+		Get-ChildItem -LiteralPath $Source -Include $Include -Exclude $Exclude -Recurse -File -Force | Remove-Item -Recurse -Force
 	}
 
-	if ($DeleteEmpty.IsPresent)
+	# Removing empty folders
+	if ($DeleteEmpty)
 	{
-		# удаляем пустые каталоги
-		Get-ChildItem -LiteralPath $src.FullName -Recurse -Directory -Force | Sort-Object {$_.FullName.Length} -Descending | ForEach-Object -Process {
+		Get-ChildItem -LiteralPath $Source -Recurse -Directory -Force | Sort-Object {$_.FullName.Length} -Descending | ForEach-Object -Process {
 			if ($null -eq (Get-ChildItem -LiteralPath $_.FullName -Recurse -Force))
 			{
 				Remove-Item -LiteralPath $_.FullName -Force
 			}
 		}
 	}
+
+	# Remove the source folder
+	if ($DeleteAll)
+	{
+		Remove-Item -LiteralPath $Source -Recurse -Force
+	}
 }
 
-$Source = "$DownloadsFolder\Metro\UPMetroSkin-master\Unofficial 4.x Patch\Main Files [Install First]"
-$Destination = "$DownloadsFolder\Metro\metro-for-steam-4.4"
-Move-Recursively -Source $Source -Destination $Destination -Delete -DeleteEmpty
+$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
+
+$Parameters = @{
+	Source = "$DownloadsFolder\Metro\UPMetroSkin-master\Unofficial 4.x Patch\Main Files [Install First]"
+	Destination = "$DownloadsFolder\Metro\metro-for-steam-4.4"
+	Exclude = ".gitattributes", ".gitignore"
+	# Delete = [switch]::Present
+	# DeleteEmpty = [switch]::Present
+	DeleteAll = [switch]::Present
+}
+Move-Recursively @Parameters
 
 # Removing unnecessary files and folders
 Remove-Item -Path "$DownloadsFolder\metro-for-steam.zip", "$DownloadsFolder\UPMetroSkin.zip" -Force
