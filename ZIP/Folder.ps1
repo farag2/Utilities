@@ -31,8 +31,8 @@ function ExtractZIPFolder
 
 	Add-Type -Assembly System.IO.Compression.FileSystem
 
-	$ZIP = [IO.Compression.ZipFile]::OpenRead($Source).Entries
-	$ZIP | Where-Object -FilterScript {$_.FullName -like "$($Folder)/*.*"} | ForEach-Object -Process {
+	$ZIP = [IO.Compression.ZipFile]::OpenRead($Source)
+	$ZIP.Entries | Where-Object -FilterScript {$_.FullName -like "$($Folder)/*.*"} | ForEach-Object -Process {
 		$File   = Join-Path -Path $Destination -ChildPath $_.FullName
 		$Parent = Split-Path -Path $File -Parent
 
@@ -43,6 +43,8 @@ function ExtractZIPFolder
 
 		[IO.Compression.ZipFileExtensions]::ExtractToFile($_, $File, $true)
 	}
+
+	$ZIP.Dispose()
 }
 
 $Parameters = @{
