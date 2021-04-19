@@ -84,7 +84,7 @@ ExtractZIPFolder @Parameters
 Remove-Item -Path "$DownloadsFolder\metro-for-steam.zip", "$DownloadsFolder\UPMetroSkin.zip" -Force
 Remove-Item -LiteralPath "$DownloadsFolder\metro-for-steam-4.4\.gitattributes", "$DownloadsFolder\metro-for-steam-4.4\.gitignore" -Force
 
-Rename-Item -Path "$DownloadsFolder\metro-for-steam-4.4" -NewName "Metro"
+Rename-Item -Path "$DownloadsFolder\metro-for-steam-4.4" -NewName "Metro" -Force
 
 # Custom menu
 $Parameters = @{
