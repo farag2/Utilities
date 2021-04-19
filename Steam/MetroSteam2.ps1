@@ -29,7 +29,7 @@ Invoke-WebRequest @Parameters
 	Where to expand folder
 
 	.Parameter File
-	Assign the folder to expand
+	Assign the folder to expand to
 
 	.Example
 	ExtractZIPFolder -Source "D:\Folder\File.zip" -Destination "D:\Folder" -File "Folder1/Folder2"
