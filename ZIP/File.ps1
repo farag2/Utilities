@@ -42,6 +42,7 @@ function ExtractZIPFile
 	}
 
 	$Entries | ForEach-Object -Process {[IO.Compression.ZipFileExtensions]::ExtractToFile($_, "$($Destination)\$($_.Name)", $true)}
+
 	$ZIP.Dispose()
 }
 
