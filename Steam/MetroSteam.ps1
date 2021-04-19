@@ -167,5 +167,5 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\Steam")
 		Remove-Item -Path "${env:ProgramFiles(x86)}\Steam\Skins\Metro" -Recurse -Force
 	}
 
-	Move-Item -Path "C:\Users\test\Downloads\Metro" -Destination "${env:ProgramFiles(x86)}\Steam\Skins\Metro" -Force
+	Move-Item -Path "$DownloadsFolder\Metro" -Destination "${env:ProgramFiles(x86)}\Steam\Skins\Metro" -Force
 }
