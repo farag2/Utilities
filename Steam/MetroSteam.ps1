@@ -60,7 +60,7 @@ Expand-Archive @Parameters
 	Remove the source folder
 
 	.Example
-		Move-Recursively -Source "D:\FOLDER1" -Destination "d:\Folder2" -Include '*.pdf', '*.txt' -Exclude '*_out.*' -Delete
+	Move-Recursively -Source "D:\FOLDER1" -Destination "d:\Folder2" -Include '*.pdf', '*.txt' -Exclude '*_out.*' -Delete
 
 	.Link
 	https://forum.ru-board.com/topic.cgi?forum=62&topic=30859&start=3600#4
