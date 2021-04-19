@@ -51,7 +51,7 @@ function ExtractZIPFolder
 
 	Add-Type -Assembly System.IO.Compression.FileSystem
 
-	$ZIP = [IO.Compression.ZipFile]::OpenRead("D:\Downloads\metro-for-steam.zip")
+	$ZIP = [IO.Compression.ZipFile]::OpenRead($Source)
 	$ZIP.Entries | Where-Object -FilterScript {$_.FullName -like "$($Folder)/*.*"} | ForEach-Object -Process {
 		$File   = Join-Path -Path $Destination -ChildPath $_.FullName
 		$Parent = Split-Path -Path $File -Parent
