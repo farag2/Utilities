@@ -28,11 +28,14 @@ Invoke-WebRequest @Parameters
 	.Parameter Destination
 	Where to expand folder
 
-	.Parameter File
+	.Parameter Folder
 	Assign the folder to expand to
 
+	.Parameter Exclude
+	Exclude files from being expanded
+
 	.Example
-	ExtractZIPFolder -Source "D:\Folder\File.zip" -Destination "D:\Folder" -File "Folder1/Folder2"
+	ExtractZIPFolder -Source "D:\Folder\File.zip" -Destination "D:\Folder" -File "Folder1/Folder2" -Exclude @(".gitignore", ".gitattributes")
 #>
 function ExtractZIPFolder
 {
@@ -46,13 +49,16 @@ function ExtractZIPFolder
 		$Destination,
 
 		[string]
-		$Folder
+		$Folder,
+
+		[string[]]
+		$Exclude
 	)
 
 	Add-Type -Assembly System.IO.Compression.FileSystem
 
 	$ZIP = [IO.Compression.ZipFile]::OpenRead($Source)
-	$ZIP.Entries | Where-Object -FilterScript {$_.FullName -like "$($Folder)/*.*"} | ForEach-Object -Process {
+	$ZIP.Entries | Where-Object -FilterScript {($_.FullName -like "$($Folder)/*.*") -and ($Exclude -notcontains $_.Name)} | ForEach-Object -Process {
 		$File   = Join-Path -Path $Destination -ChildPath $_.FullName
 		$Parent = Split-Path -Path $File -Parent
 
@@ -71,6 +77,7 @@ $Parameters = @{
 	Source      = "$DownloadsFolder\metro-for-steam.zip"
 	Destination = "$DownloadsFolder"
 	Folder      = "metro-for-steam-4.4"
+	Exclude     = @(".gitignore", ".gitattributes")
 }
 ExtractZIPFolder @Parameters
 
@@ -82,7 +89,6 @@ $Parameters = @{
 ExtractZIPFolder @Parameters
 
 Remove-Item -Path "$DownloadsFolder\metro-for-steam.zip", "$DownloadsFolder\UPMetroSkin.zip" -Force
-Remove-Item -LiteralPath "$DownloadsFolder\metro-for-steam-4.4\.gitattributes", "$DownloadsFolder\metro-for-steam-4.4\.gitignore" -Force
 
 Rename-Item -Path "$DownloadsFolder\metro-for-steam-4.4" -NewName "Metro" -Force
 
