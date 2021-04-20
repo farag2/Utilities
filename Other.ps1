@@ -624,11 +624,16 @@ DEL C:\Windows\system32\utilman.exe /F
 RENAME C:\Windows\system32\utilman.exe.bak utilman.exe
 
 # Restoring components
+Repair-WindowsImage -Online -RestoreHealth
 DISM /Online /Cleanup-Image /RestoreHealth
 
 # Restoring components locally
 DISM /Get-WimInfo /WimFile:E:\sources\install.wim
-DISM /Online /Cleanup-Image /RestoreHealth /Source:E:\sources\install.wim:3 /LimitAccess
+Get-WindowsImage -ImagePath "E:\sources\install.wim"
+
+DISM /Online /Cleanup-Image /RestoreHealth /Source:E:\sources\install.wim:1 /LimitAccess
+Repair-WindowsImage -Online -RestoreHealth -Source E:\sources\install.wim:1 -LimitAccess
+
 # Restoring system files
 sfc /scannow
 
