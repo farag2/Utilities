@@ -18,8 +18,7 @@ $PackageFullName = (Get-AppxPackage -Name Microsoft.WindowsTerminal).PackageFull
 # Create a Windows Terminal shortcut
 $Shell = New-Object -ComObject Wscript.Shell
 $Shortcut = $Shell.CreateShortcut("$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows Terminal.lnk")
-$Shortcut.TargetPath = "powershell.exe"
-$ShortCut.Arguments = "-WindowStyle Hidden -Command wt"
+$Shortcut.TargetPath = "$env:LOCALAPPDATA\Microsoft\WindowsApps\Microsoft.WindowsTerminal_8wekyb3d8bbwe\wt.exe"
 $ShortCut.IconLocation = "$env:ProgramFiles\WindowsApps\$PackageFullName\WindowsTerminal.exe"
 $Shortcut.Save()
 
