@@ -33,7 +33,7 @@ if ($null -ne (Get-Module -Name PSReadline))
 
 		Get-InstalledModule -Name PSReadline -AllVersions
 
-		Write-Verbose -Message "Restart the PowerShell session" -Verbose
+		Write-Verbose -Message "Restart the PowerShell session, and re-run the script" -Verbose
 
 		exit
 	}
@@ -48,7 +48,7 @@ else
 	}
 	Install-Module -Name PSReadLine -RequiredVersion $LatestRelease -Force
 
-	Write-Verbose -Message "Restart the PowerShell session" -Verbose
+	Write-Verbose -Message "Restart the PowerShell session, and re-run the script" -Verbose
 
 	exit
 }
