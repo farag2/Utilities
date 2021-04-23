@@ -1,9 +1,4 @@
 <#
-	.EXAMPLE
-	Remove the Archive, ReadOnly and Hidden attributes on all files in the C:\logs\ folder:
-	./Remove-Attribute -Path "C:\logs\*.*" -Archive -ReadOnly -Hidden
-#>
-<#
 	.SYNOPSIS
 	Remove file attribute
 
