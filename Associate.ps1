@@ -1,4 +1,5 @@
-# Associate the following extensions with Notepad++ (as an example)
+# Associate the following extensions with Notepad++ without generating a hash (as an example)
+# Use the "Set-Association" function from https://github.com/farag2/Windows-10-Sophia-Script to generate hash
 
 # Get the associations table
 # https://www.pstips.net/assoc-ftype.html
