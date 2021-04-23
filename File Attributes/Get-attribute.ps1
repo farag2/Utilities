@@ -1,8 +1,14 @@
-# https://ss64.com/ps/syntax-attrib.html
-
 <#
-	.EXAMPLE
+	.SYNOPSIS
+	Get file attribute
+
+	.Parameter Path
+
+	.Example
 	Get-attribute -Path C:\demo\*.txt
+
+	.LINK
+	https://ss64.com/ps/syntax-attrib.html
 #>
 function Get-attribute
 {
@@ -19,6 +25,7 @@ function Get-attribute
 	$SYSTEM_ATTRIB = [System.IO.FileAttributes]::System
 
 	$Files = Get-Item -Path $Path -Force
+
 	if ($Files.Count -gt 1)
 	{
 		$Files = Get-ChildItem -Path $Path -Recurse -Force
