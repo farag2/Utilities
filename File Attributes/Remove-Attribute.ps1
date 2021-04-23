@@ -1,9 +1,31 @@
-# https://ss64.com/ps/syntax-attrib.html
-
 <#
 	.EXAMPLE
 	Remove the Archive, ReadOnly and Hidden attributes on all files in the C:\logs\ folder:
 	./Remove-Attribute -Path "C:\logs\*.*" -Archive -ReadOnly -Hidden
+#>
+<#
+	.SYNOPSIS
+	Remove file attribute
+
+	.Parameter Path
+
+	.Parameter Archive
+	Remove the Archive attribute
+
+	.Parameter ReadOnly
+	Remove the ReadOnly attribute
+
+	.Parameter Hidden
+	Remove the Hidden attribute
+
+	.Parameter System
+	Remove the Hidden attribute
+
+	.Example
+	Remove-attribute -Path "C:\logs\monday.csv" -Archive -ReadOnly -Hidden
+
+	.LINK
+	https://ss64.com/ps/syntax-attrib.html
 #>
 function Remove-attribute
 {
@@ -31,10 +53,12 @@ function Remove-attribute
 	$HIDDEN_ATTRIB = [System.IO.FileAttributes]::Hidden
 
 	$Files = Get-Item -Path $Path -Force
+
 	if ($Files.Count -gt 1)
 	{
 		$Files = Get-ChildItem -Path $Path -Recurse -Force
 	}
+
 	foreach ($File in $Files)
 	{
 		if ($Archive.IsPresent -and ((Get-ItemProperty -Path $File.FullName).Attributes -band $ARCHIVE_ATTRIB))
