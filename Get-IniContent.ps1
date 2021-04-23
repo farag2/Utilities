@@ -1,17 +1,17 @@
 <#
+    	.Synopsis
+        Gets the content of an INI file
+
 	.Example
 	$FileContent = Get-IniContent "C:\myinifile.ini"
 	Saves the content of the c:\myinifile.ini in a hashtable called $FileContent
 
-	$inifilepath | $FileContent = Get-IniContent
-	Gets the content of the ini file passed through the pipe into a hashtable called $FileContent
-
-	$FileContent = Get-IniContent "c:\settings.ini"
+	$FileContent = Get-IniContent -Path "c:\settings.ini"
 	$FileContent["Section"]["Key"]
 	Returns the key "Key" of the section "Section" from the C:\settings.ini file
 
 	.Link
-	https://gallery.technet.microsoft.com/scriptcenter/ea40c1ef-c856-434b-b8fb-ebd7a76e8d91
+	https://github.com/lipkau/PsIni
 #>
 function Get-IniContent
 {
