@@ -1,12 +1,23 @@
-# https://ss64.com/ps/syntax-attrib.html
-
 <#
-	.EXAMPLE
-	Add the ReadOnly and Hidden attributes on the file 'C:\logs\monday.csv'
-	./Set-Attribute.ps1 -Path "C:\logs\monday.csv" -ReadOnly -Hidden
+	.SYNOPSIS
+	Set file attribute
 
-	Add the Archive attributes on all the .TXT files in the C:\logs\ folder:
-	./Set-Attribute1 -Path "C:\logs\*.txt" -Archive
+	.Parameter Path
+
+	.Parameter Archive
+	Set the Archive attribute
+
+	.Parameter ReadOnly
+	Set the ReadOnly attribute
+
+	.Parameter Hidden
+	Set the Hidden attribute
+
+	.Example
+	.Set-attribute -Path "C:\logs\monday.csv" -ReadOnly -Hidden
+
+	.LINK
+	https://ss64.com/ps/syntax-attrib.html
 #>
 function Set-attribute
 {
@@ -31,10 +42,12 @@ function Set-attribute
 	$HIDDEN_ATTRIB = [System.IO.FileAttributes]::Hidden
 
 	$Files = Get-Item -Path $Path -Force
+
 	if ($Files.Count -gt 1)
 	{
 		$Files = Get-ChildItem -Path $Path -Recurse -Force
 	}
+
 	foreach ($File in $Files)
 	{
 		if ($Archive.IsPresent)
