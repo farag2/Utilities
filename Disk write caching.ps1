@@ -99,11 +99,6 @@ foreach ($DiskN in $DiskNumbersToModify)
 	$DiskType = $DiskPath.Split([char]0x003F,[char]0x0023)
 	$RegistryPath += ($DiskType[1]+"\"+$Disktype[2]+"\"+$Disktype[3]+"\Device Parameters\Disk")
 
-	if (-not (Test-Path -Path HKLM:\SYSTEM\CurrentControlSet\Enum))
-	{
-		New-Item -Path HKLM:\SYSTEM\CurrentControlSet\Enum -Force
-	}
-
 	# CacheIsPowerProtected parameter in most cases would be "0"
 	New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Enum -Name CacheIsPowerProtected -Value 0 -PropertyType DWORD -Force
 
