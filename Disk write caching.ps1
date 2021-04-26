@@ -89,8 +89,8 @@ function DiskWriteCaching
 
 
 
+# https://wintech.sgal.info/2015/11/change-write-caching-policy.html
 $DiskNumbersToModify = (1..14)
-
 foreach ($DiskN in $DiskNumbersToModify)
 {
 	$DiskName = (Get-Disk -Number $DiskN).FriendlyName
