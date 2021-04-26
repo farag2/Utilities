@@ -86,3 +86,27 @@ function DiskWriteCaching
 
 # DiskWriteCaching -Disable
 # DiskWriteCaching -Enable
+
+
+
+$DiskNumbersToModify = (1..14)
+
+foreach ($DiskN in $DiskNumbersToModify)
+{
+	$DiskName = (Get-Disk -Number $DiskN).FriendlyName
+	$DiskSN = (Get-Disk -Number $DiskN).SerialNumber
+	$DiskPath = (Get-Disk -Number $DiskN).Path
+	$DiskType = $DiskPath.Split([char]0x003F,[char]0x0023)
+	$RegistryPath += ($DiskType[1]+"\"+$Disktype[2]+"\"+$Disktype[3]+"\Device Parameters\Disk")
+
+	if (-not (Test-Path -Path HKLM:\SYSTEM\CurrentControlSet\Enum))
+	{
+		New-Item -Path HKLM:\SYSTEM\CurrentControlSet\Enum -Force
+	}
+
+	# CacheIsPowerProtected parameter in most cases would be "0"
+	New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Enum -Name CacheIsPowerProtected -Value 0 -PropertyType DWORD -Force
+
+	# "1" turns on write-caching policy, "0" turns off write-caching policy
+	New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Enum -Name UserWriteCacheSetting -Value 1 -PropertyType DWORD -Force
+}
