@@ -773,7 +773,7 @@ $FullName = @{
 }
 $Lines = @{
 	Name = "Lines"
-	Expression = {Get-Content -Path $_ -Raw | Measure-Object -Line | Select-Object -ExpandProperty Lines}
+	Expression = {Get-Content -Path $_.FullName -Raw | Measure-Object -Line | Select-Object -ExpandProperty Lines}
 }
 Get-ChildItem -Path "D:\Folder" -Depth 0 -File -Filter *.psd1 -Recurse -Force | ForEach-Object -Process {$_ | Select-Object -Property $FullName, $Lines} | Format-Table -AutoSize
 
