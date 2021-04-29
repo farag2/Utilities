@@ -54,7 +54,6 @@ Remove-Item -Path "$ExtractPath\Adobe Acrobat\AcroPro.msi extracted" -Force
 
 # Download the latest patch
 # https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html
-
 $LatestVersion = Invoke-RestMethod -Uri https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/acrobat/current_version.txt
 $LatestVersion = $LatestVersion.Replace(".","")
 
@@ -65,9 +64,9 @@ $Parameters = @{
 }
 Invoke-WebRequest @Parameters
 
+# Create the edited setup.ini
 $PatchFile = Split-Path -Path "$DownloadsFolder\AcrobatDCUpd$($LatestVersion).msp" -Leaf
 
-# Create the edited setup.ini
 $setupini = @"
 [Product]
 PATCH=$PatchFile
