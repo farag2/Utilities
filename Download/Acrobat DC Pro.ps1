@@ -1,5 +1,6 @@
-# Downloading Acrobat_DC_Web_WWMUI.exe
+# Download Acrobat_DC_Web_WWMUI.exe
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
 	Uri = "http://trials.adobe.com/AdobeProducts/APRO/20/win32/Acrobat_DC_Web_WWMUI.exe"
@@ -25,12 +26,12 @@ $Parameters = @{
 Invoke-WebRequest @Parameters
 #>
 
-# Extracting Acrobat_DC_Web_WWMUI.exe to the "Downloads folder\AcrobatTemp" folder
+# Extract Acrobat_DC_Web_WWMUI.exe to the "Downloads folder\AcrobatTemp" folder
 # Do not change window focus while extracting Acrobat_DC_Web_WWMUI.exe, unless the process will be running forever
 $ExtractPath = "$DownloadsFolder\AcrobatTemp"
 Start-Process -FilePath "$DownloadsFolder\Acrobat_DC_Web_WWMUI.exe" -ArgumentList "/o /s /x /d $ExtractPath" -PassThru -Wait
 
-# Extracting AcroPro.msi to the "AcroPro.msi extracted" folder
+# Extract AcroPro.msi to the "AcroPro.msi extracted" folder
 $Arguments = @(
 	"/a `"$ExtractPath\Adobe Acrobat\AcroPro.msi`""
 	"TARGETDIR=`"$ExtractPath\Adobe Acrobat\AcroPro.msi extracted`""
@@ -38,7 +39,7 @@ $Arguments = @(
 )
 Start-Process "msiexec" -ArgumentList $Arguments -Wait
 
-# Removing unnecessary files and folders
+# Remove unnecessary files and folders
 Get-ChildItem -Path $ExtractPath -Filter *.htm | ForEach-Object -Process {Remove-Item -Path $_.FullName}
 Remove-Item -Path "$ExtractPath\GB18030" -Recurse -Force
 
@@ -51,7 +52,22 @@ Remove-Item -Path "$ExtractPath\Adobe Acrobat\Data1.cab" -Force
 Get-ChildItem -Path "$ExtractPath\Adobe Acrobat\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$ExtractPath\Adobe Acrobat" -Force
 Remove-Item -Path "$ExtractPath\Adobe Acrobat\AcroPro.msi extracted" -Force
 
-# Creating edited setup.ini
+# Download the latest patch
+# https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html
+
+$LatestVersion = Invoke-RestMethod -Uri https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/acrobat/current_version.txt
+$LatestVersion = $LatestVersion.Replace(".","")
+
+$Parameters = @{
+	Uri = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($LatestVersion)/AcrobatDCUpd$($LatestVersion).msp"
+	OutFile = "$DownloadsFolder\AcrobatDCUpd$($LatestVersion).msp"
+	Verbose = [switch]::Present
+}
+Invoke-WebRequest @Parameters
+
+$PatchFile = Split-Path -Path "$DownloadsFolder\AcrobatDCUpd$($LatestVersion).msp" -Leaf
+
+# Create the edited setup.ini
 $setupini = @"
 [Product]
 PATCH=$PatchFile
@@ -59,19 +75,4 @@ msi=AcroPro.msi
 Languages=1049
 1049=Russian
 "@
-Set-Content -Path "$ExtractPath\Adobe Acrobat\setup.ini" -Value $setupini -Encoding Unicode -Force
-
-# Converting setup.ini to the "UTF-8 without BOM" encoding
-$Content = Get-Content -Path "$ExtractPath\Adobe Acrobat\setup.ini" -Raw
-Set-Content -Value (New-Object System.Text.UTF8Encoding).GetBytes($Content) -Encoding Byte -Path "$ExtractPath\Adobe Acrobat\setup.ini" -Force
-
-# Downloading the latest patch
-# https://supportdownloads.adobe.com/product.jsp?product=ac&platform=Windows
-# https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html
-$PatchFile = Split-Path -Path "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/2001320064/AcrobatDCUpd2001320064.msp" -Leaf
-$Parameters = @{
-	Uri = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/2001320064/AcrobatDCUpd2001320064.msp"
-	OutFile = "$ExtractPath\Adobe Acrobat\$PatchFile"
-	Verbose = [switch]::Present
-}
-Invoke-WebRequest @Parameters
+Set-Content -Path "$ExtractPath\Adobe Acrobat\setup.ini" -Value $setupini -Encoding Default -Force
