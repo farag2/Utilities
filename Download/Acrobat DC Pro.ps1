@@ -59,7 +59,7 @@ $LatestVersion = $LatestVersion.Replace(".","")
 
 $Parameters = @{
 	Uri = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($LatestVersion)/AcrobatDCUpd$($LatestVersion).msp"
-	OutFile = "$DownloadsFolder\AcrobatDCUpd$($LatestVersion).msp"
+	OutFile = "$ExtractPath\Adobe Acrobat\AcrobatDCUpd$($LatestVersion).msp"
 	Verbose = [switch]::Present
 }
 Invoke-WebRequest @Parameters
