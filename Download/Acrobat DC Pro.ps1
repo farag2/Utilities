@@ -3,8 +3,8 @@
 
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
-	Uri = "http://trials.adobe.com/AdobeProducts/APRO/20/win32/Acrobat_DC_Web_WWMUI.exe"
-	OutFile = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.exe"
+	Uri = "http://trials.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_WWMUI.zip"
+	OutFile = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip"
 	Verbose = [switch]::Present
 }
 Invoke-WebRequest @Parameters
@@ -16,41 +16,103 @@ $Cookie.Name = "MM_TRIALS"
 $Cookie.Value = "1234"
 $Cookie.Domain = ".adobe.com"
 $Session.Cookies.Add($Cookie)
-$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
+
 $Parameters = @{
-	Uri = "https://trials3.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_WWMUI.zip"
-	OutFile = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip"
-	Verbose = [switch]::present
+	Uri =      "https://trials3.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_WWMUI.zip"
+	OutFile    = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip"
+	Verbose    = [switch]::present
 	WebSession = $Session
 }
 Invoke-WebRequest @Parameters
 #>
 
+<#
 # Extract Acrobat_DC_Web_WWMUI.exe to the "Downloads folder\AcrobatTemp" folder
 # Do not change window focus while extracting Acrobat_DC_Web_WWMUI.exe, unless the process will be running forever
-$ExtractPath = "$DownloadsFolder\AcrobatTemp"
-Start-Process -FilePath "$DownloadsFolder\Acrobat_DC_Web_WWMUI.exe" -ArgumentList "/o /s /x /d $ExtractPath" -PassThru -Wait
+Start-Process -FilePath "$DownloadsFolder\Acrobat_DC_Web_WWMUI.exe" -ArgumentList "/o /s /x /d `"$DownloadsFolder\AcrobatTemp`"" -PassThru -Wait
+#>
+
+<#
+	.SYNOPSIS
+	Expand the specific folder from ZIP archive. Folder structure will be created recursively
+
+	.Parameter Source
+	The source ZIP archive
+
+	.Parameter Destination
+	Where to expand folder
+
+	.Parameter Folder
+	Assign the folder to expand to
+
+	.Parameter ExcludedFiles
+	Exclude files from expanding
+
+	.Parameter ExcludedFolders
+	Exclude folders from expanding
+
+	.Example
+	ExtractZIPFolder -Source "D:\Folder\File.zip" -Destination "D:\Folder" -Folder "Folder1/Folder2" -ExcludedFiles @("file1.ext", "file2.ext") -ExcludedFolders "Folder"
+#>
+function ExtractZIPFolder
+{
+	[CmdletBinding()]
+	param
+	(
+		[string]
+		$Source,
+
+		[string]
+		$Destination,
+
+		[string]
+		$Folder,
+
+		[string[]]
+		$ExcludedFiles,
+
+		[string[]]
+		$ExcludedFolders
+	)
+
+	Add-Type -Assembly System.IO.Compression.FileSystem
+
+	$ZIP = [IO.Compression.ZipFile]::OpenRead($Source)
+	$ZIP.Entries | Where-Object -FilterScript {($_.FullName -like "$($Folder)/*.*") -and ($ExcludedFiles -notcontains $_.Name) -and ($_.FullName -notmatch $ExcludedFolders)} | ForEach-Object -Process {
+		$File   = Join-Path -Path $Destination -ChildPath $_.FullName
+		$Parent = Split-Path -Path $File -Parent
+
+		if (-not (Test-Path -Path $Parent))
+		{
+			New-Item -Path $Parent -Type Directory -Force
+		}
+
+		[IO.Compression.ZipFileExtensions]::ExtractToFile($_, $File, $true)
+	}
+
+	$ZIP.Dispose()
+}
+
+$Parameters = @{
+	Source          = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip"
+	Destination     = "$DownloadsFolder"
+	Folder          = "Adobe Acrobat"
+	ExcludedFiles   = @("AcrobatDCUpd2100120145.msp", "WindowsInstaller-KB893803-v2-x86.exe")
+	ExcludedFolders = "VCRT_x64"
+}
+ExtractZIPFolder @Parameters
 
 # Extract AcroPro.msi to the "AcroPro.msi extracted" folder
 $Arguments = @(
-	"/a `"$ExtractPath\Adobe Acrobat\AcroPro.msi`""
-	"TARGETDIR=`"$ExtractPath\Adobe Acrobat\AcroPro.msi extracted`""
+	"/a `"$DownloadsFolder\Adobe Acrobat\AcroPro.msi`""
+	"TARGETDIR=`"$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted`""
 	"/qb"
 )
 Start-Process "msiexec" -ArgumentList $Arguments -Wait
 
-# Remove unnecessary files and folders
-Get-ChildItem -Path $ExtractPath -Filter *.htm | ForEach-Object -Process {Remove-Item -Path $_.FullName}
-Remove-Item -Path "$ExtractPath\GB18030" -Recurse -Force
-
-Remove-Item -Path "$ExtractPath\Adobe Acrobat\VCRT_x64" -Recurse -Force
-Remove-Item -Path "$ExtractPath\Adobe Acrobat\AcrobatDCUpd*.msp" -Force
-Remove-Item -Path "$ExtractPath\Adobe Acrobat\WindowsInstaller-KB893803-v2-x86.exe" -Force
-
-Remove-Item -Path "$ExtractPath\Adobe Acrobat\AcroPro.msi" -Force
-Remove-Item -Path "$ExtractPath\Adobe Acrobat\Data1.cab" -Force
-Get-ChildItem -Path "$ExtractPath\Adobe Acrobat\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$ExtractPath\Adobe Acrobat" -Force
-Remove-Item -Path "$ExtractPath\Adobe Acrobat\AcroPro.msi extracted" -Force
+Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\Data1.cab" -Force
+Get-ChildItem -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\Adobe Acrobat" -Force
+Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Force
 
 # Download the latest patch
 # https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html
@@ -59,7 +121,7 @@ $LatestVersion = $LatestVersion.Replace(".","")
 
 $Parameters = @{
 	Uri = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($LatestVersion)/AcrobatDCUpd$($LatestVersion).msp"
-	OutFile = "$ExtractPath\Adobe Acrobat\AcrobatDCUpd$($LatestVersion).msp"
+	OutFile = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$($LatestVersion).msp"
 	Verbose = [switch]::Present
 }
 Invoke-WebRequest @Parameters
@@ -67,6 +129,7 @@ Invoke-WebRequest @Parameters
 # Create the edited setup.ini
 $PatchFile = Split-Path -Path "$DownloadsFolder\AcrobatDCUpd$($LatestVersion).msp" -Leaf
 
+# Russian
 $setupini = @"
 [Product]
 PATCH=$PatchFile
@@ -74,4 +137,4 @@ msi=AcroPro.msi
 Languages=1049
 1049=Russian
 "@
-Set-Content -Path "$ExtractPath\Adobe Acrobat\setup.ini" -Value $setupini -Encoding Default -Force
+Set-Content -Path "$DownloadsFolder\Adobe Acrobat\setup.ini" -Value $setupini -Encoding Default -Force
