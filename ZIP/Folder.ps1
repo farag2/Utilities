@@ -11,11 +11,14 @@
 	.Parameter Folder
 	Assign the folder to expand to
 
-	.Parameter Exclude
+	.Parameter ExcludedFiles
 	Exclude files from expanding
 
+	.Parameter ExcludedFolders
+	Exclude folders from expanding
+
 	.Example
-	ExtractZIPFolder -Source "D:\Folder\File.zip" -Destination "D:\Folder" -File "Folder1/Folder2"
+	ExtractZIPFolder -Source "D:\Folder\File.zip" -Destination "D:\Folder" -Folder "Folder1/Folder2" -ExcludedFiles @("file1.ext", "file2.ext") -ExcludedFolders "Folder"
 #>
 function ExtractZIPFolder
 {
@@ -32,19 +35,22 @@ function ExtractZIPFolder
 		$Folder,
 
 		[string[]]
-		$Exclude
+		$ExcludedFiles,
+
+		[string[]]
+		$ExcludedFolders
 	)
 
 	Add-Type -Assembly System.IO.Compression.FileSystem
 
 	$ZIP = [IO.Compression.ZipFile]::OpenRead($Source)
-	$ZIP.Entries | Where-Object -FilterScript {($_.FullName -like "$($Folder)/*.*")  -and ($Exclude -notcontains $_.Name)} | ForEach-Object -Process {
+	$ZIP.Entries | Where-Object -FilterScript {($_.FullName -like "$($Folder)/*.*") -and ($ExcludedFiles -notcontains $_.Name) -and ($_.FullName -notmatch $ExcludedFolders)} | ForEach-Object -Process {
 		$File   = Join-Path -Path $Destination -ChildPath $_.FullName
 		$Parent = Split-Path -Path $File -Parent
 
 		if (-not (Test-Path -Path $Parent))
 		{
-			New-Item -Path $parent -Type Directory -Force
+			New-Item -Path $Parent -Type Directory -Force
 		}
 
 		[IO.Compression.ZipFileExtensions]::ExtractToFile($_, $File, $true)
@@ -52,11 +58,3 @@ function ExtractZIPFolder
 
 	$ZIP.Dispose()
 }
-
-$Parameters = @{
-	Source      = "D:\Folder\File.zip"
-	Destination = "D:\Folder"
-	Folder      = "Folder1/Folder2"
-	Exclude     = @("file1.ext", "file2.ext")
-}
-ExtractZIPFolder @Parameters
