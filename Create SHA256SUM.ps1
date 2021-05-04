@@ -17,6 +17,6 @@ function SHA256SUM
 	)
 
 	Get-ChildItem -Path $Path -Filter Sophia.Script*.zip -Force | ForEach-Object -Process {
-		"$($_.Name) $((Get-FileHash -Path $_.FullName -Algorithm SHA256).Hash)"
+		"$($_.Name)  $((Get-FileHash -Path $_.FullName -Algorithm SHA256).Hash)"
 	} | Add-Content -Path "$Path\SHA256SUM" -Encoding Default -Force
 }
