@@ -20,8 +20,8 @@ $Session.Cookies.Add($Cookie)
 $Parameters = @{
 	Uri =      "https://trials3.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_WWMUI.zip"
 	OutFile    = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip"
-	Verbose    = [switch]::present
 	WebSession = $Session
+	Verbose    = [switch]::present
 }
 Invoke-WebRequest @Parameters
 #>
