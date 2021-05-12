@@ -68,10 +68,10 @@ function ExtractZIPFolder
 		[string]
 		$Folder,
 
-		[string]
+		[string[]]
 		$ExcludedFiles,
 
-		[string]
+		[string[]]
 		$ExcludedFolders
 	)
 
