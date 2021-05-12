@@ -1,4 +1,4 @@
-# Download Acrobat_DC_Web_WWMUI.exe
+# Download the latest Acrobat_DC_Web_WWMUI.exe
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
@@ -34,25 +34,25 @@ Start-Process -FilePath "$DownloadsFolder\Acrobat_DC_Web_WWMUI.exe" -ArgumentLis
 
 <#
 	.SYNOPSIS
-	Expand the specific folder from ZIP archive. Folder structure will be created recursively
+	Extracting the specific folder from ZIP archive. Folder structure will be created recursively
 
 	.Parameter Source
 	The source ZIP archive
 
 	.Parameter Destination
-	Where to expand folder
+	Where to extracting folder
 
 	.Parameter Folder
-	Assign the folder to expand to
+	Assign the folder to extracting to
 
 	.Parameter ExcludedFiles
-	Exclude files from expanding
+	Exclude files from extracting
 
 	.Parameter ExcludedFolders
-	Exclude folders from expanding
+	Exclude folders from extracting
 
 	.Example
-	ExtractZIPFolder -Source "D:\Folder\File.zip" -Destination "D:\Folder" -Folder "Folder1/Folder2" -ExcludedFiles @("file1.ext", "file2.ext") -ExcludedFolders "Folder"
+	ExtractZIPFolder -Source "D:\Folder\File.zip" -Destination "D:\Folder" -Folder "Folder1/Folder2" -ExcludedFiles @("file1.ext", "file2.ext") -ExcludedFolders @("folder1", "folder2")
 #>
 function ExtractZIPFolder
 {
@@ -68,16 +68,19 @@ function ExtractZIPFolder
 		[string]
 		$Folder,
 
-		[string[]]
+		[string]
 		$ExcludedFiles,
 
-		[string[]]
+		[string]
 		$ExcludedFolders
 	)
 
 	Add-Type -Assembly System.IO.Compression.FileSystem
 
 	$ZIP = [IO.Compression.ZipFile]::OpenRead($Source)
+
+	$ExcludedFolders = ($ExcludedFolders | ForEach-Object -Process {$_ + "/.*?"}) -join '|'
+
 	$ZIP.Entries | Where-Object -FilterScript {($_.FullName -like "$($Folder)/*.*") -and ($ExcludedFiles -notcontains $_.Name) -and ($_.FullName -notmatch $ExcludedFolders)} | ForEach-Object -Process {
 		$File   = Join-Path -Path $Destination -ChildPath $_.FullName
 		$Parent = Split-Path -Path $File -Parent
@@ -97,8 +100,8 @@ $Parameters = @{
 	Source          = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip"
 	Destination     = "$DownloadsFolder"
 	Folder          = "Adobe Acrobat"
-	ExcludedFiles   = @("AcrobatDCUpd2100120145.msp", "WindowsInstaller-KB893803-v2-x86.exe")
-	ExcludedFolders = "VCRT_x64"
+	ExcludedFiles   = @("AcrobatDCUpd$($LatestVersion).msp", "WindowsInstaller-KB893803-v2-x86.exe")
+	ExcludedFolders = @("Adobe Acrobat/VCRT_x64")
 }
 ExtractZIPFolder @Parameters
 
@@ -116,9 +119,7 @@ Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Force
 
 # Download the latest patch
 # https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html
-$LatestVersion = Invoke-RestMethod -Uri https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/acrobat/current_version.txt
-$LatestVersion = $LatestVersion.Replace(".","")
-
+$LatestVersion = (Invoke-RestMethod -Uri "https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/acrobat/current_version.txt").Replace(".","")
 $Parameters = @{
 	Uri = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($LatestVersion)/AcrobatDCUpd$($LatestVersion).msp"
 	OutFile = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$($LatestVersion).msp"
