@@ -26,7 +26,6 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\AIMP")
 		"${env:ProgramFiles(x86)}\AIMP\AIMP.url",
 		"${env:ProgramFiles(x86)}\AIMP\license.rtf",
 		"${env:ProgramFiles(x86)}\AIMP\Help",
-		"${env:ProgramFiles(x86)}\AIMP\Langs",
 		"${env:ProgramFiles(x86)}\AIMP\Skins",
 		"${env:ProgramFiles(x86)}\AIMP\Plugins\aimp_AnalogMeter",
 		"${env:ProgramFiles(x86)}\AIMP\Plugins\aimp_infobar",
@@ -35,6 +34,8 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\AIMP")
 		"${env:ProgramFiles(x86)}\AIMP\Plugins\Aorta"
 	)
 	Remove-Item -Path $Remove -Recurse -Force -ErrorAction Ignore
+
+	Get-ChildItem -Path "${env:ProgramFiles(x86)}\AIMP\Langs" -Exclude russian.lng -Force | Remove-Item -Force
 
 	$Arguments = @(
 		# Отключить интеграцию в контекстное меню Проводника
@@ -45,6 +46,57 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\AIMP")
 		"/REG=R2"
 	)
 	Start-Process -FilePath "${env:ProgramFiles(x86)}\AIMP\Elevator.exe" -ArgumentList $Arguments
+
+	$AIMPini = @"
+[Skins.shared]
+TrayControl.Visible=0
+[TraySettings]
+MinimizeToTray=0
+
+[AIMPSoundOut]
+VolumeLevel=100
+"@
+	Set-Content -Path "$env:APPDATA\AIMP\AIMP.ini" -Value $AIMPini -Encoding Default -Force
+
+	$AIMPacini = @"
+[Converter]
+ShowStatsDialog=0
+
+[Encoders.MP3]
+Bitrate=320
+BitrateMode=2
+ChannelsMode=0
+Quality=0
+"@
+	Set-Content -PassThru "$env:APPDATA\AIMP\AIMPac.ini" -Value $AIMPacini -Encoding Default -Force
+
+	$Defaultini = @"
+[!]
+ID=f65ea82f2ee0a6707f3ec19bfde59f6d
+
+[ThemeSwitcher]
+Position=201
+
+[ThemeSettingNightMode]
+Position=2
+
+[ThemeSettingLayout]
+Position=2
+
+[ThemeSettingApplyAccentToBottomBar]
+Position=0
+
+[AIMPMainForm]
+Position=438,272,1056,1030
+ToolbarMode=0,0,0,618
+
+[AIMPMainForm.Layout.mwControlPanel]
+Visible=0
+
+[SkinSettingsWindow]
+Visible=0
+"@
+	Set-Content -PassThru "$env:APPDATA\AIMP\Skins\Default.ini" -Value $Defaultini -Encoding Default -Force
 }
 
 # CCleaner
