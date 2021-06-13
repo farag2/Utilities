@@ -2,10 +2,10 @@
 
 # Generate a GUID
 $GUID = [guid]::NewGuid().Guid
-$Title = "Win 10 Tweaker"
 $Description = "Это мой бэкдор, и я дою его!"
 $DefaultIcon = "%SystemRoot%\System32\imageres.dll,-4"
-$TargetKnownFolder = "C:\Бэкдор"
+$TargetKnownFolder = "C:\Title"
+$Title = Split-Path -Path $TargetKnownFolder -Leaf
 
 if (-not (Test-Path -Path $TargetKnownFolder))
 {
@@ -46,5 +46,4 @@ New-ItemProperty -Path "Registry::HKEY_CLASSES_ROOT\CLSID\{$GUID}\Instance\InitP
 
 # SAVE and invoke these commands to remove the created folder
 Write-Verbose -Message "SAVE and invoke these commands to remove the created folder" -Verbose
-Write-Verbose -Message "Remove-Item -Path `"HKLM:\SOFTWARE\WOW6432Node\Classes\CLSID\$GUID`" -Recurse -Force" -Verbose
-Write-Verbose -Message "Remove-Item -Path `"Registry::HKEY_CLASSES_ROOT\CLSID\$GUID`" -Recurse -Force" -Verbose
+Write-Verbose -Message "Remove-Item -Path `"Registry::HKEY_CLASSES_ROOT\CLSID\{$GUID}`" -Recurse -Force" -Verbose
