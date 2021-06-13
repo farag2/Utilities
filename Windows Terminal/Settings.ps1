@@ -252,6 +252,16 @@ if ((New-Object -TypeName System.Drawing.Text.InstalledFontCollection).Families.
 		$Terminal.profiles.defaults | Add-Member -Name fontFace -MemberType NoteProperty -Value "Cascadia Mono" -Force
 	}
 }
+
+# Remove trailing white-space in rectangular selection
+if ($Terminal.trimBlockSelection)
+{
+	$Terminal.trimBlockSelection = $tru
+}
+else
+{
+	$Terminal | Add-Member -Name trimBlockSelection -MemberType NoteProperty -Value $true -Force
+}
 #endregion defaults
 
 #region Azure
