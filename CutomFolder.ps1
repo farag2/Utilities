@@ -47,3 +47,4 @@ New-ItemProperty -Path "Registry::HKEY_CLASSES_ROOT\CLSID\{$GUID}\Instance\InitP
 # SAVE and invoke these commands to remove the created folder
 Write-Verbose -Message "SAVE and invoke these commands to remove the created folder" -Verbose
 Write-Verbose -Message "Remove-Item -Path `"Registry::HKEY_CLASSES_ROOT\CLSID\{$GUID}`" -Recurse -Force" -Verbose
+Write-Verbose -Message "Remove-Item -Path `"HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{$GUID}`" -Force" -Verbose
