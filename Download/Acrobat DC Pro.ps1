@@ -130,11 +130,27 @@ Invoke-WebRequest @Parameters
 # Create the edited setup.ini
 $PatchFile = Split-Path -Path "$DownloadsFolder\AcrobatDCUpd$($LatestVersion).msp" -Leaf
 
-# Russian
+# setup.ini
+# https://www.adobe.com/devnet-docs/acrobatetk/tools/AdminGuide/properties.html
+$CmdLine = @(
+	"LANG_LIST=ru_RU",
+	"DISABLE_BROWSER_INTEGRATION=YES",
+	"ENABLE_CHROMEEXT=0",
+	"DISABLE_DISTILLER=YES",
+	"IGNOREVCRT64=1",
+	"EULA_ACCEPT=YES",
+	"REMOVE_PREVIOUS=YES",
+	"REMOVE_PREVIOUS_READER=YES",
+	"IW_DEFAULT_VERB=Open",
+	"DISABLE_PDFMAKER=YES",
+	"DISABLE_ARM_SERVICE_INSTALL=1"
+)
+
 $setupini = @"
 [Product]
-PATCH=$PatchFile
 msi=AcroPro.msi
+PATCH=$PatchFile
+CmdLine=$CmdLine
 Languages=1049
 1049=Russian
 "@
