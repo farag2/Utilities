@@ -850,6 +850,7 @@ foreach ($Item in $Folder.DirectoryName)
 }
 
 # Adding and Removing Items from a PowerShell Array
+# https://www.jonathanmedd.net/2014/01/adding-and-removing-items-from-a-powershell-array.html
 $Fruits = "Apple", "Pear", "Banana", "Orange"
 $Fruits.GetType()
 $Fruits.Add("Kiwi")
