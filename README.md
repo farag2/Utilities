@@ -53,6 +53,7 @@
   
 * <https://packetlife.net/library/cheat-sheets/>
 * <https://www.malwarearchaeology.com/cheat-sheets>
+* <https://zer1t0.gitlab.io/posts/attacking_ad/>
 </details>
 
 # Penetration
