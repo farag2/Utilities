@@ -47,56 +47,28 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\AIMP")
 	)
 	Start-Process -FilePath "${env:ProgramFiles(x86)}\AIMP\Elevator.exe" -ArgumentList $Arguments
 
-	$AIMPini = @"
-[Skins.shared]
-TrayControl.Visible=0
-[TraySettings]
-MinimizeToTray=0
+	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-[AIMPSoundOut]
-VolumeLevel=100
-"@
-	Set-Content -Path "$env:APPDATA\AIMP\AIMP.ini" -Value $AIMPini -Encoding Default -Force
+	$Parameters = @{
+		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/AIMP.ini"
+		OutFile = "$env:APPDATA\AIMP\AIMP.ini"
+		Verbose = [switch]::Present
+	}
+	Invoke-WebRequest @Parameters
 
-	$AIMPacini = @"
-[Converter]
-ShowStatsDialog=0
+	$Parameters = @{
+		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/AIMPac.ini"
+		OutFile = "$env:APPDATA\AIMP\AIMPac.ini"
+		Verbose = [switch]::Present
+	}
+	Invoke-WebRequest @Parameters
 
-[Encoders.MP3]
-Bitrate=320
-BitrateMode=2
-ChannelsMode=0
-Quality=0
-"@
-	Set-Content -PassThru "$env:APPDATA\AIMP\AIMPac.ini" -Value $AIMPacini -Encoding Default -Force
-
-	$Defaultini = @"
-[!]
-ID=f65ea82f2ee0a6707f3ec19bfde59f6d
-
-[ThemeSwitcher]
-Position=201
-
-[ThemeSettingNightMode]
-Position=2
-
-[ThemeSettingLayout]
-Position=2
-
-[ThemeSettingApplyAccentToBottomBar]
-Position=0
-
-[AIMPMainForm]
-Position=438,272,1056,1030
-ToolbarMode=0,0,0,618
-
-[AIMPMainForm.Layout.mwControlPanel]
-Visible=0
-
-[SkinSettingsWindow]
-Visible=0
-"@
-	Set-Content -PassThru "$env:APPDATA\AIMP\Skins\Default.ini" -Value $Defaultini -Encoding Default -Force
+	$Parameters = @{
+		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/Default.ini"
+		OutFile = "$env:APPDATA\AIMP\\Skins\Default.ini"
+		Verbose = [switch]::Present
+	}
+	Invoke-WebRequest @Parameters
 }
 
 # CCleaner
@@ -122,6 +94,13 @@ if (Test-Path -Path "$env:ProgramFiles\CCleaner")
 	Remove-Item -Path "$env:ProgramFiles\CCleaner\Lang" -Exclude lang-1049.dll -Recurse -Force -ErrorAction Ignore
 	Unregister-ScheduledTask -TaskName *CCleaner* -Confirm:$false
 	Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "CCleaner Smart Cleaning" -Force -ErrorAction Ignore
+
+	$Parameters = @{
+		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/CCleaner/ccleaner.ini"
+		OutFile = "$env:ProgramFiles\CCleaner\ccleaner.ini"
+		Verbose = [switch]::Present
+	}
+	Invoke-WebRequest @Parameters
 }
 
 # CUE Splitter
@@ -145,9 +124,13 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\Medieval Software\Medieval CUE Spl
 	Remove-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Medieval Software" -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "$env:PUBLIC\Desktop\Medieval CUE Splitter.lnk" -Force -ErrorAction Ignore
 
-	if (-not (Test-Path -Path "HKCU:\Software\Medieval\CUE Splitter"))
+	if (-not (Test-Path -Path "HKCU:\Software\Medieval\CUE Splitter\Config"))
 	{
-		New-Item -Path "HKCU:\Software\Medieval\CUE Splitter" -Force
+		New-Item -Path "HKCU:\Software\Medieval\CUE Splitter\Config" -Force
+	}
+	if (-not (Test-Path -Path "HKCU:\Software\Medieval\CUE Splitter\FileMask"))
+	{
+		New-Item -Path "HKCU:\Software\Medieval\CUE Splitter\FileMask" -Force
 	}
 	New-ItemProperty -Path "HKCU:\Software\Medieval\CUE Splitter" -Name FirstTimeAssociation -Value 821760 -Force
 	New-ItemProperty -Path "HKCU:\Software\Medieval\CUE Splitter\Config" -Name CheckUpdates -Value 0 -Force
@@ -222,11 +205,20 @@ if (Test-Path -Path "$env:ProgramFiles\MPC-BE x64")
 	Remove-Item -Path $Remove -Recurse -Force -ErrorAction Ignore
 
 	Remove-Item -Path "$env:ProgramFiles\MPC-BE x64\Lang" -Exclude mpcresources.ru.dll -Recurse -Force -ErrorAction Ignore
+
+	$Parameters = @{
+		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/MPC-BE/mpc-be64.ini"
+		OutFile = "$env:ProgramFiles\MPC-BE x64\mpc-be64.ini"
+		Verbose = [switch]::Present
+	}
+	Invoke-WebRequest @Parameters
 }
 
 # Notepad++
 if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 {
+	Stop-Process -Name notepad++ -Force
+
 	$Remove = @(
 		"$env:ProgramFiles\Notepad++\change.log",
 		"$env:ProgramFiles\Notepad++\LICENSE",
@@ -248,6 +240,24 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	cmd.exe --% /c assoc .ps1=txtfile
 	cmd.exe --% /c assoc .xml=txtfile
 	cmd.exe --% /c assoc txtfile\DefaultIcon=%ProgramFiles%\Notepad++\notepad++.exe,0
+
+	$Parameters = @{
+		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/Notepad%2B%2B/config.xml"
+		OutFile = "$env:APPDATA\Notepad++\config.xml"
+		Verbose = [switch]::Present
+	}
+	Invoke-WebRequest @Parameters
+
+	if (-not (Test-Path -Path $env:ProgramFiles\Notepad++\localization))
+	{
+		New-Item -Path $env:ProgramFiles\Notepad++\localization -ItemType Directory -Force
+	}
+	$Parameters = @{
+		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/Notepad%2B%2B/localization/russian.xml"
+		OutFile = "$env:ProgramFiles\Notepad++\localization\russian.xml"
+		Verbose = [switch]::Present
+	}
+	Invoke-WebRequest @Parameters
 }
 
 # NVidia
@@ -296,6 +306,79 @@ if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 	}
 	Remove-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\qBittorrent" -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "$env:ProgramFiles\qBittorrent\translations" -Exclude qt_ru.qm, qtbase_ru.qm -Recurse -Force -ErrorAction Ignore
+
+	$Parameters = @{
+		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/qBittorrent/qBittorrent.ini"
+		OutFile = "$env:APPDATA\qBittorrent\qBittorrent.ini"
+		Verbose = [switch]::Present
+	}
+	Invoke-WebRequest @Parameters
+
+	$LatestVersion = (Invoke-RestMethod -Uri "https://api.github.com/repos/jagannatharjun/qbt-theme/releases/latest").assets.browser_download_url
+	$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
+	$Parameters = @{
+		Uri = $LatestVersion
+		OutFile = "$DownloadsFolder\qbt-theme.zip"
+		Verbose = [switch]::Present
+	}
+	Invoke-WebRequest @Parameters
+
+	<#
+		.SYNOPSIS
+		Expand the specific file from ZIP archive. Folder structure will be created recursively
+
+		.Parameter Source
+		The source ZIP archive
+
+		.Parameter Destination
+		Where to expand file
+
+		.Parameter File
+		Assign the file to expand
+
+		.Example
+		ExtractZIPFile -Source "D:\Folder\File.zip" -Destination "D:\Folder" -File "Folder1/Folder2/File.txt"
+	#>
+	function ExtractZIPFile
+	{
+		[CmdletBinding()]
+		param
+		(
+			[string]
+			$Source,
+
+			[string]
+			$Destination,
+
+			[string]
+			$File
+		)
+
+		Add-Type -Assembly System.IO.Compression.FileSystem
+
+		$ZIP = [IO.Compression.ZipFile]::OpenRead($Source)
+		$Entries = $ZIP.Entries | Where-Object -FilterScript {$_.FullName -eq $File}
+
+		$Destination = "$Destination\$(Split-Path -Path $File -Parent)"
+
+		if (-not (Test-Path -Path $Destination))
+		{
+			New-Item -Path $Destination -ItemType Directory -Force
+		}
+
+		$Entries | ForEach-Object -Process {[IO.Compression.ZipFileExtensions]::ExtractToFile($_, "$($Destination)\$($_.Name)", $true)}
+
+		$ZIP.Dispose()
+	}
+
+	$Parameters = @{
+		Source      = "$DownloadsFolder\qbt-theme.zip"
+		Destination = $DownloadsFolder
+		File        = "darkstylesheet.qbtheme"
+	}
+	ExtractZIPFile @Parameters
+
+	Remove-Item -Path "$DownloadsFolder\qbt-theme.zip" -Force
 }
 
 # Steam
@@ -346,6 +429,13 @@ if (Test-Path -Path "$env:ProgramFiles\WinRAR")
 	cmd.exe --% /c ftype WinRAR=%ProgramFiles%\WinRAR\WinRAR.exe "%1"
 	cmd.exe --% /c assoc .iso=WinRAR
 	cmd.exe --% /c assoc WinRAR\DefaultIcon=%ProgramFiles%\WinRAR\WinRAR.exe,0
+
+	$Parameters = @{
+		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/WinRAR/WinRAR/WinRAR.ini"
+		OutFile = "$env:ProgramFiles\WinRAR\WinRAR.ini"
+		Verbose = [switch]::Present
+	}
+	Invoke-WebRequest @Parameters
 }
 
 # Меню "Пуск"
