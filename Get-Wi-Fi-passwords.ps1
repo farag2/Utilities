@@ -1,4 +1,4 @@
-﻿# Get Wi-Fi SSIDs and Passwords
+# Get Wi-Fi SSIDs and Passwords
 if ($PSUICulture -eq "ru-RU")
 {
 	ping.exe | Out-Null
