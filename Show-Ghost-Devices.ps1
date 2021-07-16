@@ -1,4 +1,4 @@
-﻿$removeDevices = $true
+$removeDevices = $true
 
 $setupapi = @"
 using System;
