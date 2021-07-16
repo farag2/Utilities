@@ -1,11 +1,12 @@
 # Change location of the user folders
-# Изменить расположение пользовательских папок
 <#
-.SYNOPSIS
+.	SYNOPSIS
 	Change location of the each user folders using SHSetKnownFolderPath function
-.EXAMPLE
+
+	.EXAMPLE
 	UserShellFolder -UserFolder Desktop -FolderPath "C:\Desktop"
-.NOTES
+
+	.NOTES
 	User files or folders won't me moved to the new location
 #>
 function KnownFolderPath
@@ -84,7 +85,6 @@ function UserShellFolder
 	}
 
 	# Hidden desktop.ini for each type of user folders
-	# Скрытый desktop.ini для каждого типа пользовательских папок
 	$DesktopINI = @{
 		"Desktop"	=	"",
 						"[.ShellClassInfo]",
@@ -120,7 +120,6 @@ function UserShellFolder
 	}
 
 	# Checking the current user folder path
-	# Проверяем текущее значение пути пользовательской папки
 	$UserShellFolderRegValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name $UserShellFoldersRegName[$UserFolder]
 	if ($UserShellFolderRegValue -ne $FolderPath)
 	{
@@ -137,7 +136,6 @@ function UserShellFolder
 		}
 
 		# Creating a new folder if there is no one
-		# Создаем новую папку, если таковая отсутствует
 		if (-not (Test-Path -Path $FolderPath))
 		{
 			New-Item -Path $FolderPath -ItemType Directory -Force
@@ -152,11 +150,13 @@ function UserShellFolder
 	}
 }
 <#
-.SYNOPSIS
+	.SYNOPSIS
 	The "Show menu" function using PowerShell with the up/down arrow keys and enter key to make a selection
-.EXAMPLE
+
+	.EXAMPLE
 	ShowMenu -Menu $ListOfItems -Default $DefaultChoice
-.NOTES
+
+	.NOTES
 	Doesn't work in PowerShell ISE
 #>
 function ShowMenu
@@ -236,13 +236,11 @@ function ShowMenu
 }
 
 # Store all drives letters to use them within ShowMenu function
-# Сохранить все буквы диска, чтобы использовать их в функции ShowMenu
 $DriveLetters = @((Get-Disk | Where-Object -FilterScript {$_.BusType -ne "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | Sort-Object)
 
 if ($DriveLetters.Count -gt 1)
 {
 	# If the number of disks is more than one, set the second drive in the list as default drive
-	# Если количество дисков больше одного, сделать второй диск в списке диском по умолчанию
 	$Default = 1
 }
 else
@@ -251,7 +249,6 @@ else
 }
 
 # Desktop
-# Рабочий стол
 $Title = ""
 $Message = "To change the location of the Desktop folder enter the required letter"
 Write-Warning "`nFiles will not be moved"
@@ -274,7 +271,6 @@ switch ($Result)
 }
 
 # Documents
-# Документы
 $Title = ""
 $Message = "To change the location of the Documents folder enter the required letter"
 Write-Warning "`nFiles will not be moved"
@@ -320,7 +316,6 @@ switch ($Result)
 }
 
 # Music
-# Музыка
 $Title = ""
 $Message = "To change the location of the Music folder enter the required letter"
 Write-Warning "`nFiles will not be moved"
@@ -344,7 +339,6 @@ switch ($Result)
 
 
 # Pictures
-# Изображения
 $Title = ""
 $Message = "To change the location of the Pictures folder enter the required letter"
 Write-Warning "`nFiles will not be moved"
@@ -367,7 +361,6 @@ switch ($Result)
 }
 
 # Videos
-# Видео
 $Title = ""
 $Message = "To change the location of the Videos folder enter the required letter"
 Write-Warning "`nFiles will not be moved"
