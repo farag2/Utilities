@@ -1,4 +1,4 @@
-﻿# Add "Windows Photo Viewer" to Open with context menu
+# Add "Windows Photo Viewer" to Open with context menu
 # Добавить Средство просмотра фотографий Windows в пункт контекстного меню "Открыть с помощью"
 if (-not (Test-Path -Path Registry::HKEY_CLASSES_ROOT\Applications\photoviewer.dll\shell\open\command))
 {
