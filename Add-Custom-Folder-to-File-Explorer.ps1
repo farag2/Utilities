@@ -1,4 +1,4 @@
-﻿# Needs UTF-8 with BOM encoding
+# Needs UTF-8 with BOM encoding
 
 # Generate a GUID
 $GUID = [guid]::NewGuid().Guid
