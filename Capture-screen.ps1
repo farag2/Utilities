@@ -8,12 +8,15 @@ function Capture-Screen
 		[string]
 		$Path
 	)
+
 	if (-not (Test-Path -Path $Path))
 	{
 		New-Item -Path $Path -ItemType Directory -Force
 	}
+
 	$FileName = "$(Get-Date -f yyyy-MM-dd_HHmmss).bmp"
 	$File = "$Path\$FileName"
+
 	Add-Type -AssemblyName System.Windows.Forms
 	Add-Type -AssemblyName System.Drawing
 	$Screen = [System.Windows.Forms.SystemInformation]::VirtualScreen
