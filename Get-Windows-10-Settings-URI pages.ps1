@@ -1,4 +1,4 @@
-﻿# Hidden URIs
+# Hidden URIs
 # https://docs.microsoft.com/en-us/windows/uwp/launch-resume/launch-settings-app
 [xml]$xml = Get-Content -Path "$env:SystemRoot\ImmersiveControlPanel\Settings\AllSystemSettings_{253E530E-387D-4BC2-959D-E6F86122E5F2}.xml"
 
