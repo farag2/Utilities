@@ -12,3 +12,4 @@ foreach ($Item in $Items)
 		DeepLink = $Item.ApplicationInformation.DeepLink
 	}
 }
+# windowsdefender://CoreIsolation
