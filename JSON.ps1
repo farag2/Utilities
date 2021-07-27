@@ -88,3 +88,6 @@ $JHT += @{
 	"terminal.integrated.shell.windows" = "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe"
 }
 $JHT | ConvertTo-Json | Set-Content -Path "$env:APPDATA\Code\User\settings.json"
+
+# Add-Member without "Value" and "Count" elements in JSON
+Remove-TypeData -TypeName System.Array
