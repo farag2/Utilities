@@ -798,3 +798,22 @@ catch
 
 	continue
 }
+
+# Check if Microsoft Defender is enabled
+$cimParams = @{
+	Namespace = "root/SecurityCenter2"
+	ClassName = "Antivirusproduct"
+}
+$productState = (Get-CimInstance @CimParams | Where-Object -FilterScript {$_.displayName -match "Defender"}).productState
+
+$AVState = ('0x{0:x}' -f $productState).Substring(3, 2)
+if ($AVState -match "00|01")
+{
+	$false
+}
+else
+{
+	$true
+}
+
+(Get-MpComputerStatus).AntivirusEnabled -eq $true
