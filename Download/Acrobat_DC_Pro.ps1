@@ -100,7 +100,7 @@ $Parameters = @{
 	Source          = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip"
 	Destination     = "$DownloadsFolder"
 	Folder          = "Adobe Acrobat"
-	ExcludedFiles   = @("AcrobatDCUpd$($LatestVersion).msp", "WindowsInstaller-KB893803-v2-x86.exe")
+	ExcludedFiles   = @("WindowsInstaller-KB893803-v2-x86.exe")
 	ExcludedFolders = @("Adobe Acrobat/VCRT_x64")
 }
 ExtractZIPFolder @Parameters
@@ -119,16 +119,39 @@ Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Force
 
 # Download the latest patch
 # https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html
-$LatestVersion = (Invoke-RestMethod -Uri "https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/acrobat/current_version.txt").Replace(".","")
-$Parameters = @{
-	Uri = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($LatestVersion)/AcrobatDCUpd$($LatestVersion).msp"
-	OutFile = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$($LatestVersion).msp"
-	Verbose = [switch]::Present
+if (Test-Path -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp")
+{
+	$LatestPatchVersion = (Invoke-RestMethod -Uri "https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/acrobat/current_version.txt").Replace(".","")
+	# Get the bare patch number to compare with the latest one
+	$CurrentPatchVersion = (Split-Path -Path (Get-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp").FullName -Leaf).Replace(".msp","").Replace("AcrobatDCUpd","")
+	if ($CurrentPatchVersion -lt $LatestPatchVersion)
+	{
+		$Parameters = @{
+			Uri = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($LatestPatchVersion)/AcrobatDCUpd$($LatestPatchVersion).msp"
+			OutFile = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$($LatestPatchVersion).msp"
+			Verbose = [switch]::Present
+		}
+		Invoke-WebRequest @Parameters
+
+		Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$($CurrentPatchVersion).msp" -Force
+	}
+	else
+	{
+		$LatestPatchVersion = $CurrentPatchVersion
+	}
 }
-Invoke-WebRequest @Parameters
+else
+{
+	$Parameters = @{
+		Uri = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($LatestPatchVersion)/AcrobatDCUpd$($LatestPatchVersion).msp"
+		OutFile = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$($LatestPatchVersion).msp"
+		Verbose = [switch]::Present
+	}
+	Invoke-WebRequest @Parameters
+}
 
 # Create the edited setup.ini
-$PatchFile = Split-Path -Path "$DownloadsFolder\AcrobatDCUpd$($LatestVersion).msp" -Leaf
+$PatchFile = Split-Path -Path "$DownloadsFolder\AcrobatDCUpd$($LatestPatchVersion).msp" -Leaf
 
 # setup.ini
 # https://www.adobe.com/devnet-docs/acrobatetk/tools/AdminGuide/properties.html
@@ -145,12 +168,15 @@ $CmdLine = @(
 	"UPDATE_MODE=3"
 )
 
+$LCID = (Get-WinSystemLocale).LCID
+$DispalyLanguage = (Get-WinUserLanguageList).EnglishName | Select-Object -First 1
+
 $setupini = @"
 [Product]
 msi=AcroPro.msi
 PATCH=$PatchFile
 CmdLine=$CmdLine
-Languages=1049
-1049=Russian
+Languages=$LCID
+$LCID=$DispalyLanguage
 "@
 Set-Content -Path "$DownloadsFolder\Adobe Acrobat\setup.ini" -Value $setupini -Encoding Default -Force
