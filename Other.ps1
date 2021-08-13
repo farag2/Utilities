@@ -817,3 +817,16 @@ else
 }
 
 (Get-MpComputerStatus).AntivirusEnabled -eq $true
+
+# Disable NTFS compression in all subfolders
+# https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/compact
+$Paths = Get-ChildItem -Path D:\Folder -Recurse -Directory -Force
+foreach($Path in $Paths.FullName)
+{
+	$RecurseArgument = ('/S:{0}' -f $Path)
+	& compact.exe /U $RecurseArgument
+}
+
+# Disable NTFS compression for the parent subfolder
+$ParentFolder = Split-Path -Path $Paths.FullName -Parent
+& compact.exe /U $ParentFolder 
