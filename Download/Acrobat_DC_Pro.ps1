@@ -169,7 +169,7 @@ $CmdLine = @(
 )
 
 $LCID = (Get-WinSystemLocale).LCID
-$DispalyLanguage = (Get-WinUserLanguageList).EnglishName | Select-Object -First 1
+$DisplayLanguage = (Get-WinUserLanguageList).EnglishName | Select-Object -First 1
 
 $setupini = @"
 [Product]
@@ -177,6 +177,6 @@ msi=AcroPro.msi
 PATCH=$PatchFile
 CmdLine=$CmdLine
 Languages=$LCID
-$LCID=$DispalyLanguage
+$LCID=$DisplayLanguage
 "@
 Set-Content -Path "$DownloadsFolder\Adobe Acrobat\setup.ini" -Value $setupini -Encoding Default -Force
