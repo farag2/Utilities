@@ -1,4 +1,4 @@
-# Download the latest Acrobat_DC_Web_WWMUI.exe
+# Download the latest Adobe Acrobat Pro DC x86
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
