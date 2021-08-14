@@ -1,3 +1,5 @@
+# Download the latest Adobe Acrobat Reader DC x64
+
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 # https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html
