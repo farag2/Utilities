@@ -830,3 +830,7 @@ foreach($Path in $Paths.FullName)
 # Disable NTFS compression for the parent subfolder
 $ParentFolder = Split-Path -Path $Paths.FullName -Parent
 & compact.exe /U $ParentFolder 
+
+# Carve up IP addresses only
+$Array = @('Handshake', 'Success', 'Status', 200, '192.30.253.113', 'OK', 0xF, "2001:4860:4860::8888")
+$Array | Where-Object -FiletScript {-not ($_ -as [Double]) -and ($_ -as [IPAddress])}
