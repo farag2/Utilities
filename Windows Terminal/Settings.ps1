@@ -6,7 +6,7 @@ if ($psISE)
 }
 
 # Get the latest PSReadLine version number
-$LatestRelease = ((Invoke-RestMethod -Uri "https://api.github.com/repos/PowerShell/PSReadLine/releases") | Where-Object -FilterScript {$_.prerelease -eq $false}).tag_name.Replace("v","")[0]
+$LatestRelease = (Invoke-RestMethod -Uri "https://api.github.com/repos/PowerShell/PSReadLine/releases/latest").tag_name.Replace("v","")
 $CurrentVersion = (Get-Module -Name PSReadline).Version.ToString()
 
 # If PSReadline is installed
