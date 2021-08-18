@@ -1,4 +1,4 @@
-# Downloading Firefox Setup.exe
+# Downloading Firefox Setup xx.msi
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $LatestStableVersion = (Invoke-WebRequest -Uri "https://product-details.mozilla.org/1.0/firefox_versions.json" | ConvertFrom-Json).LATEST_FIREFOX_VERSION
@@ -11,7 +11,7 @@ $Parameters = @{
 }
 Invoke-WebRequest @Parameters
 
-# Extracting Firefox.exe to the "Firefox Setup xx" folder
+# Extracting Firefox.msi to the "Firefox Setup xx" folder
 # https://support.mozilla.org/kb/deploy-firefox-msi-installers
 Start-Process -FilePath "$DownloadsFolder\Firefox Setup $LatestStableVersion.msi" -ArgumentList "EXTRACT_DIR=`"$DownloadsFolder\Firefox Setup $LatestStableVersion`"" -Wait
 
