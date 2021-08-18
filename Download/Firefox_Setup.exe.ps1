@@ -13,7 +13,6 @@ Invoke-WebRequest @Parameters
 
 # Extracting Firefox.exe to the "Firefox Setup xx" folder
 # https://firefox-source-docs.mozilla.org/browser/installer/windows/installer/FullConfig.html
-# https://support.mozilla.org/ru/kb/nastrojka-firefox-s-pomoshyu-msi-ustanovshikov
 # Don't paste quotes after /ExtractDir even if a path contains spaces
 Start-Process -FilePath "$DownloadsFolder\Firefox Setup $($LatestStableVersion).exe" -ArgumentList "/ExtractDir=$DownloadsFolder\Firefox Setup $($LatestStableVersion)" -Wait
 
@@ -30,7 +29,7 @@ RegisterDefaultAgent=false
 Set-Content -Path "$DownloadsFolder\Firefox Setup $($LatestStableVersion)\setup.ini" -Value $Setupini -Encoding Default -Force
 
 # 
-$Setupini = @"
+$Setupini = @'
 "%~dp0setup.exe" /INI=$($DownloadsFolder\Firefox Setup $($LatestStableVersion)\setup.ini)
-"@
+'@
 Set-Content -Path "$DownloadsFolder\Firefox Setup $($LatestStableVersion)\setup.cmd" -Value $Setupini -Encoding Default -Force
