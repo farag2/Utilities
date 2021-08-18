@@ -1,20 +1,29 @@
-# Downloading Firefox.msi
+# Downloading Firefox Setup.exe
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
+$LatestStableVersion = (Invoke-WebRequest -Uri "https://product-details.mozilla.org/1.0/firefox_versions.json" | ConvertFrom-Json).LATEST_FIREFOX_VERSION
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
-
-$Arch = "win64"
-$Lang = "ru"
+$Language = (Get-WinSystemLocale).Parent.Name # ru
 $Parameters = @{
-	Uri = "https://download.mozilla.org/?product=firefox-msi-latest-ssl&os=$Arch&lang=$Lang"
-	OutFile = "$DownloadsFolder\Firefox.msi"
+	Uri = "https://download.mozilla.org/?product=firefox-msi-latest-ssl&os=win64&lang=$Language"
+	OutFile = "$DownloadsFolder\Firefox Setup $LatestStableVersion.msi"
 	Verbose = [switch]::Present
 }
 Invoke-WebRequest @Parameters
 
-# Extracting Firefox.msi to the "Downloads\Firefox" folder
-$ExtractPath = "$DownloadsFolder\Firefox"
-Start-Process -FilePath "$DownloadsFolder\Firefox.msi" -ArgumentList "EXTRACT_DIR=$ExtractPath" -Wait
+# Extracting Firefox.exe to the "Firefox Setup xx" folder
+# https://support.mozilla.org/kb/deploy-firefox-msi-installers
+Start-Process -FilePath "$DownloadsFolder\Firefox Setup $LatestStableVersion.msi" -ArgumentList "EXTRACT_DIR=`"$DownloadsFolder\Firefox Setup $LatestStableVersion`"" -Wait
 
-# Removing unnecessary files
-Remove-Item -Path "$DownloadsFolder\Firefox.msi", "$DownloadsFolder\Firefox\postSigningData" -Force
+Remove-Item -Path "$DownloadsFolder\Firefox Setup $LatestStableVersion\postSigningData" -Force
+
+$Arguments = @(
+    "TASKBAR_SHORTCUT=false",
+    "DESKTOP_SHORTCUT=false",
+    "START_MENU_SHORTCUT=true",
+    "INSTALL_MAINTENANCE_SERVICE=true",
+    "PREVENT_REBOOT_REQUIRED=false",
+    "OPTIONAL_EXTENSIONS=true"
+)
+
+Start-Process -FilePath "$DownloadsFolder\Firefox Setup $LatestStableVersion.msi" -ArgumentList $Arguments -Wait
