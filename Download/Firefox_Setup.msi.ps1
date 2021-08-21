@@ -17,8 +17,8 @@ Start-Process -FilePath "$DownloadsFolder\Firefox Setup $LatestStableVersion.msi
 
 Remove-Item -Path "$DownloadsFolder\Firefox Setup $LatestStableVersion\postSigningData" -Force
 
+# It isn’t possible to create taskbar pins on Windows 10 and later
 $Arguments = @(
-    "TASKBAR_SHORTCUT=false",
     "DESKTOP_SHORTCUT=false",
     "START_MENU_SHORTCUT=true",
     "INSTALL_MAINTENANCE_SERVICE=true",
