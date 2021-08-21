@@ -16,9 +16,9 @@ Invoke-WebRequest @Parameters
 # Don't paste quotes after /ExtractDir even if a path contains spaces
 Start-Process -FilePath "$DownloadsFolder\Firefox Setup $LatestStableVersion.exe" -ArgumentList "/ExtractDir=$DownloadsFolder\Firefox Setup $LatestStableVersion" -Wait
 
+# It isn’t possible to create taskbar pins on Windows 10 and later
 $Setupini = @"
 [Install]
-TaskbarShortcut=false
 DesktopShortcut=false
 StartMenuShortcuts=true
 MaintenanceService=true
