@@ -20,7 +20,7 @@ Start-Process -FilePath "$DownloadsFolder\Firefox Setup $LatestStableVersion.exe
 $Setupini = @"
 [Install]
 DesktopShortcut=false
-StartMenuShortcuts=true
+StartMenuShortcut=true
 MaintenanceService=true
 PreventRebootRequired=false
 OptionalExtensions=true
