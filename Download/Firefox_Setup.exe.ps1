@@ -3,7 +3,7 @@
 
 $LatestStableVersion = (Invoke-WebRequest -Uri "https://product-details.mozilla.org/1.0/firefox_versions.json" | ConvertFrom-Json).LATEST_FIREFOX_VERSION
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
-$Language = (Get-WinSystemLocale).Parent.Name
+$Language = (Get-WinSystemLocale).Parent.Name # ru
 $Parameters = @{
 	Uri = "https://ftp.mozilla.org/pub/firefox/releases/$LatestStableVersion/win64-EME-free/$Language/Firefox%20Setup%20$LatestStableVersion.exe"
 	OutFile = "$DownloadsFolder\Firefox Setup $LatestStableVersion.exe"
