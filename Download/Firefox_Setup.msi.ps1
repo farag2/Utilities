@@ -6,16 +6,16 @@ $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows
 $Language = (Get-WinSystemLocale).Parent.Name # ru
 $Parameters = @{
 	Uri = "https://download.mozilla.org/?product=firefox-msi-latest-ssl&os=win64&lang=$Language"
-	OutFile = "$DownloadsFolder\Firefox Setup $LatestStableVersion.msi"
+	OutFile = "$DownloadsFolder\Firefox Setup $($LatestStableVersion).msi"
 	Verbose = [switch]::Present
 }
 Invoke-WebRequest @Parameters
 
 # Extracting Firefox.msi to the "Firefox Setup xx" folder
 # https://support.mozilla.org/kb/deploy-firefox-msi-installers
-Start-Process -FilePath "$DownloadsFolder\Firefox Setup $LatestStableVersion.msi" -ArgumentList "EXTRACT_DIR=`"$DownloadsFolder\Firefox Setup $LatestStableVersion`"" -Wait
+Start-Process -FilePath "$DownloadsFolder\Firefox Setup $($LatestStableVersion).msi" -ArgumentList "EXTRACT_DIR=`"$DownloadsFolder\Firefox Setup $($LatestStableVersion)`"" -Wait
 
-Remove-Item -Path "$DownloadsFolder\Firefox Setup $LatestStableVersion\postSigningData" -Force
+Remove-Item -Path "$DownloadsFolder\Firefox Setup $($LatestStableVersion)\postSigningData" -Force
 
 # It isn’t possible to create taskbar pins on Windows 10 and later
 $Arguments = @(
