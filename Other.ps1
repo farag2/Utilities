@@ -834,3 +834,24 @@ $ParentFolder = Split-Path -Path $Paths.FullName -Parent
 # Carve up IP addresses only
 $Array = @('Handshake', 'Success', 'Status', 200, '192.30.253.113', 'OK', 0xF, "2001:4860:4860::8888")
 $Array | Where-Object -FiletScript {-not ($_ -as [Double]) -and ($_ -as [IPAddress])}
+
+# Get the latest GitHub release version via GitHub API
+try
+{
+	$LatestRelease = (Invoke-RestMethod -Uri "https://api.github.com/repos/farag2/Sophia-Script-for-Windows/releases/latest").tag_name
+	$CurrentRelease = (Get-Module -Name Sophia).Version.ToString()
+	switch ([System.Version]$LatestRelease -gt [System.Version]$CurrentRelease)
+	{
+		$true
+		{
+
+		}
+	}
+}
+catch [System.Net.WebException]
+{
+	
+}
+	
+# Parse PowerShell manifest
+(Import-PowerShellDataFile -Path $DownloadsFolder\Manifest.psd1).ModuleVersion
