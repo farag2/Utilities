@@ -854,4 +854,4 @@ catch [System.Net.WebException]
 }
 	
 # Parse PowerShell manifest
-(Import-PowerShellDataFile -Path $DownloadsFolder\Manifest.psd1).ModuleVersion
+Import-PowerShellDataFile -Path D:\Manifest.psd1
