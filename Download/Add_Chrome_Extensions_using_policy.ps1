@@ -10,6 +10,9 @@
 
 	.NOTES
 	if you remove the HKLM:\Software\Policies\Google\Chrome\ExtensionInstallForcelist key all extensions will be uninstalled
+
+	.LINK
+	https://chromeenterprise.google/policies/#ExtensionInstallForcelist
 #>
 function New-ChromeExtension
 {
@@ -57,17 +60,16 @@ function New-ChromeExtension
 		}
 
 		$Name = $Count + 1
-		$Value = "$ExtensionID;https://clients2.google.com/service/update2/crx"
 
 		switch ($Hive)
 		{
 			"HKLM"
 			{
-				New-ItemProperty -Path HKLM:\Software\Policies\Google\Chrome\ExtensionInstallForcelist -Name $Name -PropertyType String -Value $Value -Force
+				New-ItemProperty -Path HKLM:\Software\Policies\Google\Chrome\ExtensionInstallForcelist -Name $Name -PropertyType String -Value "$ExtensionID;https://clients2.google.com/service/update2/crx" -Force
 			}
 			"HKCU"
 			{
-				New-ItemProperty -Path HKCU:\Software\Policies\Google\Chrome\ExtensionInstallForcelist -Name $Name -PropertyType String -Value $Value -Force
+				New-ItemProperty -Path HKCU:\Software\Policies\Google\Chrome\ExtensionInstallForcelist -Name $Name -PropertyType String -Value "$ExtensionID;https://clients2.google.com/service/update2/crx" -Force
 			}
 		}
 	}
