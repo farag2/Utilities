@@ -5,7 +5,7 @@
 	.PARAMETER ExtensionID
 	String value of an extension ID taken from the Chrome Web Store URL for the extension
 
-	.EXAMPLE
+	.EXAMPLE Install uBlock Origin
 	New-ChromeExtension -ExtensionID @("cjpalhdlnbpafiamejdnhcphjbkeiagm") -Hive HKLM -Verbose
 
 	.NOTES
