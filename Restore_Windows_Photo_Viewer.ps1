@@ -1,5 +1,4 @@
 # Add "Windows Photo Viewer" to Open with context menu
-# Добавить Средство просмотра фотографий Windows в пункт контекстного меню "Открыть с помощью"
 if (-not (Test-Path -Path Registry::HKEY_CLASSES_ROOT\Applications\photoviewer.dll\shell\open\command))
 {
 	New-Item -Path Registry::HKEY_CLASSES_ROOT\Applications\photoviewer.dll\shell\open\command -Force
@@ -13,7 +12,6 @@ New-ItemProperty -Path Registry::HKEY_CLASSES_ROOT\Applications\photoviewer.dll\
 New-ItemProperty -Path Registry::HKEY_CLASSES_ROOT\Applications\photoviewer.dll\shell\open\DropTarget -Name Clsid -Type String -Value "{FFE2A43C-56B9-4bf5-9A79-CC6D4285608A}" -Force
 
 # Associate BMP, JPEG, PNG, TIF to "Windows Photo Viewer"
-# Ассоциировать BMP, JPEG, PNG, TIF со Средством просмотра фотографий Windows
 cmd.exe --% /c ftype Paint.Picture=%windir%\System32\rundll32.exe "%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll", ImageView_Fullscreen %1
 cmd.exe --% /c ftype jpegfile=%windir%\System32\rundll32.exe "%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll", ImageView_Fullscreen %1
 cmd.exe --% /c ftype pngfile=%windir%\System32\rundll32.exe "%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll", ImageView_Fullscreen %1
