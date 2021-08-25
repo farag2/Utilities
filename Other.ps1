@@ -1,6 +1,6 @@
 exit
 # Re-register all UWP apps
-$Bundles = (Get-AppXPackage -PackageTypeFilter Bundle -AllUsers).PackageFullName
+$Bundles = (Get-AppXPackage -PackageTypeFilter Framework -AllUsers).PackageFullName
 Get-ChildItem -Path "HKLM:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\PackageRepository\Packages" | ForEach-Object -Process {
 	Get-ItemProperty -Path $_.PSPath
 } | Where-Object -FilterScript {$_.Path -match "Program Files"} | Where-Object -FilterScript {$_.PSChildName -notin $Bundles} | Where-Object -FilterScript {$_.Path -match "x64"} | ForEach-Object -Process {"$($_.Path)\AppxManifest.xml"} | Add-AppxPackage -Register -ForceApplicationShutdown -ForceUpdateFromAnyVersion -DisableDevelopmentMode -Verbose
