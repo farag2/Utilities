@@ -30,7 +30,7 @@ $Arguments = @(
 )
 Start-Process "msiexec" -ArgumentList $Arguments -Wait
 
-Remove-Item -Path "$DownloadsFolder\AcroRdrDCx64$($LatestVersion)_$($Locale)\Core.cab", "$DownloadsFolder\AcroRdrDCx64$($LatestVersion)_$($Locale)\Languages.cab", "$DownloadsFolder\AcroRdrDCx64$($LatestVersion)_$($Locale)\WindowsInstaller-KB893803-v2-x86.exe" -Force
+Remove-Item -Path "$DownloadsFolder\AcroRdrDCx64$($LatestVersion)_$($Locale)\Core.cab", "$DownloadsFolder\AcroRdrDCx64$($LatestVersion)_$($Locale)\Languages.cab", "$DownloadsFolder\AcroRdrDCx64$($LatestVersion)_$($Locale)\WindowsInstaller-KB893803-v2-x86.exe" -Force -ErrorAction Ignore
 Remove-Item -Path "$DownloadsFolder\AcroRdrDCx64$($LatestVersion)_$($Locale)\VCRT_x64" -Recurse -Force
 Get-ChildItem -Path "$DownloadsFolder\AcroRdrDCx64$($LatestVersion)_$($Locale)\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\AcroRdrDCx64$($LatestVersion)_$($Locale)" -Force
 Remove-Item -Path "$DownloadsFolder\AcroRdrDCx64$($LatestVersion)_$($Locale)\AcroPro.msi extracted" -Force
