@@ -3,9 +3,10 @@
 
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
-	Uri = "http://trials.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_WWMUI.zip"
-	OutFile = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip"
-	Verbose = [switch]::Present
+	Uri             = "http://trials.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_WWMUI.zip"
+	OutFile         = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip"
+	UseBasicParsing = $true
+	Verbose         = $true
 }
 Invoke-WebRequest @Parameters
 
@@ -143,9 +144,10 @@ if (Test-Path -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp")
 else
 {
 	$Parameters = @{
-		Uri = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($LatestPatchVersion)/AcrobatDCUpd$($LatestPatchVersion).msp"
-		OutFile = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$($LatestPatchVersion).msp"
-		Verbose = [switch]::Present
+		Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($LatestPatchVersion)/AcrobatDCUpd$($LatestPatchVersion).msp"
+		OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$($LatestPatchVersion).msp"
+		UseBasicParsing = $true
+		Verbose         = $true
 	}
 	Invoke-WebRequest @Parameters
 }
