@@ -359,32 +359,6 @@ Get-ChildItem -Path $Path | Rename-Item -NewName {$_.FullName.Replace(".txt1",".
 # Добавить REG_NONE
 New-ItemProperty -Path HKCU:\Software -Name Name -PropertyType None -Value ([byte[]]@()) -Force
 
-<#
-	youtube-dl
-
-	https://github.com/ytdl-org/youtube-dl/releases
-	https://github.com/BtbN/FFmpeg-Builds
-
-	"D:\youtube-dl.exe" --list-formats url
-	Get video & audio indexes: --format 43+35 url
-
-	--username $username
-	--password $password
-	--video-password $videopassword
-#>
-$URLs = @()
-$youtubedl = "D:\Downloads\youtube-dl.exe"
-$output = "D:\Downloads"
-$title = "%(title)s.mp4"
-
-$n = 1
-foreach ($URL in $URLs)
-{
-	# 1. FileName.mp4
-	$FileName = "{0}. {1}" -f $n++, $title
-	Start-Process -FilePath $youtubedl -ArgumentList "--output `"$output\$FileName`" --format 136+251 $url"
-}
-
 # Binary
 "50,33,01".Split(",") | ForEach-Object -Process {"0x$_"}
 #
