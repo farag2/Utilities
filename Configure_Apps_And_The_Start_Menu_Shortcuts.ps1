@@ -423,22 +423,21 @@ if (Test-Path -Path "$env:ProgramFiles\WinRAR")
 	)
 	Remove-Item -Path $Remove -Recurse -Force -ErrorAction Ignore
 
-	Remove-ItemProperty -Path Registry::HKEY_CLASSES_ROOT\.zip\ShellNew -Name FileName -Force -ErrorAction Ignore
-	Remove-ItemProperty -Path Registry::HKEY_CLASSES_ROOT\.rar\ShellNew -Name FileName -Force -ErrorAction Ignore
-
-	cmd.exe --% /c ftype WinRAR=%ProgramFiles%\WinRAR\WinRAR.exe "%1"
-	cmd.exe --% /c assoc .iso=WinRAR
-	cmd.exe --% /c assoc WinRAR\DefaultIcon=%ProgramFiles%\WinRAR\WinRAR.exe,0
-
 	$Parameters = @{
-		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/WinRAR/WinRAR/WinRAR.ini"
+		Uri     = "https://raw.githubusercontent.com/farag2/Utilities/master/WinRAR/WinRAR/WinRAR.ini"
 		OutFile = "$env:ProgramFiles\WinRAR\WinRAR.ini"
-		Verbose = [switch]::Present
+		Verbose = $true
 	}
 	Invoke-WebRequest @Parameters
+
+	# Change the file encoding to UTF-16 LE
+	(Get-Content -Path "$env:ProgramFiles\WinRAR\WinRAR.ini" -Encoding Default) | Set-Content -Path "$env:ProgramFiles\WinRAR\WinRAR.ini" -Encoding BigEndianUnicode -Force
+
+	# Start WinRAR to apply changes
+	Start-Process -FilePath "$env:ProgramFiles\WinRAR\WinRAR.exe" -ArgumentList "-setup_integration" -Wait
 }
 
-# Меню "Пуск"
+# The Start menu
 Remove-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Maintenance" -Recurse -Force -ErrorAction Ignore
 Remove-Item -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Maintenance" -Recurse -Force -ErrorAction Ignore
 Remove-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Accessibility" -Recurse -Force -ErrorAction Ignore
