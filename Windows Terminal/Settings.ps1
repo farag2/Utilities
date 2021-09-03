@@ -228,14 +228,23 @@ else
 }
 
 # Acrylic opacity
-$Value = 0.75
-if ($Terminal.profiles.defaults.acrylicOpacity)
+if ($Terminal.useAcrylicInTabRow)
 {
-	$Terminal.profiles.defaults.acrylicOpacity = $Value
+	$Terminal.useAcrylicInTabRow = $true
 }
 else
 {
-	$Terminal.profiles.defaults | Add-Member -Name acrylicOpacity -MemberType NoteProperty -Value 0.75 -Force
+	$Terminal | Add-Member -Name useAcrylicInTabRow -MemberType NoteProperty -Value $true -Force
+}
+
+# Show acrylic in tab row
+if ($Terminal.profiles.defaults.useAcrylic)
+{
+	$Terminal.profiles.defaults.useAcrylic = $true
+}
+else
+{
+	$Terminal.profiles.defaults | Add-Member -Name useAcrylic -MemberType NoteProperty -Value $true -Force
 }
 
 # Set "Cascadia Mono" as a default font
