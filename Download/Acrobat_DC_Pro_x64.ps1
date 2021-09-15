@@ -139,13 +139,13 @@ if (Test-Path -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd*.msp")
 	if ($CurrentPatchVersion -lt $LatestPatchVersion)
 	{
 		$Parameters = @{
-			Uri = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($LatestPatchVersion)/AcrobatDCx64Upd$($LatestPatchVersion).msp"
+			Uri     = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($LatestPatchVersion)/AcrobatDCx64Upd$($LatestPatchVersion).msp"
 			OutFile = "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd$($LatestPatchVersion).msp"
-			Verbose = [switch]::Present
+			Verbose = $true
 		}
 		Invoke-WebRequest @Parameters
 
-		#Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd$($CurrentPatchVersion).msp" -Force
+		Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd$($CurrentPatchVersion).msp" -Force
 	}
 	else
 	{
