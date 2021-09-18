@@ -6,7 +6,7 @@ $Parameters = @{
 }
 Invoke-WebRequest @Parameters
 
-Start-Process -FilePath "$DownloadsFolder\7z2102-x64.msi" -ArgumentList "/S" -Wait
+Start-Process -FilePath "$DownloadsFolder\7z2102-x64.msi" -ArgumentList "/quiet" -Wait
 
 if (-not (Test-Path -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\7-Zip File Manager.lnk"))
 {
@@ -14,5 +14,11 @@ if (-not (Test-Path -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Program
 	Remove-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\7-Zip" -Recurse -Force
 }
 
+if (-not (Test-Path -Path HKCU:\SOFTWARE\7-Zip\Options))
+{
+	New-Item -Path HKCU:\SOFTWARE\7-Zip\Options -Force
+}
 New-ItemProperty -Path HKCU:\SOFTWARE\7-Zip\Options -Name ContextMenu -PropertyType DWord -Value 4192 -Force
 New-ItemProperty -Path HKCU:\SOFTWARE\7-Zip\Options -Name MenuIcons -PropertyType DWord -Value 1 -Force
+
+Start-Process -FilePath "$env:ProgramFiles\7-Zip\7zFM.exe" -Wait
