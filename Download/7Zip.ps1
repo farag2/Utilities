@@ -1,3 +1,6 @@
+# Download 7Zip
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
 	Uri     = "https://deac-ams.dl.sourceforge.net/project/sevenzip/7-Zip/21.02/7z2102-x64.msi"
