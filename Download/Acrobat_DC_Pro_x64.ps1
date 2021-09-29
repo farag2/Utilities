@@ -133,19 +133,19 @@ $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows
 # https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html
 if (Test-Path -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd*.msp")
 {
-	$LatestPatchVersion = (Invoke-RestMethod -Uri "https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/acrobat/current_version.txt").Replace(".","")
+	$LatestPatchVersion = (Invoke-RestMethod -Uri "https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/acrobat/current_version.txt").Replace(".","").Trim()
 	# Get the bare patch number to compare with the latest one
 	$CurrentPatchVersion = (Split-Path -Path (Get-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd*.msp").FullName -Leaf).Replace(".msp","").Replace("AcrobatDCx64Upd","")
 	if ($CurrentPatchVersion -lt $LatestPatchVersion)
 	{
 		$Parameters = @{
-			Uri = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($LatestPatchVersion)/AcrobatDCx64Upd$($LatestPatchVersion).msp"
+			Uri     = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($LatestPatchVersion)/AcrobatDCx64Upd$($LatestPatchVersion).msp"
 			OutFile = "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd$($LatestPatchVersion).msp"
-			Verbose = [switch]::Present
+			Verbose = $true
 		}
 		Invoke-WebRequest @Parameters
 
-		#Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd$($CurrentPatchVersion).msp" -Force
+		Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd$($CurrentPatchVersion).msp" -Force
 	}
 	else
 	{

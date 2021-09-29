@@ -829,3 +829,9 @@ catch [System.Net.WebException]
 	
 # Parse PowerShell manifest
 Import-PowerShellDataFile -Path D:\Manifest.psd1
+
+# Trigger Windows Update for detecting new updates
+# https://michlstechblog.info/blog/windows-10-trigger-detecting-updates-from-command-line
+# https://omgdebugging.com/2017/10/09/command-line-equivalent-of-wuauclt-in-windows-10-windows-server-2016/
+(New-Object -ComObject Microsoft.Update.AutoUpdate).DetectNow()
+usoclient StartScan
