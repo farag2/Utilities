@@ -1,3 +1,4 @@
+cls
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $Parameters = @{
@@ -15,6 +16,8 @@ $Parameters = @{
 }
 Invoke-WebRequest @Parameters
 
+Get-Process -Name "TaskbarX Configurator", "TaskbarX" -ErrorAction Ignore | Stop-Process -Force
+
 $Parameters = @{
 	Path            = "$DownloadsFolder\TaskbarX.zip"
 	DestinationPath = "$env:ProgramFiles\TaskbarX"
@@ -25,4 +28,7 @@ Expand-Archive @Parameters
 
 Remove-Item -Path "$DownloadsFolder\TaskbarX.zip" -Force
 
-Start-Process -FilePath "$env:ProgramFiles\TaskbarX\TaskbarX Configurator.exe"
+# TaskbarX advices not to run the Configurator as admin. Do it manually
+# Start-Process -FilePath "$env:ProgramFiles\TaskbarX\TaskbarX Configurator.exe"
+
+Invoke-Item -Path "$env:ProgramFiles\TaskbarX"
