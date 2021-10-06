@@ -352,7 +352,7 @@ $String = "аа аа аа"
 # Replace a word in a file name in a folder
 Get-ChildItem -Path "D:\folder" | Rename-Item -NewName {$_.Name.Replace("abc","cba")}
 
-# Replace an extension name in a fodler
+# Replace an extension name in a folder
 $Path = "D:\folder"
 Get-ChildItem -Path $Path | Rename-Item -NewName {$_.FullName.Replace(".txt1",".txt")}
 

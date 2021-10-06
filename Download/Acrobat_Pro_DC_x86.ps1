@@ -128,9 +128,9 @@ if (Test-Path -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp")
 	if ($CurrentPatchVersion -lt $LatestPatchVersion)
 	{
 		$Parameters = @{
-			Uri = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($LatestPatchVersion)/AcrobatDCUpd$($LatestPatchVersion).msp"
+			Uri     = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($LatestPatchVersion)/AcrobatDCUpd$($LatestPatchVersion).msp"
 			OutFile = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$($LatestPatchVersion).msp"
-			Verbose = [switch]::Present
+			Verbose = $true
 		}
 		Invoke-WebRequest @Parameters
 
@@ -171,7 +171,7 @@ $CmdLine = @(
 )
 
 $LCID = (Get-WinSystemLocale).LCID
-$DisplayLanguage = (Get-WinUserLanguageList).EnglishName | Select-Object -First 1
+$DisplayLanguage = (Get-WinUserLanguageList).EnglishName | Select-Object -Index 0
 
 $setupini = @"
 [Product]
