@@ -242,9 +242,10 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	cmd.exe --% /c assoc txtfile\DefaultIcon=%ProgramFiles%\Notepad++\notepad++.exe,0
 
 	$Parameters = @{
-		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/Notepad%2B%2B/config.xml"
-		OutFile = "$env:APPDATA\Notepad++\config.xml"
-		Verbose = [switch]::Present
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Notepad%2B%2B/config.xml"
+		OutFile         = "$env:APPDATA\Notepad++\config.xml"
+		UseBasicParsing = $true
+		Verbose         = $true
 	}
 	Invoke-WebRequest @Parameters
 
@@ -253,19 +254,12 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 		New-Item -Path $env:ProgramFiles\Notepad++\localization -ItemType Directory -Force
 	}
 	$Parameters = @{
-		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/Notepad%2B%2B/localization/russian.xml"
-		OutFile = "$env:ProgramFiles\Notepad++\localization\russian.xml"
-		Verbose = [switch]::Present
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Notepad%2B%2B/localization/russian.xml"
+		OutFile         = "$env:ProgramFiles\Notepad++\localization\russian.xml"
+		UseBasicParsing = $true
+		Verbose         = $true
 	}
 	Invoke-WebRequest @Parameters
-}
-
-# NVidia
-if (Test-Path -Path "$env:ProgramFiles\NVIDIA Corporation")
-{
-	Remove-Item -Path "$env:PUBLIC\Pictures\NVIDIA Corporation" -Recurse -Force -ErrorAction Ignore
-	Remove-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\NVIDIA Corporation" -Recurse -Force -ErrorAction Ignore
-	Remove-Item -Path "$env:PUBLIC\Desktop\3D Vision Photo Viewer.lnk" -Force -ErrorAction Ignore
 }
 
 # Office
@@ -308,18 +302,19 @@ if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 	Remove-Item -Path "$env:ProgramFiles\qBittorrent\translations" -Exclude qt_ru.qm, qtbase_ru.qm -Recurse -Force -ErrorAction Ignore
 
 	$Parameters = @{
-		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/qBittorrent/qBittorrent.ini"
-		OutFile = "$env:APPDATA\qBittorrent\qBittorrent.ini"
-		Verbose = [switch]::Present
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/qBittorrent/qBittorrent.ini"
+		OutFile         = "$env:APPDATA\qBittorrent\qBittorrent.ini"
+		UseBasicParsing = $true
+		Verbose         = $true
 	}
 	Invoke-WebRequest @Parameters
 
 	$LatestVersion = (Invoke-RestMethod -Uri "https://api.github.com/repos/jagannatharjun/qbt-theme/releases/latest").assets.browser_download_url
 	$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 	$Parameters = @{
-		Uri = $LatestVersion
+		Uri     = $LatestVersion
 		OutFile = "$DownloadsFolder\qbt-theme.zip"
-		Verbose = [switch]::Present
+		Verbose = $true
 	}
 	Invoke-WebRequest @Parameters
 
@@ -373,7 +368,7 @@ if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 
 	$Parameters = @{
 		Source      = "$DownloadsFolder\qbt-theme.zip"
-		Destination = $DownloadsFolder
+		Destination = "$env:APPDATA\qBittorrent"
 		File        = "darkstylesheet.qbtheme"
 	}
 	ExtractZIPFile @Parameters
