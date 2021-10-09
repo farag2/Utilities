@@ -1,17 +1,28 @@
-"menubar"
+"menubar" [$WINDOWS]
 {
 	Steam
 	{
-		text=""
 		SkinVersion
 		{
-			text="Metro for Steam 4.4"
-			shellcmd="steam://openurl/https://metroforsteam.com"
+			text="Metro For Steam - 4.4"
+			shellcmd=""
 		}
-		SkinVersionMod
+		Divider {}
+		CheckForUpdates
 		{
-			text="Unofficial Patch 9"
-			shellcmd="steam://openurl/https://github.com/redsigma/UPMetroSkin"
+			text="#steam_menu_checkforupdates"
+			command="CheckForUpdates"
+		}
+		Divider {}
+		GoOnline
+		{
+			text="#SteamUI_OfflineMode_GoOnline"
+			command="goonline"
+		}
+		GoOffline
+		{
+			text="#SteamUI_OfflineMode_GoOffline"
+			command="gooffline"
 		}
 		Divider {}
 		ActivateRetail
@@ -25,38 +36,16 @@
 			shellcmd="steam://url/RedeemWalletVoucher"
 		}
 		Divider {}
-		CheckForUpdates
-		{
-			text="#steam_menu_checkforupdates"
-			command="CheckForUpdates"
-		}
 		Settings
 		{
 			text="#steam_menu_settings"
 			command="Settings"
-		}
-		Divider {}
-		ChangeUser
-		{
-			text="#steam_menu_changeuser"
-			command="ChangeUser"
-		}
-		GoOnline
-		{
-			text="#SteamUI_OfflineMode_GoOnline"
-			command="goonline"
-		}
-		GoOffline
-		{
-			text="#SteamUI_OfflineMode_GoOffline"
-			command="gooffline"
 		}
 		Restart
 		{
 			text="#Steam_MustRestart_Button"
 			command="RestartSteam"
 		}
-		Divider {}
 		Exit
 		{
 			text="#Steam_ExitSteam"
