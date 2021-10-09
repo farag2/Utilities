@@ -181,12 +181,6 @@ if (Test-Path -Path "$env:ProgramFiles\Icaros")
 	Start-Process -FilePath "$env:ProgramFiles\Icaros\IcarosConfig.exe" -ArgumentList "-activate"
 }
 
-# Intel
-if (Test-Path -Path "${env:ProgramFiles(x86)}\Intel")
-{
-	Remove-Item -Path "${env:ProgramFiles(x86)}\Intel\Intel(R) Processor Graphics\uninstall" -Exclude ru-RU, x64, igxpin.exe -Recurse -Force -ErrorAction Ignore
-}
-
 # MPC-BE
 if (Test-Path -Path "$env:ProgramFiles\MPC-BE x64")
 {
@@ -431,9 +425,3 @@ if (Test-Path -Path "$env:ProgramFiles\WinRAR")
 	# Start WinRAR to apply changes
 	Start-Process -FilePath "$env:ProgramFiles\WinRAR\WinRAR.exe" -ArgumentList "-setup_integration" -Wait
 }
-
-# The Start menu
-Remove-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Maintenance" -Recurse -Force -ErrorAction Ignore
-Remove-Item -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Maintenance" -Recurse -Force -ErrorAction Ignore
-Remove-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Accessibility" -Recurse -Force -ErrorAction Ignore
-Remove-Item -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Accessibility" -Recurse -Force -ErrorAction Ignore
