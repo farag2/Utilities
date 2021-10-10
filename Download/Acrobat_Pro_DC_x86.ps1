@@ -8,21 +8,21 @@ $Parameters = @{
 	UseBasicParsing = $true
 	Verbose         = $true
 }
-Invoke-WebRequest @Parameters
+# Invoke-WebRequest @Parameters
 
 <#
-$Session = New-Object -TypeName Microsoft.PowerShell.Commands.WebRequestSession
-$Cookie = New-Object -TypeName System.Net.Cookie
-$Cookie.Name = "MM_TRIALS"
-$Cookie.Value = "1234"
+$Session       = New-Object -TypeName Microsoft.PowerShell.Commands.WebRequestSession
+$Cookie        = New-Object -TypeName System.Net.Cookie
+$Cookie.Name   = "MM_TRIALS"
+$Cookie.Value  = "1234"
 $Cookie.Domain = ".adobe.com"
 $Session.Cookies.Add($Cookie)
 
 $Parameters = @{
-	Uri =      "https://trials3.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_WWMUI.zip"
+	Uri        = "https://trials3.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_WWMUI.zip"
 	OutFile    = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip"
 	WebSession = $Session
-	Verbose    = [switch]::present
+	Verbose    = $true
 }
 Invoke-WebRequest @Parameters
 #>
@@ -120,21 +120,35 @@ Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Force
 
 # Download the latest patch
 # https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html
+<#
+    (Invoke-RestMethod -Uri "https://armmf.adobe.com/arm-manifests/win/AcrobatDC/acrobat/current_version.txt").Replace(".","").Trim()
+    won't help due to that fact it outputs the Mac patch version instead of Windows one that is always has a higher version number
+#>
+
 if (Test-Path -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp")
 {
-	$LatestPatchVersion = (Invoke-RestMethod -Uri "https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/acrobat/current_version.txt").Replace(".","").Trim()
 	# Get the bare patch number to compare with the latest one
 	$CurrentPatchVersion = (Split-Path -Path (Get-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp").FullName -Leaf).Replace(".msp","").Replace("AcrobatDCUpd","")
+
+	$Parameters = @{
+		Uri             = "https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html"
+		UseBasicParsing = $true
+	}
+	$outerHTML = (Invoke-WebRequest @Parameters).Links.outerHTML
+	[xml]$LatestPatch = $outerHTML | Where-Object -FilterScript {$_ -match "(Win)"} | Select-Object -Index 1
+	$LatestPatchVersion = ($LatestPatch.a.span.'#text' -split "," | Select-Object -Index 0).Replace("(Win)", "").Replace(".","").Trim()
+
 	if ($CurrentPatchVersion -lt $LatestPatchVersion)
 	{
 		$Parameters = @{
-			Uri     = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($LatestPatchVersion)/AcrobatDCUpd$($LatestPatchVersion).msp"
-			OutFile = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$($LatestPatchVersion).msp"
-			Verbose = $true
+			Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$LatestPatchVersion/AcrobatDCUpd$LatestPatchVersion.msp"
+			OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$LatestPatchVersion.msp"
+			UseBasicParsing = $true
+			Verbose         = $true
 		}
 		Invoke-WebRequest @Parameters
 
-		Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$($CurrentPatchVersion).msp" -Force
+		Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$CurrentPatchVersion.msp" -Force
 	}
 	else
 	{
@@ -144,8 +158,8 @@ if (Test-Path -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp")
 else
 {
 	$Parameters = @{
-		Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($LatestPatchVersion)/AcrobatDCUpd$($LatestPatchVersion).msp"
-		OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$($LatestPatchVersion).msp"
+		Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$LatestPatchVersion/AcrobatDCUpd$LatestPatchVersion.msp"
+		OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$LatestPatchVersion.msp"
 		UseBasicParsing = $true
 		Verbose         = $true
 	}
@@ -153,7 +167,7 @@ else
 }
 
 # Create the edited setup.ini
-$PatchFile = Split-Path -Path "$DownloadsFolder\AcrobatDCUpd$($LatestPatchVersion).msp" -Leaf
+$PatchFile = Split-Path -Path "$DownloadsFolder\AcrobatDCUpd$LatestPatchVersion.msp" -Leaf
 
 # setup.ini
 # https://www.adobe.com/devnet-docs/acrobatetk/tools/AdminGuide/properties.html
