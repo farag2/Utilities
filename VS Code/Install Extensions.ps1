@@ -16,9 +16,12 @@ $Extensions = @(
 	"chrmarti.regex",
 
 	# SVG Viewer
-	"cssho.vscode-svgviewer"
+	"cssho.vscode-svgviewer",
+
+	# Gremlins tracker
+	"nhoizey.gremlins"
 )
 foreach ($Extension in $Extensions)
 {
-	 & "${env:ProgramFiles}\Microsoft VS Code\bin\code.cmd" --install-extension $Extension
+	 & "$env:ProgramFiles\Microsoft VS Code\bin\code.cmd" --install-extension $Extension
 }

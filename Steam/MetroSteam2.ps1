@@ -4,17 +4,19 @@ $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows
 
 # Main archive
 $Parameters = @{
-	Uri = "https://github.com/minischetti/metro-for-steam/archive/v4.4.zip"
-	OutFile = "$DownloadsFolder\metro-for-steam.zip"
-	Verbose = [switch]::Present
+	Uri            = "https://github.com/minischetti/metro-for-steam/archive/v4.4.zip"
+	OutFile         = "$DownloadsFolder\metro-for-steam.zip"
+	UseBasicParsing = $true
+	Verbose         = $true
 }
 Invoke-WebRequest @Parameters
 
 # Patch
 $Parameters = @{
-	Uri = "https://github.com/redsigma/UPMetroSkin/archive/master.zip"
-	OutFile = "$DownloadsFolder\UPMetroSkin.zip"
-	Verbose = [switch]::Present
+	Uri             = "https://github.com/redsigma/UPMetroSkin/archive/master.zip"
+	OutFile         = "$DownloadsFolder\UPMetroSkin.zip"
+	UseBasicParsing = $true
+	Verbose         = $true
 }
 Invoke-WebRequest @Parameters
 
@@ -94,9 +96,10 @@ Rename-Item -Path "$DownloadsFolder\metro-for-steam-4.4" -NewName "Metro" -Force
 
 # Custom menu
 $Parameters = @{
-	Uri = "https://github.com/farag2/Utilities/blob/master/Steam/steam.menu"
-	OutFile = "$DownloadsFolder\Metro\resource\menus\steam.menu"
-	Verbose = [switch]::Present
+	Uri             = "https://github.com/farag2/Utilities/blob/master/Steam/steam.menu"
+	OutFile         = "$DownloadsFolder\Metro\resource\menus\steam.menu"
+	UseBasicParsing = $true
+	Verbose         = $true
 }
 Invoke-WebRequest @Parameters
 
