@@ -215,7 +215,7 @@ if (Test-Path -Path "$env:ProgramFiles\MPC-BE x64")
 # Notepad++
 if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 {
-	Stop-Process -Name notepad++ -Force
+	Stop-Process -Name notepad++ -Force -ErrorAction Ignore
 
 	$Remove = @(
 		"$env:ProgramFiles\Notepad++\change.log",
