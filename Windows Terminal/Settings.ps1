@@ -1,3 +1,4 @@
+cls
 # https://docs.microsoft.com/en-us/windows/terminal/
 
 if ($psISE)
@@ -7,12 +8,15 @@ if ($psISE)
 
 # Get the latest PSReadLine version number
 $LatestRelease = (Invoke-RestMethod -Uri "https://api.github.com/repos/PowerShell/PSReadLine/releases/latest").tag_name.Replace("v","")
-$CurrentVersion = (Get-Module -Name PSReadline).Version.ToString()
+if (Test-Path -Path "$env:ProgramFiles\WindowsPowerShell\Modules\PSReadline")
+{
+	$CurrentVersion = (Get-Module -Name PSReadline).Version.ToString()
+}
 
 # If PSReadline is installed
 if ($null -ne (Get-Module -Name PSReadline))
 {
-	if ($CurrentVersion -ne $LatestRelease)
+	if ([System.Version]$LatestRelease -gt [System.Version]$CurrentRelease)
 	{
 		# Intalling the latest PSReadLine
 		# https://github.com/PowerShell/PSReadLine/releases
@@ -22,9 +26,11 @@ if ($null -ne (Get-Module -Name PSReadline))
 		}
 		Install-Module -Name PSReadLine -RequiredVersion $LatestRelease -Force
 
+		Import-Module -Name PSReadLine
+
 		# Removing the old PSReadLine
 		$PSReadLine = @{
-			ModuleName = "PSReadLine"
+			ModuleName    = "PSReadLine"
 			ModuleVersion = $CurrentVersion
 		}
 		Remove-Module -FullyQualifiedName $PSReadLine -Force
@@ -47,6 +53,8 @@ else
 		Install-Package -Name NuGet -Force
 	}
 	Install-Module -Name PSReadLine -RequiredVersion $LatestRelease -Force
+
+	Import-Module -Name PSReadLine
 
 	Write-Verbose -Message "Restart the PowerShell session, and re-run the script" -Verbose
 
