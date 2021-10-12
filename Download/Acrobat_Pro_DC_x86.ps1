@@ -121,8 +121,8 @@ Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Force
 # Download the latest patch
 # https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html
 <#
-    (Invoke-RestMethod -Uri "https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/acrobat/current_version.txt").Replace(".","").Trim()
-    won't help due to that fact it outputs the Mac patch version instead of Windows one that is always has a higher version number
+	(Invoke-RestMethod -Uri "https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/acrobat/current_version.txt").Replace(".","").Trim()
+	won't help due to that fact it outputs the Mac patch version instead of Windows one that is always has a higher version number
 #>
 
 if (Test-Path -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp")
@@ -140,31 +140,17 @@ if (Test-Path -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp")
 
 	if ($CurrentPatchVersion -lt $LatestPatchVersion)
 	{
-		$Parameters = @{
-			Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$LatestPatchVersion/AcrobatDCUpd$LatestPatchVersion.msp"
-			OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$LatestPatchVersion.msp"
-			UseBasicParsing = $true
-			Verbose         = $true
-		}
-		Invoke-WebRequest @Parameters
-
 		Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$CurrentPatchVersion.msp" -Force
 	}
-	else
-	{
-		$LatestPatchVersion = $CurrentPatchVersion
-	}
 }
-else
-{
-	$Parameters = @{
-		Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$LatestPatchVersion/AcrobatDCUpd$LatestPatchVersion.msp"
-		OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$LatestPatchVersion.msp"
-		UseBasicParsing = $true
-		Verbose         = $true
-	}
-	Invoke-WebRequest @Parameters
+$Parameters = @{
+	Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$LatestPatchVersion/AcrobatDCUpd$LatestPatchVersion.msp"
+	OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$LatestPatchVersion.msp"
+	UseBasicParsing = $true
+	Verbose         = $true
 }
+Invoke-WebRequest @Parameters
+
 
 # Create the edited setup.ini
 $PatchFile = Split-Path -Path "$DownloadsFolder\AcrobatDCUpd$LatestPatchVersion.msp" -Leaf
