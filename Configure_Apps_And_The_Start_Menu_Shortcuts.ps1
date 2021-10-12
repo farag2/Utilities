@@ -50,23 +50,26 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\AIMP")
 	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 	$Parameters = @{
-		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/AIMP.ini"
-		OutFile = "$env:APPDATA\AIMP\AIMP.ini"
-		Verbose = [switch]::Present
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/AIMP.ini"
+		OutFile         = "$env:APPDATA\AIMP\AIMP.ini"
+		UseBasicParsing = $true
+		Verbose         = $true
 	}
 	Invoke-WebRequest @Parameters
 
 	$Parameters = @{
-		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/AIMPac.ini"
-		OutFile = "$env:APPDATA\AIMP\AIMPac.ini"
-		Verbose = [switch]::Present
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/AIMPac.ini"
+		OutFile         = "$env:APPDATA\AIMP\AIMPac.ini"
+		UseBasicParsing = $true
+		Verbose         = $true
 	}
 	Invoke-WebRequest @Parameters
 
 	$Parameters = @{
-		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/Default.ini"
-		OutFile = "$env:APPDATA\AIMP\\Skins\Default.ini"
-		Verbose = [switch]::Present
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/Default.ini"
+		OutFile         = "$env:APPDATA\AIMP\Skins\Default.ini"
+		UseBasicParsing = $true
+		Verbose         = $true
 	}
 	Invoke-WebRequest @Parameters
 }
@@ -96,9 +99,10 @@ if (Test-Path -Path "$env:ProgramFiles\CCleaner")
 	Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "CCleaner Smart Cleaning" -Force -ErrorAction Ignore
 
 	$Parameters = @{
-		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/CCleaner/ccleaner.ini"
-		OutFile = "$env:ProgramFiles\CCleaner\ccleaner.ini"
-		Verbose = [switch]::Present
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/CCleaner/ccleaner.ini"
+		OutFile         = "$env:ProgramFiles\CCleaner\ccleaner.ini"
+		UseBasicParsing = $true
+		Verbose         = $true
 	}
 	Invoke-WebRequest @Parameters
 }
@@ -201,9 +205,9 @@ if (Test-Path -Path "$env:ProgramFiles\MPC-BE x64")
 	Remove-Item -Path "$env:ProgramFiles\MPC-BE x64\Lang" -Exclude mpcresources.ru.dll -Recurse -Force -ErrorAction Ignore
 
 	$Parameters = @{
-		Uri = "https://raw.githubusercontent.com/farag2/Utilities/master/MPC-BE/mpc-be64.ini"
+		Uri     = "https://raw.githubusercontent.com/farag2/Utilities/master/MPC-BE/mpc-be64.ini"
 		OutFile = "$env:ProgramFiles\MPC-BE x64\mpc-be64.ini"
-		Verbose = [switch]::Present
+		Verbose = $true
 	}
 	Invoke-WebRequest @Parameters
 }
@@ -211,7 +215,7 @@ if (Test-Path -Path "$env:ProgramFiles\MPC-BE x64")
 # Notepad++
 if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 {
-	Stop-Process -Name notepad++ -Force
+	Stop-Process -Name notepad++ -Force -ErrorAction Ignore
 
 	$Remove = @(
 		"$env:ProgramFiles\Notepad++\change.log",
@@ -415,7 +419,8 @@ if (Test-Path -Path "$env:ProgramFiles\WinRAR")
 	$Parameters = @{
 		Uri     = "https://raw.githubusercontent.com/farag2/Utilities/master/WinRAR/WinRAR/WinRAR.ini"
 		OutFile = "$env:ProgramFiles\WinRAR\WinRAR.ini"
-		Verbose = $true
+		UseBasicParsing = $true
+		Verbose         = $true
 	}
 	Invoke-WebRequest @Parameters
 
