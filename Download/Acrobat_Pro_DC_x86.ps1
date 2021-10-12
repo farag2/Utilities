@@ -121,7 +121,7 @@ Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Force
 # Download the latest patch
 # https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html
 <#
-    (Invoke-RestMethod -Uri "https://armmf.adobe.com/arm-manifests/win/AcrobatDC/acrobat/current_version.txt").Replace(".","").Trim()
+    (Invoke-RestMethod -Uri "https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/acrobat/current_version.txt").Replace(".","").Trim()
     won't help due to that fact it outputs the Mac patch version instead of Windows one that is always has a higher version number
 #>
 
@@ -136,7 +136,7 @@ if (Test-Path -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp")
 	}
 	$outerHTML = (Invoke-WebRequest @Parameters).Links.outerHTML
 	[xml]$LatestPatch = $outerHTML | Where-Object -FilterScript {$_ -match "(Win)"} | Select-Object -Index 0
-	$LatestPatchVersion = ($LatestPatch.a.span.'#text' -split "," | Select-Object -Index 0).Replace("(Win)", "").Replace(".","").Trim()
+	$LatestPatchVersion = ($LatestPatch.a.title -replace "Planned.*$", "").Replace(".","").Trim()
 
 	if ($CurrentPatchVersion -lt $LatestPatchVersion)
 	{
