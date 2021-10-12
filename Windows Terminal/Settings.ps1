@@ -1,3 +1,5 @@
+#Requires -RunAsAdministrator
+
 # https://docs.microsoft.com/en-us/windows/terminal/
 
 Clear-Host
@@ -28,8 +30,9 @@ if ([System.Version]$CurrentPowerShellGetVersion -lt [System.Version]"2.2.5")
 {
 	Install-Module -Name PowerShellGet -Force
 
-	# Removing the old PowerShellGet
+	# Unloading the old PowerShellGet
 	Remove-Module -Name PowerShellGet -Force
+	Get-InstalledModule -Name PowerShellGet -AllVersions | Where-Object -FilterScript {$_.Version -ne "2.2.5"} | Uninstall-Module -Force
 	# Removing all folders except the latest one
 	Remove-Item -Path ((Get-Childitem -Path "$env:ProgramFiles\WindowsPowerShell\Modules\PowerShellGet").FullName | Select-Object -SkipLast 1) -Recurse -Force
 
@@ -66,7 +69,7 @@ if ($null -ne (Get-Module -Name PSReadline))
 		}
 		Install-Module -Name PSReadLine -RequiredVersion $LatestRelease -Force
 
-		# Removing the old PSReadLine
+		# Unloading the old PSReadLine
 		$PSReadLine = @{
 			ModuleName    = "PSReadLine"
 			ModuleVersion = $CurrentVersion
