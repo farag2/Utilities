@@ -107,15 +107,10 @@ $CmdLine = @(
 	"UPDATE_MODE=3"
 )
 
-$LCID = (Get-WinSystemLocale).LCID
-$DisplayLanguage = (Get-WinUserLanguageList).EnglishName | Select-Object -Index 0
-
 $setupini = @"
 [Product]
 msi=AcroPro.msi
 PATCH=$PatchFile
 CmdLine=$CmdLine
-Languages=$LCID
-$LCID=$DisplayLanguage
 "@
 Set-Content -Path "$DownloadsFolder\AcroRdrDCx64\setup.ini" -Value $setupini -Encoding Default -Force
