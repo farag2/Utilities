@@ -75,19 +75,29 @@ if (Test-Path -Path "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd*.msp")
 	}
 	$LatestPatchVersion = (Invoke-RestMethod @Parameters).Replace(".","").Trim()
 
+	$Parameters = @{
+		Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$LatestPatchVersion/AcroRdrDCx64Upd$LatestPatchVersion.msp"
+		OutFile         = "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd$LatestPatchVersion.msp"
+		UseBasicParsing = $true
+		Verbose         = $true
+	}
+	Invoke-WebRequest @Parameters
+
 	if ($CurrentPatchVersion -lt $LatestPatchVersion)
 	{
 		Remove-Item -Path "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd$CurrentPatchVersion.msp" -Force
 	}
 }
-
-$Parameters = @{
-	Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$LatestPatchVersion/AcroRdrDCx64Upd$LatestPatchVersion.msp"
-	OutFile         = "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd$LatestPatchVersion.msp"
-	UseBasicParsing = $true
-	Verbose         = $true
+else
+{
+	$Parameters = @{
+		Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$LatestPatchVersion/AcroRdrDCx64Upd$LatestPatchVersion.msp"
+		OutFile         = "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd$LatestPatchVersion.msp"
+		UseBasicParsing = $true
+		Verbose         = $true
+	}
+	Invoke-WebRequest @Parameters
 }
-Invoke-WebRequest @Parameters
 
 # Create the edited setup.ini
 $PatchFile = Split-Path -Path "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd$LatestPatchVersion.msp" -Leaf
