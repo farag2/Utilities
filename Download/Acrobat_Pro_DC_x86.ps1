@@ -135,7 +135,7 @@ if (Test-Path -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp")
 		UseBasicParsing = $true
 	}
 	$outerHTML = (Invoke-WebRequest @Parameters).Links.outerHTML
-	[xml]$LatestPatch = $outerHTML | Where-Object -FilterScript {$_ -match "(Win)"} | Select-Object -Index 0
+	[xml]$LatestPatch = $outerHTML | Where-Object -FilterScript {$_ -match "Planned"} | Select-Object -Index 0
 	$LatestPatchVersion = ($LatestPatch.a.title -replace "Planned.*$", "").Replace(".","").Trim()
 
 	$Parameters = @{
