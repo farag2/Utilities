@@ -53,13 +53,59 @@ $Arguments = @(
 )
 Start-Process "msiexec" -ArgumentList $Arguments -Wait
 
-Remove-Item -Path "$DownloadsFolder\AcroRdrDCx64\Core.cab", "$DownloadsFolder\AcroRdrDCx64\Languages.cab", "$DownloadsFolder\AcroRdrDCx64\WindowsInstaller-KB893803-v2-x86.exe" -Force -ErrorAction Ignore
-Remove-Item -Path "$DownloadsFolder\AcroRdrDCx64\VCRT_x64" -Recurse -Force
+$Items = @(
+	"$DownloadsFolder\AcroRdrDCx64\Core.cab",
+	"$DownloadsFolder\AcroRdrDCx64\Languages.cab",
+	"$DownloadsFolder\AcroRdrDCx64\WindowsInstaller-KB893803-v2-x86.exe",
+	"$DownloadsFolder\AcroRdrDCx64\VCRT_x64"
+)
+Remove-Item -Path $Items -Recurse -Force -ErrorAction Ignore
 Get-ChildItem -Path "$DownloadsFolder\AcroRdrDCx64\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\AcroRdrDCx64" -Force
 Remove-Item -Path "$DownloadsFolder\AcroRdrDCx64\AcroPro.msi extracted" -Force
 
+# Download the latest patch
+# https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html
+<#
+	(Invoke-RestMethod -Uri "https://armmf.adobe.com/arm-manifests/win/AcrobatDC/acrobat/current_version.txt" -UseBasicParsing).Replace(".","").Trim()
+	won't help due to that fact it outputs the Mac patch version instead of Windows one that is always has a higher version number
+#>
+if (Test-Path -Path "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd*.msp")
+{
+	# Get the bare patch number to compare with the latest one
+	$CurrentPatchVersion = (Split-Path -Path (Get-Item -Path "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64*.msp").FullName -Leaf).Replace(".msp","").Replace("AcroRdrDCx64Upd","")
+
+	$Parameters = @{
+		Uri             = "https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/reader/current_version.txt"
+		UseBasicParsing = $true
+	}
+	$LatestPatchVersion = (Invoke-RestMethod @Parameters).Replace(".","").Trim()
+
+	$Parameters = @{
+		Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$LatestPatchVersion/AcroRdrDCx64Upd$LatestPatchVersion.msp"
+		OutFile         = "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd$LatestPatchVersion.msp"
+		UseBasicParsing = $true
+		Verbose         = $true
+	}
+	Invoke-WebRequest @Parameters
+
+	if ($CurrentPatchVersion -lt $LatestPatchVersion)
+	{
+		Remove-Item -Path "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd$CurrentPatchVersion.msp" -Force
+	}
+}
+else
+{
+	$Parameters = @{
+		Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$LatestPatchVersion/AcroRdrDCx64Upd$LatestPatchVersion.msp"
+		OutFile         = "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd$LatestPatchVersion.msp"
+		UseBasicParsing = $true
+		Verbose         = $true
+	}
+	Invoke-WebRequest @Parameters
+}
+
 # Create the edited setup.ini
-$PatchFile = (Get-Item -Path "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd*.msp").Name
+$PatchFile = Split-Path -Path "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd$LatestPatchVersion.msp" -Leaf
 
 # setup.ini
 # https://www.adobe.com/devnet-docs/acrobatetk/tools/AdminGuide/properties.html
@@ -71,8 +117,7 @@ $CmdLine = @(
 	"IGNOREVCRT64=1",
 	"EULA_ACCEPT=YES",
 	"DISABLE_PDFMAKER=YES",
-	# This is the only valid value for Reader
-	"DISABLEDESKTOPSHORTCUT=1",
+	"DISABLEDESKTOPSHORTCUT=2",
 	# Install updates automatically
 	"UPDATE_MODE=3"
 )
