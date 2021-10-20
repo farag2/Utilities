@@ -835,3 +835,10 @@ Import-PowerShellDataFile -Path D:\Manifest.psd1
 # https://omgdebugging.com/2017/10/09/command-line-equivalent-of-wuauclt-in-windows-10-windows-server-2016/
 (New-Object -ComObject Microsoft.Update.AutoUpdate).DetectNow()
 usoclient StartScan
+
+# Check whether fTPM 2.0 supported
+$CurrentVersion = (Get-CimInstance -Namespace root/cimv2/Security/MicrosoftTpm -ClassName Win32_Tpm).SpecVersion.Split(",").Trim() | Select-Object -First 1
+if ([System.Version]$CurrentVersion -lt [System.Version]"2.0")
+{
+	
+}
