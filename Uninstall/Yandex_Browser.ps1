@@ -5,9 +5,9 @@ if ($YandexUninstallString)
 {
 	# Stop all Yandex Browser processes
 	Stop-Process -Name browser, searchbandapp64 -Force -ErrorAction Ignore
-	Get-Service -Name YandexBrowserService | Stop-Service -Force -ErrorAction Ignore
+	Get-Service -Name YandexBrowserService -ErrorAction Ignore | Stop-Service -Force
 
-	# Backup the Yandex Browser bookmarks before removing. Bookmarks (without an extension) This is just a JSON file
+	# Backup the Yandex Browser bookmarks before removing. Bookmarks (without an extension) is just a JSON file
 	# Get the current user Desktop folder location
 	$DesktopFolderLocation = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name Desktop
 	Get-Item -Path "$env:LOCALAPPDATA\Yandex\YandexBrowser\User Data\Default\Bookmarks" -Force -ErrorAction Ignore | Copy-Item -Destination $DesktopFolderLocation -Force -ErrorAction Ignore
