@@ -4,13 +4,13 @@
 if ($YandexUninstallString)
 {
 	# Stop all Yandex Browser processes
-	Stop-Process -Name browser, searchbandapp64 -Force
-	Get-Service -Name YandexBrowserService | Stop-Service -Force
+	Stop-Process -Name browser, searchbandapp64 -Force -ErrorAction Ignore
+	Get-Service -Name YandexBrowserService | Stop-Service -Force -ErrorAction Ignore
 
 	# Backup the Yandex Browser bookmarks before removing. Bookmarks (without an extension) This is just a JSON file
 	# Get the current user Desktop folder location
 	$DesktopFolderLocation = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name Desktop
-	Get-Item -Path "$env:LOCALAPPDATA\Yandex\YandexBrowser\User Data\Default\Bookmarks" -Force | Copy-Item -Destination $DesktopFolderLocation -Force
+	Get-Item -Path "$env:LOCALAPPDATA\Yandex\YandexBrowser\User Data\Default\Bookmarks" -Force -ErrorAction Ignore | Copy-Item -Destination $DesktopFolderLocation -Force -ErrorAction Ignore
 
 	# Get arguments
 	[string[]]$YandexBrowserSetup = ($YandexUninstallString -Replace("\s*--",",--")).Split(",").Trim()
@@ -18,7 +18,7 @@ if ($YandexUninstallString)
 	Start-Process -FilePath $YandexBrowserSetup[0] -ArgumentList "$YandexBrowserSetup[1..2] --force-uninstall" -Wait
 
 	# Get the pinned Yandex button uninstall string. In Russian only
-	[string]$YandexUninstallString = Get-Package -Name "Кнопка `"Яндекс`" на панели задач" | ForEach-Object -Process {$_.Meta.Attributes["UninstallString"]}
+	[string]$YandexUninstallString = Get-Package -Name "Кнопка `"Яндекс`" на панели задач" -ErrorAction Ignore | ForEach-Object -Process {$_.Meta.Attributes["UninstallString"]}
 	# Get arguments
 	[string[]]$YandexBrowserSetup = ($YandexUninstallString -Replace("\s*--",",--")).Split(",").Trim()
 	# Uninstall the Yandex button
@@ -33,5 +33,5 @@ if ($YandexUninstallString)
 		"$env:LOCALAPPDATA\Yandex",
 		"$env:APPDATA\Yandex"
 	)
-	Remove-Item -Path $YandexTrails -Recurse -Force
+	Remove-Item -Path $YandexTrails -Recurse -Force -ErrorAction Ignore
 }
