@@ -1,6 +1,7 @@
 #Requires -RunAsAdministrator
 
 # https://docs.microsoft.com/en-us/windows/terminal/
+# https://github.com/microsoft/terminal/releases
 
 Clear-Host
 
@@ -40,7 +41,7 @@ if ([System.Version]$CurrentPowerShellGetVersion -lt [System.Version]"2.2.5")
 
 	Import-Module -Name PowerShellGet -Force
 
-	Write-Verbose -Message "Restart the PowerShell session, and re-run the script" -Verbose
+	Write-Verbose -Message "PowerShellGet installed. Restart the PowerShell session, and re-run the script" -Verbose
 
 	Import-Module -Name PackageManagement -Force
 
@@ -89,7 +90,7 @@ if ($null -ne (Get-Module -Name PSReadline))
 
 		Get-InstalledModule -Name PSReadline -AllVersions
 
-		Write-Verbose -Message "Restart the PowerShell session, and re-run the script" -Verbose
+		Write-Verbose -Message "PSReadLine installed. Restart the PowerShell session and re-run the script" -Verbose
 
 		exit
 	}
@@ -105,7 +106,7 @@ else
 
 	Import-Module -Name PSReadLine
 
-	Write-Verbose -Message "Restart the PowerShell session, and re-run the script" -Verbose
+	Write-Verbose -Message "PSReadLine installed. Restart the PowerShell session and re-run the script" -Verbose
 
 	exit
 }
@@ -130,6 +131,9 @@ if (Test-Path -Path "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb
 else
 {
 	Start-Process -FilePath wt -Wait
+
+	Write-Verbose -Message "Restart the PowerShell session and re-run the script" -Verbose
+
 	exit
 }
 
@@ -219,6 +223,16 @@ if ($Terminal.showTabsInTitlebar)
 else
 {
 	$Terminal | Add-Member -Name showTabsInTitlebar -MemberType NoteProperty -Value $false -Force
+}
+
+# Restore previous tabs and panes after relaunching
+if ($Terminal.firstWindowPreference)
+{
+	$Terminal.firstWindowPreference = $false
+}
+else
+{
+	$Terminal | Add-Member -Name firstWindowPreference -MemberType NoteProperty -Value persistedWindowLayout -Force
 }
 #endregion General
 
