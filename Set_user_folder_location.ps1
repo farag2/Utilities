@@ -1,6 +1,6 @@
 # Change location of the user folders
 <#
-.	SYNOPSIS
+	.SYNOPSIS
 	Change location of the each user folders using SHSetKnownFolderPath function
 
 	.EXAMPLE
