@@ -1,3 +1,5 @@
+# Activate Office 2019/2021 using a 3rd party KMS server
+
 # https://docs.microsoft.com/en-us/deployoffice/vlactivation/tools-to-manage-volume-activation-of-office
 <#
 	ProPlus2021VL
