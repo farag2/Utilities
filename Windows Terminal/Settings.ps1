@@ -343,6 +343,16 @@ else
 {
 	$Terminal | Add-Member -Name trimBlockSelection -MemberType NoteProperty -Value $true -Force
 }
+
+# Create new tabs in the most recently used window on this desktop. If there's not an existing window on this virtual desktop, then create a new terminal window
+if ($Terminal.windowingBehavior)
+{
+	$Terminal.windowingBehavior = "useExisting"
+}
+else
+{
+	$Terminal | Add-Member -Name windowingBehavior -MemberType NoteProperty -Value "useExisting" -Force
+}
 #endregion defaults
 
 #region Azure
