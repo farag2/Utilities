@@ -6,6 +6,7 @@ $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows
 $Parameters = @{
 	Uri     = "https://github.com/tonsky/FiraCode/releases/download/$Tag/Fira_Code_v$Tag.zip"
 	OutFile = "$DownloadsFolder\Fira_Code_v$Tag.zip"
+	UseBasicParsing = $true
 	Verbose = $true
 }
 Invoke-WebRequest @Parameters
