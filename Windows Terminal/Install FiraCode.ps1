@@ -1,20 +1,20 @@
-# Downloading the latest FiraCode version within GitHub API
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-# (Invoke-WebRequest -Uri "https://api.github.com/repos/tonsky/FiraCode/releases" -UseBasicParsing | ConvertFrom-Json).tag_name | Select-Object -First 1
-$Tag = (Invoke-RestMethod -Uri "https://api.github.com/repos/tonsky/FiraCode/releases").tag_name | Select-Object -First 1
+
+# https://github.com/tonsky/FiraCode
+$Tag = (Invoke-RestMethod -Uri "https://api.github.com/repos/tonsky/FiraCode/releases/latest").tag_name
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
-	Uri = "https://github.com/tonsky/FiraCode/releases/download/$Tag/Fira_Code_v$Tag.zip"
+	Uri     = "https://github.com/tonsky/FiraCode/releases/download/$Tag/Fira_Code_v$Tag.zip"
 	OutFile = "$DownloadsFolder\Fira_Code_v$Tag.zip"
-	Verbose = [switch]::Present
+	Verbose = $true
 }
 Invoke-WebRequest @Parameters
 
 $Parameters = @{
-	Path = "$DownloadsFolder\Fira_Code_v$Tag.zip"
+	Path            = "$DownloadsFolder\Fira_Code_v$Tag.zip"
 	DestinationPath = "$DownloadsFolder\Fira_Code"
-	Force = [switch]::Present
-	Verbose = [switch]::Present
+	Force           = $true
+	Verbose         = $true
 }
 Expand-Archive @Parameters
 
@@ -39,5 +39,4 @@ foreach ($Font in $Fonts)
 	(New-Object -ComObject Shell.Application).NameSpace($ssfFONTS).CopyHere($Font.FullName, $CopyOptions)
 }
 
-Remove-Item -Path "$DownloadsFolder\Fira_Code_v$Tag.zip" -Force
-Remove-Item -Path "$DownloadsFolder\Fira_Code" -Recurse -Force
+Remove-Item -Path "$DownloadsFolder\Fira_Code_v$Tag.zip", "$DownloadsFolder\Fira_Code" -Recurse -Force
