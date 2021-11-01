@@ -13,6 +13,9 @@
 
 	.Example
 	ExtractZIPFile -Source "D:\Folder\File.zip" -Destination "D:\Folder" -File "Folder1/Folder2/File.txt"
+
+	.NOTES
+	Pay attention to slash in the folders path of archive: "/" Instead of Windows "\"
 #>
 function ExtractZIPFile
 {
