@@ -37,7 +37,10 @@ Invoke-WebRequest @Parameters
 	Exclude files from being expanded
 
 	.Example
-	ExtractZIPFolder -Source "D:\Folder\File.zip" -Destination "D:\Folder" -File "Folder1/Folder2" -Exclude @(".gitignore", ".gitattributes")
+	ExtractZIPFolder -Source "D:\Folder\File.zip" -Destination "D:\Folder" -Folder "Folder1/Folder2" -Exclude @(".gitignore", ".gitattributes")
+
+	.NOTES
+	Pay attention to slash in the folders path of archive: "/" Instead of Windows "\"
 #>
 function ExtractZIPFolder
 {
