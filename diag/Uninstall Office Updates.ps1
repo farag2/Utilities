@@ -3,15 +3,15 @@
 
 function Get-SupersededState ([string]$Patch)
 {
-	# Проверка состояния обновления
+	# Chekcing the update status
 	$IsSuperseded = $false
 	$Uninstallable = Get-ItemPropertyValue -LiteralPath "Registry::$Patch" -Name Uninstallable
 
-	# Обновление является удаляемым
+	# The update is uninstallable
 	if ($Uninstallable -eq "1")
 	{
 		$State = Get-ItemPropertyValue -LiteralPath "Registry::$Patch" -Name State
-		# Обновление является устаревшим
+		# The update is outdated
 		if ($State -eq "2")
 		{
 			$IsSuperseded = $true
@@ -23,7 +23,7 @@ function Get-SupersededState ([string]$Patch)
 
 function Get-Guid ([string]$Token)
 {
-	# Преобразование ключа реестра соответствующего обновлению в специальное значение необходимое для его удаления
+	# Convert the registry key corresponding to the update to a special value needed to delete it
 	$guid = $Token[7] + $Token[6] + $Token[5] + $Token[4] + $Token[3] + $Token[2] + $Token[1] + $Token[0] + "-"
 	$guid += $Token[11] + $Token[10] + $Token[9] + $Token[8] + "-"
 	$guid += $Token[15] + $Token[14] + $Token[13] + $Token[12] + "-"
@@ -35,46 +35,36 @@ function Get-Guid ([string]$Token)
 
 function Get-OfficeUpdates
 {
-	# Поиск устаревших обновлений для офиса
+	# Searching for outdated office updates
 	[System.Collections.Hashtable]$ProductsNames = @{}
 	[System.Collections.Hashtable]$ProductsUpdates = @{}
 	[System.Collections.Hashtable]$ProductsPatches = @{}
 
-	# Список обновлений 
+	# List of updates
 	[string[]]$Updates = $null
 	[string[]]$Patches = $null
 
-	# Цикл по офисным продуктам
 	foreach ($Product in (Get-ChildItem -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products"))
 	{
-		# Значения оканчивающиеся 000000F01FEC
 		if ($Product.PSChildName -match "000000F01FEC")
 		{
 			$Updates = $null
 			$Patches = $null
 			$KeyPatches = "$Product\Patches"
-
-			# Цикл по обновлениям для выбранного продукта
 			foreach ($Item in Get-ChildItem -Path "Registry::$KeyPatches")
 			{
-				# Проверка состояния обновления
 				$IsSuperseded = Get-SupersededState -Patch $Item
 
-				# Обновление является устаревшим
 				if ($IsSuperseded)
 				{
-					# Получение имени обновления
 					$Update = Get-ItemPropertyValue -LiteralPath "Registry::$Item" -Name DisplayName
-					# Получение списка названий обновлений
 					$Updates += , "$Update"
-					# Получение списка ключей
 					$Patches += , $Item.PSChildName
 				}
 			}
 
 			if ($Patches)
 			{
-				# Получение имени продукта
 				$KeyProduct = "$Product\InstallProperties"
 				$ProductName = Get-ItemProperty -LiteralPath "Registry::$KeyProduct" -Name DisplayName
 				$ProductsNames[$Product.PSChildName] = $ProductName
@@ -84,32 +74,23 @@ function Get-OfficeUpdates
 		}
 	}
 
-	# Вывод результатов
 	if ($ProductsNames.Count -gt 0)
 	{
 		foreach ($Key in $ProductsNames.Keys)
 		{
-			# Название продукта
 			$Title = $ProductsNames["$Key"]
-			# Обновления
 			$Updates = $ProductsUpdates["$Key"]
 		}
 
 		Clear-Host
 
-		# Удаление обновлений
 		foreach ($Key in $ProductsNames.Keys)
 		{
-			# Название продукта
 			$Title = $ProductsNames["$Key"]
-			# Обновления
 			$Updates = $ProductsUpdates["$Key"]
-			# Ключи
 			$Patches = $ProductsPatches["$Key"]
-			# Преобразование ключа в специальное значение
 			$ProductGuid = Get-Guid -Token "$Key"
 
-			# Цикл по удаляемым обновлениям
 			for
 			(
 				$n = 0
@@ -117,18 +98,14 @@ function Get-OfficeUpdates
 				$n++
 			)
 			{
-				# Преобразование ключа в специальное значение
 				$Patch = $Patches[$n]
 				$PatchGuid = Get-Guid -Token $Patch
 
-				# Вывод имени удаляемого обновления
 				Write-Host "Removing: " -NoNewline
 				Write-Host $Updates[$n]
 
-				# Удаление обновления с помощью специальных значений для продукта и обновления
 				if ((Test-Path -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Patches\$Patch") -and (Test-Path -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products\$Key\Patches\$Patch"))
 				{
-					# Проверка существования файла инсталлятора для обновления
 					if ($PathPatch = (Get-ItemPropertyValue -LiteralPath "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Patches\$Patch" -Name LocalPackage))
 					{
 						if (Test-Path -Path "$PathPatch")
