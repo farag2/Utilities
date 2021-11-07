@@ -19,6 +19,9 @@
 
 	.Example
 	ExtractZIPFolder -Source "D:\Folder\File.zip" -Destination "D:\Folder" -Folder "Folder1/Folder2" -ExcludedFiles @("file1.ext", "file2.ext") -ExcludedFolders "Folder"
+
+	.NOTES
+	Pay attention to slash in the folders path of archive: "/" instead of Windows "\"
 #>
 function ExtractZIPFolder
 {
