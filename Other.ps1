@@ -795,7 +795,7 @@ else
 # Disable NTFS compression in all subfolders
 # https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/compact
 $Paths = Get-ChildItem -Path D:\Folder -Recurse -Directory -Force
-foreach($Path in $Paths.FullName)
+foreach ($Path in $Paths.FullName)
 {
 	$RecurseArgument = ('/S:{0}' -f $Path)
 	& compact.exe /U $RecurseArgument
@@ -842,3 +842,6 @@ if ([System.Version]$CurrentVersion -lt [System.Version]"2.0")
 {
 	
 }
+
+# Exclude KB update from installing
+(New-Object -ComObject Microsoft.Update.Session).CreateUpdateSearcher().Search("IsHidden = 0").Updates | Where-Object -FilterScript {$_.KBArticleIDs -eq "5005463"} | ForEach-Object -Process {$_.IsHidden = $true}
