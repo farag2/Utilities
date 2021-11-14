@@ -249,6 +249,18 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	# Wrap around
 	$config.NotepadPlus.FindHistory | ForEach-Object -Process {$_.wrap = "yes"}
 	$config.Save("$env:APPDATA\Notepad++\config.xml")
+
+	if (-not (Test-Path -Path $env:ProgramFiles\Notepad++\localization))
+	{
+		New-Item -Path $env:ProgramFiles\Notepad++\localization -ItemType Directory -Force
+	}
+	$Parameters = @{
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Notepad%2B%2B/localization/russian.xml"
+		OutFile         = "$env:ProgramFiles\Notepad++\localization\russian.xml"
+		UseBasicParsing = $true
+		Verbose         = $true
+	}
+	Invoke-WebRequest @Parameters
 }
 
 # Office
