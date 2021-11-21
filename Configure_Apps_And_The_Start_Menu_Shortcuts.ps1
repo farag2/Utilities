@@ -239,13 +239,16 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	cmd.exe --% /c assoc .xml=txtfile
 	cmd.exe --% /c assoc txtfile\DefaultIcon=%ProgramFiles%\Notepad++\notepad++.exe,0
 
-	$Parameters = @{
-		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Notepad%2B%2B/config.xml"
-		OutFile         = "$env:APPDATA\Notepad++\config.xml"
-		UseBasicParsing = $true
-		Verbose         = $true
-	}
-	Invoke-WebRequest @Parameters
+	[xml]$config = Get-Content -Path "$env:APPDATA\Notepad++\config.xml" -Force
+	# Fluent UI: large
+	$config.NotepadPlus.GUIConfigs.GUIConfig | Where-Object -FilterScript {$_.name -eq "ToolBar"} | ForEach-Object -Process {$_."#text" = "large"}
+	# Mute all sounds
+	$config.NotepadPlus.GUIConfigs.GUIConfig | Where-Object -FilterScript {$_.name -eq "MISC"} | ForEach-Object -Process {$_.muteSounds = "yes"}
+	# 2 find buttons mode
+	$config.NotepadPlus.FindHistory | ForEach-Object -Process {$_.isSearch2ButtonsMode = "yes"}
+	# Wrap around
+	$config.NotepadPlus.FindHistory | ForEach-Object -Process {$_.wrap = "yes"}
+	$config.Save("$env:APPDATA\Notepad++\config.xml")
 
 	if (-not (Test-Path -Path $env:ProgramFiles\Notepad++\localization))
 	{
