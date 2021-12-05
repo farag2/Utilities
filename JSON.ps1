@@ -91,3 +91,8 @@ $JHT | ConvertTo-Json | Set-Content -Path "$env:APPDATA\Code\User\settings.json"
 
 # Add-Member without "Value" and "Count" elements in JSON
 Remove-TypeData -TypeName System.Array
+
+# Check the sequence of Ids
+$Ids = (Get-Content -Path "D:\Downloads\1.js" -Encoding UTF8 -Raw | ConvertFrom-Json).Id
+$UniqueIds = $Ids | Select-Object -Unique
+(Compare-Object -ReferenceObject $UniqueIds -DifferenceObject $Ids).InputObject
