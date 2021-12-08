@@ -4,33 +4,33 @@ $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows
 
 # Main archive
 $Parameters = @{
-	Uri = "https://github.com/minischetti/metro-for-steam/archive/v4.4.zip"
+	Uri     = "https://github.com/minischetti/metro-for-steam/archive/v4.4.zip"
 	OutFile = "$DownloadsFolder\metro-for-steam.zip"
-	Verbose = [switch]::Present
+	Verbose = $true
 }
 Invoke-WebRequest @Parameters
 
 $Parameters = @{
-	Path = "$DownloadsFolder\metro-for-steam.zip"
+	Path            = "$DownloadsFolder\metro-for-steam.zip"
 	DestinationPath = "$DownloadsFolder\Metro"
-	Force = [switch]::Present
-	Verbose = [switch]::Present
+	Force           = $true
+	Verbose         = $true
 }
 Expand-Archive @Parameters
 
 # Patch
 $Parameters = @{
-	Uri = "https://github.com/redsigma/UPMetroSkin/archive/master.zip"
+	Uri     = "https://github.com/redsigma/UPMetroSkin/archive/master.zip"
 	OutFile = "$DownloadsFolder\UPMetroSkin.zip"
-	Verbose = [switch]::Present
+	Verbose = $true
 }
 Invoke-WebRequest @Parameters
 
 $Parameters = @{
-	Path = "$DownloadsFolder\UPMetroSkin.zip"
+	Path            = "$DownloadsFolder\UPMetroSkin.zip"
 	DestinationPath = "$DownloadsFolder\Metro"
-	Force = [switch]::Present
-	Verbose = [switch]::Present
+	Force           = $true
+	Verbose         = $true
 }
 Expand-Archive @Parameters
 
@@ -131,12 +131,10 @@ function Move-Recursively
 	}
 }
 
-$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
-
 $Parameters = @{
-	Source = "$DownloadsFolder\Metro\UPMetroSkin-master\Unofficial 4.x Patch\Main Files [Install First]"
+	Source      = "$DownloadsFolder\Metro\UPMetroSkin-master\Unofficial 4.x Patch\Main Files [Install First]"
 	Destination = "$DownloadsFolder\Metro\metro-for-steam-4.4"
-	DeleteAll = [switch]::Present
+	DeleteAll   = $true
 }
 Move-Recursively @Parameters
 
@@ -149,9 +147,9 @@ Remove-Item -LiteralPath "$DownloadsFolder\Metro\metro-for-steam-4.4" -Force
 
 # Custom menu
 $Parameters = @{
-	Uri = "https://github.com/farag2/Utilities/blob/master/Steam/steam.menu"
+	Uri     = "https://github.com/farag2/Utilities/blob/master/Steam/steam.menu"
 	OutFile = "$DownloadsFolder\Metro\resource\menus\steam.menu"
-	Verbose = [switch]::Present
+	Verbose = $true
 }
 Invoke-WebRequest @Parameters
 
@@ -167,5 +165,9 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\Steam")
 		Remove-Item -Path "${env:ProgramFiles(x86)}\Steam\Skins\Metro" -Recurse -Force
 	}
 
+	Get-Process -Name steam | Stop-Process -Force -ErrorAction Ignore
+	Remove-Item -Path "${env:ProgramFiles(x86)}\Steam\Skins\Metro" -Recurse -Force -ErrorAction Ignore
+	Copy-Item -Path "$DownloadsFolder\Metro\resource\menus\steam.menu" -Destination "$DownloadsFolder\Metro\resource\menus\steam_original.menu" -Force
 	Move-Item -Path "$DownloadsFolder\Metro" -Destination "${env:ProgramFiles(x86)}\Steam\Skins\Metro" -Force
+	Invoke-Item -Path "${env:ProgramFiles(x86)}\Steam\Skins\Metro\resource\menus"
 }

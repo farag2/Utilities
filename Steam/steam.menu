@@ -1,19 +1,30 @@
-"menubar" [$WINDOWS]
+"menubar"
 {
-	Steam
+	Store
 	{
-		SkinVersion
-		{
-			text="Metro For Steam - 4.4"
-			shellcmd=""
-		}
+		text = ""
 		Divider {}
 		CheckForUpdates
 		{
 			text="#steam_menu_checkforupdates"
 			command="CheckForUpdates"
 		}
+		Settings
+		{
+			text="#steam_menu_settings"
+			command="Settings"
+		}
+		About
+		{
+			text="#steam_about"
+			command="About"
+		}
 		Divider {}
+		ChangeUser
+		{
+			text="#steam_menu_changeuser"
+			command="ChangeUser"
+		}
 		GoOnline
 		{
 			text="#SteamUI_OfflineMode_GoOnline"
@@ -24,32 +35,35 @@
 			text="#SteamUI_OfflineMode_GoOffline"
 			command="gooffline"
 		}
-		Divider {}
-		ActivateRetail
-		{
-			text="#Steam_RegisterProductCode"
-			command="ActivateRetail"
-		}
-		RedeemWalletVoucher
-		{
-			text="#Steam_RedeemWalletVoucher"
-			shellcmd="steam://url/RedeemWalletVoucher"
-		}
-		Divider {}
-		Settings
-		{
-			text="#steam_menu_settings"
-			command="Settings"
-		}
 		Restart
 		{
 			text="#Steam_MustRestart_Button"
 			command="RestartSteam"
 		}
+		Divider {}
 		Exit
 		{
 			text="#Steam_ExitSteam"
 			command="Exit"
+		}
+	}
+	Steam
+	{
+		text = ""
+		ActivateRetail
+		{
+			text="#Steam_RegisterProductCode"
+			command="ActivateRetail"
+		}
+		ManageGuestPasses
+		{
+			text="#Steam_ManageGuestPasses"
+			command="ManageGuestPasses"
+		}
+		AddShortcut
+		{
+			text="#Steam_menu_AddShortcut"
+			shellcmd="steam://AddNonSteamGame"
 		}
 	}
 }
