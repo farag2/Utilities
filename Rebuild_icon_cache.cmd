@@ -1,12 +1,12 @@
 :: Rebuild icon cache
 @echo off
+
 TASKKILL /IM explorer.exe /F
-TIMEOUT /T 2 /NOBREAK >nul
+TIMEOUT /T 3 /NOBREAK
 
-DEL /A /F /Q "%LOCALAPPDATA%\IconCache.db"
-DEL /A /F /Q "%LOCALAPPDATA%\Microsoft\Windows\Explorer\iconcache_*"
+DEL "%LOCALAPPDATA%\IconCache.db" /F /Q
+DEL "%LOCALAPPDATA%\Microsoft\Windows\Explorer\iconcache_*" /F /Q
 
-TIMEOUT /T 2 /NOBREAK >nul
 start explorer.exe
 
 ie4uinit.exe -show
