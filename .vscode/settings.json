@@ -1,3 +1,27 @@
 {
-	"gitdoc.enabled": false
+    "gitdoc.enabled": false,
+    "workbench.colorCustomizations": {
+        "activityBar.activeBackground": "#d51b7f",
+        "activityBar.activeBorder": "#76c619",
+        "activityBar.background": "#d51b7f",
+        "activityBar.foreground": "#e7e7e7",
+        "activityBar.inactiveForeground": "#e7e7e799",
+        "activityBarBadge.background": "#76c619",
+        "activityBarBadge.foreground": "#15202b",
+        "editorGroup.border": "#d51b7f",
+        "sash.hoverBorder": "#d51b7f",
+        "sideBar.border": "#d51b7f",
+        "statusBar.background": "#a81564",
+        "statusBar.border": "#a81564",
+        "statusBar.foreground": "#e7e7e7",
+        "statusBarItem.hoverBackground": "#d51b7f",
+        "statusBarItem.remoteBackground": "#a81564",
+        "statusBarItem.remoteForeground": "#e7e7e7",
+        "titleBar.activeBackground": "#a81564",
+        "titleBar.activeForeground": "#e7e7e7",
+        "titleBar.border": "#a81564",
+        "titleBar.inactiveBackground": "#a8156499",
+        "titleBar.inactiveForeground": "#e7e7e799"
+    },
+    "peacock.color": "#a81564"
 }
