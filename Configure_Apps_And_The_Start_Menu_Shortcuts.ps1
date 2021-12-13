@@ -312,71 +312,12 @@ if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 	}
 	Invoke-WebRequest @Parameters
 
-	$LatestVersion = (Invoke-RestMethod -Uri "https://api.github.com/repos/jagannatharjun/qbt-theme/releases/latest").assets.browser_download_url
-	$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 	$Parameters = @{
-		Uri     = $LatestVersion
-		OutFile = "$DownloadsFolder\qbt-theme.zip"
+		Uri     = "https://github.com/jagannatharjun/qbt-theme/blob/master/darkstylesheet.qbtheme"
+		OutFile = "$env:APPDATA\qBittorrent"
 		Verbose = $true
 	}
 	Invoke-WebRequest @Parameters
-
-	<#
-		.SYNOPSIS
-		Expand the specific file from ZIP archive. Folder structure will be created recursively
-
-		.Parameter Source
-		The source ZIP archive
-
-		.Parameter Destination
-		Where to expand file
-
-		.Parameter File
-		Assign the file to expand
-
-		.Example
-		ExtractZIPFile -Source "D:\Folder\File.zip" -Destination "D:\Folder" -File "Folder1/Folder2/File.txt"
-	#>
-	function ExtractZIPFile
-	{
-		[CmdletBinding()]
-		param
-		(
-			[string]
-			$Source,
-
-			[string]
-			$Destination,
-
-			[string]
-			$File
-		)
-
-		Add-Type -Assembly System.IO.Compression.FileSystem
-
-		$ZIP = [IO.Compression.ZipFile]::OpenRead($Source)
-		$Entries = $ZIP.Entries | Where-Object -FilterScript {$_.FullName -eq $File}
-
-		$Destination = "$Destination\$(Split-Path -Path $File -Parent)"
-
-		if (-not (Test-Path -Path $Destination))
-		{
-			New-Item -Path $Destination -ItemType Directory -Force
-		}
-
-		$Entries | ForEach-Object -Process {[IO.Compression.ZipFileExtensions]::ExtractToFile($_, "$($Destination)\$($_.Name)", $true)}
-
-		$ZIP.Dispose()
-	}
-
-	$Parameters = @{
-		Source      = "$DownloadsFolder\qbt-theme.zip"
-		Destination = "$env:APPDATA\qBittorrent"
-		File        = "darkstylesheet.qbtheme"
-	}
-	ExtractZIPFile @Parameters
-
-	Remove-Item -Path "$DownloadsFolder\qbt-theme.zip" -Force
 }
 
 # Steam
