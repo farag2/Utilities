@@ -845,3 +845,6 @@ if ([System.Version]$CurrentVersion -lt [System.Version]"2.0")
 
 # Exclude KB update from installing
 (New-Object -ComObject Microsoft.Update.Session).CreateUpdateSearcher().Search("IsHidden = 0").Updates | Where-Object -FilterScript {$_.KBArticleIDs -eq "5005463"} | ForEach-Object -Process {$_.IsHidden = $true}
+
+# Download and install all Store related UWP packages
+wsreset -i
