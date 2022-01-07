@@ -66,7 +66,7 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\AIMP")
 	Invoke-WebRequest @Parameters
 
 	# Save the current ID in the variable
-	$ID = Get-Content -Path "C:\Users\test\AppData\Roaming\AIMP\Skins\Default.ini" | Select-Object -Index 1
+	$ID = Get-Content -Path "$env:APPDATA\AIMP\Skins\Default.ini" | Select-Object -Index 1
 
 	$Parameters = @{
 		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/Default.ini"
