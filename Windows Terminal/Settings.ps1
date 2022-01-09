@@ -12,103 +12,143 @@ if ($psISE)
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-# Intalling the latest PowerShellGet
-if (-not (Get-Package -Name NuGet -Force -ErrorAction Ignore))
+# Installing the latest NuGet
+if (-not (Test-Path -Path "$env:ProgramFiles\PackageManagement\ProviderAssemblies\nuget\*\Microsoft.PackageManagement.NuGetProvider.dll"))
 {
-	Install-Package -Name NuGet -Force
+	Write-Verbose -Message "Installing NuGet" -Verbose
+
+	Install-PackageProvider -Name NuGet -Force
+}
+if ($null -eq (Get-PackageProvider -ListAvailable | Where-Object -FilterScript {$_.Name -ceq "NuGet"} -ErrorAction Ignore))
+{
+	Write-Verbose -Message "Installing NuGet" -Verbose
+
+	Install-PackageProvider -Name NuGet -Force
 }
 
-Remove-Module -Name PackageManagement -Force
-
-if ((Get-Childitem -path "$env:ProgramFiles\WindowsPowerShell\Modules\PowerShellGet").Count -eq 1)
-{
-	$CurrentPowerShellGetVersion = (Get-Childitem -Path "$env:ProgramFiles\WindowsPowerShell\Modules\PowerShellGet").Name | Select-Object -Index 0
-}
-else
-{
-	$CurrentPowerShellGetVersion = (Get-Childitem -Path "$env:ProgramFiles\WindowsPowerShell\Modules\PowerShellGet").Name | Select-Object -Last 1
-}
-
-if ([System.Version]$CurrentPowerShellGetVersion -lt [System.Version]"2.2.5")
-{
-	Install-Module -Name PowerShellGet -Force
-
-	# Unloading the old PowerShellGet
-	Remove-Module -Name PowerShellGet -Force
-	Get-InstalledModule -Name PowerShellGet -AllVersions | Where-Object -FilterScript {$_.Version -ne "2.2.5"} | Uninstall-Module -Force
-	# Removing all folders except the latest one
-	Remove-Item -Path ((Get-Childitem -Path "$env:ProgramFiles\WindowsPowerShell\Modules\PowerShellGet").FullName | Select-Object -SkipLast 1) -Recurse -Force
-
-	Import-Module -Name PowerShellGet -Force
-
-	Write-Verbose -Message "PowerShellGet installed. Restart the PowerShell session, and re-run the script" -Verbose
-
-	Import-Module -Name PackageManagement -Force
-
-	exit
-}
-
-# Intalling the latest PSReadLine
-# https://github.com/PowerShell/PSReadLine/releases
+# Installing the latest PowerShellGet & PackageManagement
+# https://www.powershellgallery.com/packages/PowerShellGet
+# https://github.com/PowerShell/PowerShellGet
+# https://www.powershellgallery.com/packages/PackageManagement
+# https://devblogs.microsoft.com/powershell/powershellget-3-0-preview-1/
+$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
-	Uri            = "https://api.github.com/repos/PowerShell/PSReadLine/releases/latest"
+	Uri             = "https://raw.githubusercontent.com/PowerShell/PowerShellGet/master/src/PowerShellGet.psd1"
+	OutFile         = "$DownloadsFolder\PowerShellGet.psd1"
 	UseBasicParsing = $true
+	Verbose         = $true
 }
-$LatestRelease = (Invoke-RestMethod @Parameters).tag_name.Replace("v","")
+Invoke-WebRequest @Parameters
 
-if (Test-Path -Path "$env:ProgramFiles\WindowsPowerShell\Modules\PSReadline\2.1.0\Microsoft.PowerShell.PSReadLine2.dll")
-{
-	$CurrentRelease = (Get-Module -Name PSReadline).Version.ToString()
-}
-else
-{
-	$null = $CurrentRelease
-}
+# Get the latest PowerShellGet version
+$LatestPowerShellGetVersion = (Import-PowerShellDataFile -Path "$DownloadsFolder\PowerShellGet.psd1").ModuleVersion
+Remove-Item -Path "$DownloadsFolder\PowerShellGet.psd1" -Force
 
-# Check if PSReadline is installed
-if ($null -ne (Get-Module -Name PSReadline))
+if ($null -eq (Get-Module -Name PowerShellGet -ErrorAction Ignore))
 {
-	if ([System.Version]$LatestRelease -gt [System.Version]$CurrentRelease)
+	try
 	{
-		# Intalling the latest PSReadLine
-		if (-not (Get-Package -Name NuGet -Force -ErrorAction Ignore))
-		{
-			Install-Package -Name NuGet -Force
-		}
-		Install-Module -Name PSReadLine -RequiredVersion $LatestRelease -Force
+		Import-Module -Name PowerShellGet -Force -ErrorAction Stop
+		$CurrentPowerShellGetVersion = (Get-Module -Name PowerShellGet).Version.ToString()
+	}
+	catch
+	{
+		Write-Verbose -Message "PowerShellGet module doesn't exist" -Verbose
+		Write-Verbose -Message "Installing PowerShellGet 2.2.5 & PackageManagement 1.4.7" -Verbose
 
-		# Unloading the old PSReadLine
-		$PSReadLine = @{
-			ModuleName    = "PSReadLine"
-			ModuleVersion = $CurrentVersion
-		}
-		Remove-Module -FullyQualifiedName $PSReadLine -Force
-		Get-InstalledModule -Name PSReadline -AllVersions | Where-Object -FilterScript {$_.Version -eq $CurrentVersion} | Uninstall-Module -Force
-		Remove-Item -Path $env:ProgramFiles\WindowsPowerShell\Modules\PSReadline\$CurrentVersion -Recurse -Force -ErrorAction Ignore
+		Install-Module -Name PowerShellGet -Force
+		Remove-Module -Name PowerShellGet -Force
 
-		Import-Module -Name PSReadLine -Force
+		# Removing all PowerShellGet folders except the latest and the default ones
+		Get-Childitem -Path "$env:ProgramFiles\WindowsPowerShell\Modules\PowerShellGet" -Force | Where-Object -FilterScript {$_.Name -ne "2.2.5"} | Remove-Item -Recurse -Force
 
-		Get-InstalledModule -Name PSReadline -AllVersions
+		Import-Module -Name PowerShellGet -RequiredVersion 2.2.5 -Force
+		Import-Module -Name PackageManagement -RequiredVersion 1.4.7 -Force
 
-		Write-Verbose -Message "PSReadLine installed. Restart the PowerShell session and re-run the script" -Verbose
+		Write-Verbose -Message "PowerShellGet 2.2.5 & PackageManagement 1.4.7 installed. Restart the PowerShell session, and re-run the script" -Verbose
 
 		exit
 	}
 }
 else
 {
-	# Intalling the latest PSReadLine
-	if (-not (Get-Package -Name NuGet -Force -ErrorAction Ignore))
-	{
-		Install-Package -Name NuGet -Force
-	}
-	Install-Module -Name PSReadLine -RequiredVersion $LatestRelease -Force
+	$CurrentPowerShellGetVersion = (Get-Module -Name PowerShellGet).Version.ToString()
+}
 
-	Import-Module -Name PSReadLine
+if ([System.Version]$CurrentPowerShellGetVersion -lt [System.Version]"2.2.5")
+{
+		Write-Verbose -Message "Installing PowerShellGet & PackageManagement" -Verbose
+
+		Install-Module -Name PowerShellGet -Force
+		Remove-Module -Name PowerShellGet -Force
+
+		# Removing all PowerShellGet folders except the latest and the default ones
+		Get-Childitem -Path "$env:ProgramFiles\WindowsPowerShell\Modules\PowerShellGet" -Force | Where-Object -FilterScript {$_.Name -ne "2.2.5"} | Remove-Item -Recurse -Force
+
+		Import-Module -Name PowerShellGet -RequiredVersion 2.2.5 -Force
+		Import-Module -Name PackageManagement -RequiredVersion 1.4.7 -Force
+
+		Write-Verbose -Message "PowerShellGet 2.2.5 & PackageManagement 1.4.7 installed. Restart the PowerShell session, and re-run the script" -Verbose
+
+		exit
+}
+
+if ([System.Version]$CurrentPowerShellGetVersion -lt [System.Version]$LatestPowerShellGetVersion)
+{
+		Write-Verbose -Message "Installing PowerShellGet $($LatestPowerShellGetVersion)" -Verbose
+
+		# We cannot install the preview build immediately due to the default 1.0.0.1 build doesn't support -AllowPrerelease
+		Install-Module -Name PowerShellGet -AllowPrerelease -Force
+
+		Write-Verbose -Message "PowerShellGet $($LatestPowerShellGetVersion) installed. Restart the PowerShell session, and re-run the script" -Verbose
+
+		exit
+}
+
+# Installing the latest PSReadLine
+# https://github.com/PowerShell/PSReadLine/releases
+# https://www.powershellgallery.com/packages/PSReadLine
+$Parameters = @{
+	Uri            = "https://api.github.com/repos/PowerShell/PSReadLine/releases"
+	UseBasicParsing = $true
+}
+$LatestPSReadLineVersion = (Invoke-RestMethod @Parameters | Where-Object -FilterScript {$_.prerelease -eq $true}).tag_name.Replace("v", "") | Select-Object -First 1
+# Remove "-beta" in the release version
+$LatestPSReadLineVersion = $LatestPSReadLineVersion.Substring(0, $LatestPSReadLineVersion.IndexOf('-'))
+
+if ($null -eq (Get-Module -Name PSReadline -ListAvailable -ErrorAction Ignore))
+{
+	Write-Verbose -Message "PSReadline module doesn't exist" -Verbose
+	Write-Verbose -Message "Installing PSReadline" -Verbose
+
+	Install-Module -Name PSReadline -AllowPrerelease -Force
+	Remove-Module -Name PowerShellGet -Force
+
+	Write-Verbose -Message "PSReadline installed. Restart the PowerShell session, and re-run the script" -Verbose
+
+	exit
+}
+else
+{
+	$CurrentPSReadlineVersion = (Get-Module -Name PSReadline).Version.ToString()
+}
+
+# Installing the latest PSReadLine
+if ([System.Version]$CurrentPSReadlineVersion -lt [System.Version]$LatestPSReadLineVersion)
+{
+	Write-Verbose -Message "Installing PSReadLine $($LatestPSReadLineVersion)" -Verbose
+
+	Install-Module -Name PSReadline -AllowPrerelease -Force
 
 	Write-Verbose -Message "PSReadLine installed. Restart the PowerShell session and re-run the script" -Verbose
 
 	exit
+}
+
+if ([System.Version]$CurrentPSReadlineVersion -eq [System.Version]$LatestPSReadLineVersion)
+{
+	# Removing all PSReadLine folders except the latest and the default ones
+	Get-Childitem -Path "$env:ProgramFiles\WindowsPowerShell\Modules\PSReadLine" -Force | Where-Object -FilterScript {$_.Name -ne $LatestPSReadLineVersion} | Remove-Item -Recurse -Force
 }
 
 # Downloading Windows95.gif
@@ -424,37 +464,3 @@ if (-not (Test-Path -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell
 	New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked" -Force
 }
 New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked" -Name "{9F156763-7844-4DC4-B2B1-901F640F5155}" -PropertyType String -Value "WindowsTerminal" -Force
-
-# Refresh desktop icons, environment variables, taskbar
-$UpdateExplorer = @{
-	Namespace = "WinAPI"
-	Name = "UpdateExplorer"
-	Language = "CSharp"
-	MemberDefinition = @"
-private static readonly IntPtr HWND_BROADCAST = new IntPtr(0xffff);
-private const int WM_SETTINGCHANGE = 0x1a;
-private const int SMTO_ABORTIFHUNG = 0x0002;
-
-[DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = false)]
-private static extern int SHChangeNotify(int eventId, int flags, IntPtr item1, IntPtr item2);
-[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = false)]
-private static extern IntPtr SendMessageTimeout(IntPtr hWnd, int Msg, IntPtr wParam, string lParam, int fuFlags, int uTimeout, IntPtr lpdwResult);
-
-public static void Refresh()
-{
-	// Update desktop icons
-	SHChangeNotify(0x8000000, 0x1000, IntPtr.Zero, IntPtr.Zero);
-
-	// Update environment variables
-	SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, IntPtr.Zero, null, SMTO_ABORTIFHUNG, 100, IntPtr.Zero);
-}
-"@
-}
-
-if (-not ("WinAPI.UpdateExplorer" -as [type]))
-{
-	Add-Type @UpdateExplorer
-}
-
-# Refresh desktop icons, environment variables, taskbar
-[WinAPI.UpdateExplorer]::Refresh()
