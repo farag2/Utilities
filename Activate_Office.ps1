@@ -23,7 +23,7 @@ cscript "$env:ProgramFiles\Microsoft Office\Office16\ospp.vbs" /setprt:1688 //no
 # Uninstall an installed product key with the last five digits of the product key to uninstall (as displayed by the /dstatus option)
 cscript "$env:ProgramFiles\Microsoft Office\Office16\ospp.vbs" /unpkey:"$KeyToRemove" //nologo
 
-# https://github.com/YerongAI/Office-Tool/blob/master/doc/Tech%20Articles/Licenses.md
+# https://docs.microsoft.com/en-us/deployoffice/vlactivation/gvlks
 # Office Professional Plus 2019: NMMKJ-6RK4F-KMJVX-8D9MJ-6MWKP
 # Office Standard 2019: 6NWWJ-YQWMR-QKGCB-6TMB3-9D9HK
 # Office Professional Plus 2021: FXYTK-NJJ8C-GB6DW-3DYQT-6F7TH 

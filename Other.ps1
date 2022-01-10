@@ -356,7 +356,7 @@ Get-ChildItem -Path "D:\folder" | Rename-Item -NewName {$_.Name.Replace("abc","c
 $Path = "D:\folder"
 Get-ChildItem -Path $Path | Rename-Item -NewName {$_.FullName.Replace(".txt1",".txt")}
 
-# Добавить REG_NONE
+# Add REG_NONE
 New-ItemProperty -Path HKCU:\Software -Name Name -PropertyType None -Value ([byte[]]@()) -Force
 
 # Binary
@@ -570,7 +570,7 @@ $ArrayList
 $ArrayList.Remove("Apple")
 $ArrayList
 
-# Конвертировать массив в System.Collections.ObjectModel.Collection`1
+# Conver an array into System.Collections.ObjectModel.Collection`1
 $Collection = {$Fruits}.Invoke()
 $Collection
 $Collection.GetType()
@@ -671,6 +671,15 @@ $Lines = @{
 }
 Get-ChildItem -Path "D:\Folder" -Recurse -File -Force | Where-Object -FilterScript {$_.PSParentPath -notmatch "sophos"} | ForEach-Object -Process {$_ | Select-Object -Property $FullName, $Lines} | Format-Table -AutoSize
 (Get-ChildItem -Path "D:\Folder" -Recurse -File -Force | Where-Object -FilterScript {$_.PSParentPath -notmatch "sophos"} | ForEach-Object -Process {(Get-Content -Path $_.FullName).Count} | Measure-Object -Sum).Sum
+
+# Count the total number of lines in all files in all subfolders
+$i = 0
+Get-ChildItem -Path "D:\folder" -Depth 0 -Exclude *.dll, *.winmd, *.ps1 -File -Recurse -Force | ForEach-Object -Process {
+    (Get-Content -Path $_.FullName -Raw | Measure-Object -Line).Lines | ForEach-Object -Process {
+        $i += $_
+    }
+}
+Write-Verbose -Message "Total number of lines is: $i" -Verbose
 
 # Error description
 function Convert-Error ([int]$ErrorCode)
@@ -805,7 +814,7 @@ foreach ($Path in $Paths.FullName)
 $ParentFolder = Split-Path -Path $Paths.FullName -Parent
 & compact.exe /U $ParentFolder 
 
-# Carve up IP addresses only
+# Isolate IP addresses only
 $Array = @('Handshake', 'Success', 'Status', 200, '192.30.253.113', 'OK', 0xF, "2001:4860:4860::8888")
 $Array | Where-Object -FiletScript {-not ($_ -as [Double]) -and ($_ -as [IPAddress])}
 
@@ -846,5 +855,5 @@ if ([System.Version]$CurrentVersion -lt [System.Version]"2.0")
 # Exclude KB update from installing
 (New-Object -ComObject Microsoft.Update.Session).CreateUpdateSearcher().Search("IsHidden = 0").Updates | Where-Object -FilterScript {$_.KBArticleIDs -eq "5005463"} | ForEach-Object -Process {$_.IsHidden = $true}
 
-# Download and install all Store related UWP packages
+# Download and install all Store related UWP packages. Even for LTSC
 wsreset -i

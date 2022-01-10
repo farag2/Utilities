@@ -38,11 +38,11 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\AIMP")
 	Get-ChildItem -Path "${env:ProgramFiles(x86)}\AIMP\Langs" -Exclude russian.lng -Force | Remove-Item -Force
 
 	$Arguments = @(
-		# Отключить интеграцию в контекстное меню Проводника
+		# Disable the context menu integration
 		"/REG=M0"
-		# Ассоциировать файлы с плеером
+		# Associate files with AIMP
 		"/REG=R1"
-		# Сделать плеер программой по умолчанию
+		# Make AIMP a default audio player
 		"/REG=R2"
 	)
 	Start-Process -FilePath "${env:ProgramFiles(x86)}\AIMP\Elevator.exe" -ArgumentList $Arguments
@@ -65,6 +65,9 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\AIMP")
 	}
 	Invoke-WebRequest @Parameters
 
+	# Save the current ID in the variable
+	$ID = Get-Content -Path "$env:APPDATA\AIMP\Skins\Default.ini" | Select-Object -Index 1
+
 	$Parameters = @{
 		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/Default.ini"
 		OutFile         = "$env:APPDATA\AIMP\Skins\Default.ini"
@@ -72,6 +75,10 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\AIMP")
 		Verbose         = $true
 	}
 	Invoke-WebRequest @Parameters
+
+	$Defaultini = Get-Content -Path "$env:APPDATA\AIMP\Skins\Default.ini" -Encoding Default
+	$Defaultini[1] = $ID
+	$Defaultini | Set-Content -Path "$env:APPDATA\AIMP\Skins\Default.ini" -Encoding Default -Force
 }
 
 # CCleaner
@@ -377,6 +384,10 @@ if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 	ExtractZIPFile @Parameters
 
 	Remove-Item -Path "$DownloadsFolder\qbt-theme.zip" -Force
+
+	# Enable dark theme
+	$qbtheme = (Resolve-Path -Path "$env:APPDATA\qBittorrent\darkstylesheet.qbtheme").Path.Replace("\", "/")
+	(Get-Content -Path "$env:APPDATA\qBittorrent\qBittorrent.ini" -Encoding Default) -replace "General\\CustomUIThemePath=", "General\CustomUIThemePath=$qbtheme" | Set-Content -Path "$env:APPDATA\qBittorrent\qBittorrent.ini" -Encoding Default -Force
 }
 
 # Steam
