@@ -255,6 +255,16 @@ else
 	$Terminal | Add-Member -Name confirmCloseAllTabs -MemberType NoteProperty -Value $false -Force
 }
 
+# Set default profile on PowerShell
+if ($Terminal.defaultProfile)
+{
+	$Terminal.defaultProfile = "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}"
+}
+else
+{
+	$Terminal | Add-Member -Name defaultProfile -MemberType NoteProperty -Value "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}" -Force
+}
+
 # Show tabs in title bar
 if ($Terminal.showTabsInTitlebar)
 {
@@ -413,21 +423,11 @@ if (Test-Path -Path "$env:ProgramFiles\PowerShell\7")
 	# Set the PowerShell 7 tab name
 	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).name)
 	{
-		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).name = "PowerShell 7"
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).name = "🏆 PowerShell 7"
 	}
 	else
 	{
-		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name name -Value "PowerShell 7" -Force
-	}
-
-	# Set the PowerShell 7 tab icon
-	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).icon)
-	{
-		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).icon = "🏆"
-	}
-	else
-	{
-		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name icon -Value "🏆" -Force
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name name -Value "🏆 PowerShell 7" -Force
 	}
 }
 
@@ -436,21 +436,11 @@ if (Test-Path -Path "$env:ProgramFiles\PowerShell\7-preview")
 	# Background image stretch mode
 	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).name)
 	{
-		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).name = "PowerShell 7 Preview"
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).name = "🐷 PowerShell 7 Preview"
 	}
 	else
 	{
-		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"} | Add-Member -MemberType NoteProperty -Name name -Value "PowerShell 7" -Force
-	}
-
-	# Set the icon that displays within the tab, dropdown menu, jumplist, and tab switcher
-	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).icon)
-	{
-		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).icon = "🐷"
-	}
-	else
-	{
-		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"} | Add-Member -MemberType NoteProperty -Name icon -Value "🐷" -Force
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"} | Add-Member -MemberType NoteProperty -Name name -Value "🐷 PowerShell 7 Preview" -Force
 	}
 }
 #endregion Powershell Core
