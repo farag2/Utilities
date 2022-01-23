@@ -178,13 +178,13 @@ else
 }
 
 # Removing all comments to parse JSON file
-if (Get-Content -Path $settings | Select-String -Pattern "//" -SimpleMatch)
+if (Get-Content -Path $settings -Force | Select-String -Pattern "//" -SimpleMatch)
 {
-	Set-Content -Path $settings -Value (Get-Content -Path $settings | Select-String -Pattern "//" -NotMatch) -Force
+	Set-Content -Path $settings -Value (Get-Content -Path $settings -Force | Select-String -Pattern "//" -NotMatch) -Force
 }
 
 # Deleting all blank lines from JSON file
-(Get-Content -Path $settings) | Where-Object -FilterScript {$_.Trim(" `t")} | Set-Content -Path $settings -Force
+(Get-Content -Path $settings -Force) | Where-Object -FilterScript {$_.Trim(" `t")} | Set-Content -Path $settings -Encoding UTF8 -Force
 
 try
 {
@@ -319,7 +319,7 @@ else
 }
 
 # Starting directory
-$DesktopFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name Desktop
+$DesktopFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name Desktop
 if ($Terminal.profiles.defaults.startingDirectory)
 {
 	$Terminal.profiles.defaults.startingDirectory = $DesktopFolder
@@ -456,7 +456,7 @@ if (Test-Path -Path "$env:ProgramFiles\PowerShell\7-preview")
 
 #endregion Powershell Core
 
-ConvertTo-Json -InputObject $Terminal -Depth 4 | Set-Content -Path $settings -Force
+ConvertTo-Json -InputObject $Terminal -Depth 4 | Set-Content -Path $settings -Encoding UTF8 -Force
 
 # Remove the "Open in Windows Terminal" context menu item
 if (-not (Test-Path -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked"))
