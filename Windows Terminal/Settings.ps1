@@ -178,9 +178,9 @@ else
 }
 
 # Removing all comments to parse JSON file
-if (Get-Content -Path $settings -Force | Select-String -Pattern "//" -SimpleMatch)
+if (Get-Content -Path $settings -Encoding UTF8 -Force | Select-String -Pattern "//" -SimpleMatch)
 {
-	Set-Content -Path $settings -Value (Get-Content -Path $settings -Force | Select-String -Pattern "//" -NotMatch) -Force
+	Set-Content -Path $settings -Value (Get-Content -Path $settings -Encoding UTF8 -Force | Select-String -Pattern "//" -NotMatch) -Encoding UTF8 -Force
 }
 
 # Deleting all blank lines from JSON file
@@ -188,7 +188,7 @@ if (Get-Content -Path $settings -Force | Select-String -Pattern "//" -SimpleMatc
 
 try
 {
-	$Terminal = Get-Content -Path $settings -Force | ConvertFrom-Json
+	$Terminal = Get-Content -Path $settings -Encoding UTF8 -Force | ConvertFrom-Json
 }
 catch [System.Exception]
 {
@@ -453,10 +453,11 @@ if (Test-Path -Path "$env:ProgramFiles\PowerShell\7-preview")
 		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"} | Add-Member -MemberType NoteProperty -Name icon -Value "🐷" -Force
 	}
 }
-
 #endregion Powershell Core
 
 ConvertTo-Json -InputObject $Terminal -Depth 4 | Set-Content -Path $settings -Encoding UTF8 -Force
+# Re-save in UTF8 without BOM due to JSON must not has the BOM: https://datatracker.ietf.org/doc/html/rfc8259#section-8.1
+Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path $settings -Raw)) -Encoding Byte -Path $settings -Force
 
 # Remove the "Open in Windows Terminal" context menu item
 if (-not (Test-Path -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked"))
