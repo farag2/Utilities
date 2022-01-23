@@ -857,3 +857,6 @@ if ([System.Version]$CurrentVersion -lt [System.Version]"2.0")
 
 # Download and install all Store related UWP packages. Even for LTSC
 wsreset -i
+
+# Save file in the UTF-8 without BOM encoding
+Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path $settings -Raw)) -Encoding Byte -Path $settings -Force
