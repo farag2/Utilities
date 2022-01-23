@@ -456,7 +456,7 @@ if (Test-Path -Path "$env:ProgramFiles\PowerShell\7-preview")
 #endregion Powershell Core
 
 ConvertTo-Json -InputObject $Terminal -Depth 4 | Set-Content -Path $settings -Encoding UTF8 -Force
-# Re-save in UTF8 without BOM due to JSON must not has the BOM: https://datatracker.ietf.org/doc/html/rfc8259#section-8.1
+# Re-save in the UTF-8 without BOM encoding due to JSON must not has the BOM: https://datatracker.ietf.org/doc/html/rfc8259#section-8.1
 Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path $settings -Raw)) -Encoding Byte -Path $settings -Force
 
 # Remove the "Open in Windows Terminal" context menu item
