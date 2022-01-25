@@ -178,17 +178,17 @@ else
 }
 
 # Removing all comments to parse JSON file
-if (Get-Content -Path $settings | Select-String -Pattern "//" -SimpleMatch)
+if (Get-Content -Path $settings -Encoding UTF8 -Force | Select-String -Pattern "//" -SimpleMatch)
 {
-	Set-Content -Path $settings -Value (Get-Content -Path $settings | Select-String -Pattern "//" -NotMatch) -Force
+	Set-Content -Path $settings -Value (Get-Content -Path $settings -Encoding UTF8 -Force | Select-String -Pattern "//" -NotMatch) -Encoding UTF8 -Force
 }
 
 # Deleting all blank lines from JSON file
-(Get-Content -Path $settings) | Where-Object -FilterScript {$_.Trim(" `t")} | Set-Content -Path $settings -Force
+(Get-Content -Path $settings -Force) | Where-Object -FilterScript {$_.Trim(" `t")} | Set-Content -Path $settings -Encoding UTF8 -Force
 
 try
 {
-	$Terminal = Get-Content -Path $settings -Force | ConvertFrom-Json
+	$Terminal = Get-Content -Path $settings -Encoding UTF8 -Force | ConvertFrom-Json
 }
 catch [System.Exception]
 {
@@ -255,6 +255,16 @@ else
 	$Terminal | Add-Member -Name confirmCloseAllTabs -MemberType NoteProperty -Value $false -Force
 }
 
+# Set default profile on PowerShell
+if ($Terminal.defaultProfile)
+{
+	$Terminal.defaultProfile = "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}"
+}
+else
+{
+	$Terminal | Add-Member -Name defaultProfile -MemberType NoteProperty -Value "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}" -Force
+}
+
 # Show tabs in title bar
 if ($Terminal.showTabsInTitlebar)
 {
@@ -319,7 +329,7 @@ else
 }
 
 # Starting directory
-$DesktopFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name Desktop
+$DesktopFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name Desktop
 if ($Terminal.profiles.defaults.startingDirectory)
 {
 	$Terminal.profiles.defaults.startingDirectory = $DesktopFolder
@@ -413,21 +423,11 @@ if (Test-Path -Path "$env:ProgramFiles\PowerShell\7")
 	# Set the PowerShell 7 tab name
 	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).name)
 	{
-		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).name = "PowerShell 7"
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).name = "🏆 PowerShell 7"
 	}
 	else
 	{
-		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name name -Value "PowerShell 7" -Force
-	}
-
-	# Set the PowerShell 7 tab icon
-	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).icon)
-	{
-		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).icon = "🏆"
-	}
-	else
-	{
-		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name icon -Value "🏆" -Force
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name name -Value "🏆 PowerShell 7" -Force
 	}
 }
 
@@ -436,27 +436,18 @@ if (Test-Path -Path "$env:ProgramFiles\PowerShell\7-preview")
 	# Background image stretch mode
 	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).name)
 	{
-		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).name = "PowerShell 7 Preview"
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).name = "🐷 PowerShell 7 Preview"
 	}
 	else
 	{
-		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"} | Add-Member -MemberType NoteProperty -Name name -Value "PowerShell 7" -Force
-	}
-
-	# Set the icon that displays within the tab, dropdown menu, jumplist, and tab switcher
-	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).icon)
-	{
-		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"}).icon = "🐷"
-	}
-	else
-	{
-		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"} | Add-Member -MemberType NoteProperty -Name icon -Value "🐷" -Force
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{a3a2e83a-884a-5379-baa8-16f193a13b21}"} | Add-Member -MemberType NoteProperty -Name name -Value "🐷 PowerShell 7 Preview" -Force
 	}
 }
-
 #endregion Powershell Core
 
-ConvertTo-Json -InputObject $Terminal -Depth 4 | Set-Content -Path $settings -Force
+ConvertTo-Json -InputObject $Terminal -Depth 4 | Set-Content -Path $settings -Encoding UTF8 -Force
+# Re-save in the UTF-8 without BOM encoding due to JSON must not has the BOM: https://datatracker.ietf.org/doc/html/rfc8259#section-8.1
+Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path $settings -Raw)) -Encoding Byte -Path $settings -Force
 
 # Remove the "Open in Windows Terminal" context menu item
 if (-not (Test-Path -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked"))
