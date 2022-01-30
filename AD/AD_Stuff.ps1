@@ -34,7 +34,20 @@ Get-ADUser -SearchBase "OU=XX, OU=XX, OU=XX, OU=XX, OU=XX, DC=XX, DC=XX, DC=XX" 
 (Get-ADUser -SearchBase "OU=XX, OU=XX, OU=XX, OU=XX, OU=XX, DC=XX, DC=XX, DC=XX" -Filter * -Properties l | Where-Object -FilterScript {$_.l -match "Moscow"}).SamAccountName
 
 # Find users by position
-(Get-ADUser -SearchBase "OU=Regional, OU=RU, OU=EMEA, OU=USR, OU=CORP, DC=eur, DC=mccormick, DC=com" -Filter * -Properties * | Where-Object -FilterScript {$_.Title -like "*volgograd*"}).SamAccountName
+(Get-ADUser -SearchBase "OU=XX, OU=XX, OU=XX, OU=XX, OU=XX, DC=XX, DC=XX, DC=XX" -Filter * -Properties * | Where-Object -FilterScript {$_.Title -like "*volgograd*"}).SamAccountName
+
+# Change the physicalDeliveryOfficeName property
+Get-ADUser -SearchBase "OU=XX, OU=XX, OU=XX, OU=XX, OU=XX, DC=XX, DC=XX, DC=XX" -Filter * -Properties physicalDeliveryOfficeName | Where-Object -FilterScript {($_.Enabled) -and ($_.physicalDeliveryOfficeName -ne "XX")} | ForEach-Object -Process {
+	[PSCustomObject] @{
+		Name	 = $_.Name
+		userID   = (Get-ADUser -Identity $_).SamAccountName
+	}
+
+	Write-Verbose -Message "Changing $_" -Verbose
+	Get-ADUser -Identity $_.SamAccountName | ForEach-Object -Process {
+		Set-ADUser -Identity $_ -Replace @{physicalDeliveryOfficeName = "XXX"}
+	}
+}
 
 # Install ExchangeOnlineManagement
 Install-Module -Name ExchangeOnlineManagement -Force
