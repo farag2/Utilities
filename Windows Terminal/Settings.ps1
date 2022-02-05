@@ -275,14 +275,14 @@ else
 	$Terminal | Add-Member -Name showTabsInTitlebar -MemberType NoteProperty -Value $false -Force
 }
 
-# Restore previous tabs and panes after relaunching
+# Do not restore previous tabs and panes after relaunching
 if ($Terminal.firstWindowPreference)
 {
-	$Terminal.firstWindowPreference = $false
+	$Terminal.firstWindowPreference = "defaultProfile"
 }
 else
 {
-	$Terminal | Add-Member -Name firstWindowPreference -MemberType NoteProperty -Value persistedWindowLayout -Force
+	$Terminal | Add-Member -Name firstWindowPreference -MemberType NoteProperty -Value "defaultProfile" -Force
 }
 #endregion General
 
@@ -417,6 +417,30 @@ else
 }
 #endregion Azure
 
+#region Powershell
+# Run this profile as Administrator by default
+if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}"}).elevate)
+{
+	($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}"}).elevate = $true
+}
+else
+{
+	$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}"} | Add-Member -MemberType NoteProperty -Name elevate -Value $true -Force
+}
+#endregion Powershell
+
+#region Command Prompt
+# Run this profile as Administrator by default
+if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}"}).elevate)
+{
+	($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}"}).elevate = $true
+}
+else
+{
+	$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}"} | Add-Member -MemberType NoteProperty -Name elevate -Value $true -Force
+}
+#endregion Command Prompt
+
 #region Powershell Core
 if (Test-Path -Path "$env:ProgramFiles\PowerShell\7")
 {
@@ -428,6 +452,16 @@ if (Test-Path -Path "$env:ProgramFiles\PowerShell\7")
 	else
 	{
 		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name name -Value "🏆 PowerShell 7" -Force
+	}
+
+	# Run this profile as Administrator by default
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).elevate)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).elevate = $true
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name elevate -Value $true -Force
 	}
 }
 
