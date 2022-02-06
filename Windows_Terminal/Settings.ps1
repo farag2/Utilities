@@ -156,7 +156,7 @@ if ([System.Version]$CurrentPSReadlineVersion -eq [System.Version]$LatestPSReadL
 if (-not (Test-Path -Path "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\Windows95.gif"))
 {
 	$Parameters = @{
-		Uri             = "https://github.com/farag2/Utilities/raw/master/Windows%20Terminal/Windows95.gif"
+		Uri             = "https://github.com/farag2/Utilities/raw/master/Windows_Terminal/Windows95.gif"
 		OutFile         = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\Windows95.gif"
 		UseBasicParsing = $true
 		Verbose         = $true
