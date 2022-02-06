@@ -369,6 +369,17 @@ else
 	$Terminal.profiles.defaults | Add-Member -Name useAcrylic -MemberType NoteProperty -Value $true -Force
 }
 
+
+# Run profile as Administrator by default
+if ($Terminal.profiles.defaults.elevate)
+{
+	$Terminal.profiles.defaults.elevate = $true
+}
+else
+{
+	$Terminal.profiles.defaults | Add-Member -MemberType NoteProperty -Name elevate -Value $true -Force
+}
+
 # Set "Cascadia Mono" as a default font
 [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing") | Out-Null
 
@@ -416,30 +427,6 @@ else
 	$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{b453ae62-4e3d-5e58-b989-0a998ec441b8}"} | Add-Member -MemberType NoteProperty -Name hidden -Value $true -Force
 }
 #endregion Azure
-
-#region Powershell
-# Run this profile as Administrator by default
-if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}"}).elevate)
-{
-	($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}"}).elevate = $true
-}
-else
-{
-	$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}"} | Add-Member -MemberType NoteProperty -Name elevate -Value $true -Force
-}
-#endregion Powershell
-
-#region Command Prompt
-# Run this profile as Administrator by default
-if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}"}).elevate)
-{
-	($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}"}).elevate = $true
-}
-else
-{
-	$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}"} | Add-Member -MemberType NoteProperty -Name elevate -Value $true -Force
-}
-#endregion Command Prompt
 
 #region Powershell Core
 if (Test-Path -Path "$env:ProgramFiles\PowerShell\7")
