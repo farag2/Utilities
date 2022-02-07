@@ -257,6 +257,8 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	$config.NotepadPlus.FindHistory | ForEach-Object -Process {$_.isSearch2ButtonsMode = "yes"}
 	# Wrap around
 	$config.NotepadPlus.FindHistory | ForEach-Object -Process {$_.wrap = "yes"}
+	# Disable creating backups
+	$config.NotepadPlus.GUIConfigs.GUIConfig | Where-Object -FilterScript {$_.name -eq "Backup"} | ForEach-Object -Process {$_.action = "0"}
 	$config.Save("$env:APPDATA\Notepad++\config.xml")
 
 	if (-not (Test-Path -Path $env:ProgramFiles\Notepad++\localization))
