@@ -156,7 +156,7 @@ if ([System.Version]$CurrentPSReadlineVersion -eq [System.Version]$LatestPSReadL
 if (-not (Test-Path -Path "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\Windows95.gif"))
 {
 	$Parameters = @{
-		Uri             = "https://github.com/farag2/Utilities/raw/master/Windows%20Terminal/Windows95.gif"
+		Uri             = "https://github.com/farag2/Utilities/raw/master/Windows_Terminal/Windows95.gif"
 		OutFile         = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\Windows95.gif"
 		UseBasicParsing = $true
 		Verbose         = $true
@@ -275,14 +275,14 @@ else
 	$Terminal | Add-Member -Name showTabsInTitlebar -MemberType NoteProperty -Value $false -Force
 }
 
-# Restore previous tabs and panes after relaunching
+# Do not restore previous tabs and panes after relaunching
 if ($Terminal.firstWindowPreference)
 {
-	$Terminal.firstWindowPreference = $false
+	$Terminal.firstWindowPreference = "defaultProfile"
 }
 else
 {
-	$Terminal | Add-Member -Name firstWindowPreference -MemberType NoteProperty -Value persistedWindowLayout -Force
+	$Terminal | Add-Member -Name firstWindowPreference -MemberType NoteProperty -Value "defaultProfile" -Force
 }
 #endregion General
 
@@ -369,6 +369,17 @@ else
 	$Terminal.profiles.defaults | Add-Member -Name useAcrylic -MemberType NoteProperty -Value $true -Force
 }
 
+
+# Run profile as Administrator by default
+if ($Terminal.profiles.defaults.elevate)
+{
+	$Terminal.profiles.defaults.elevate = $true
+}
+else
+{
+	$Terminal.profiles.defaults | Add-Member -MemberType NoteProperty -Name elevate -Value $true -Force
+}
+
 # Set "Cascadia Mono" as a default font
 [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing") | Out-Null
 
@@ -428,6 +439,16 @@ if (Test-Path -Path "$env:ProgramFiles\PowerShell\7")
 	else
 	{
 		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name name -Value "🏆 PowerShell 7" -Force
+	}
+
+	# Run this profile as Administrator by default
+	if (($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).elevate)
+	{
+		($Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"}).elevate = $true
+	}
+	else
+	{
+		$Terminal.profiles.list | Where-Object -FilterScript {$_.guid -eq "{574e775e-4f2a-5b96-ac1e-a2962a402336}"} | Add-Member -MemberType NoteProperty -Name elevate -Value $true -Force
 	}
 }
 
