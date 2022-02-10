@@ -860,3 +860,22 @@ wsreset -i
 
 # Save file in the UTF-8 without BOM encoding
 Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path $settings -Raw)) -Encoding Byte -Path $settings -Force
+
+# Check for a Windows Update pending reboot
+$Parameters = @{
+	Namespace  = "root\CIMv2"
+	ClassName  = "StdRegProv"
+	MethodName = "EnumKey"
+}
+
+$Parameters.Arguments = @{
+	hDefKey     = [UInt32]2147483650
+	sSubKeyName = "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
+}
+(Invoke-CimMethod @invokeWmiMethodParameters).sNames -contains "RebootPending"
+
+$Parameters.Arguments = @{
+	hDefKey     = [UInt32]2147483650
+	sSubKeyName = "SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update"
+}
+(Invoke-CimMethod @invokeWmiMethodParameters).sNames -contains "RebootRequired"
