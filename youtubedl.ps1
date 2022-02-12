@@ -50,12 +50,12 @@ function youtube-dl
 	Invoke-WebRequest @Parameters
 
 	# Get the latest FFmpeg URL
+    # "ffmpeg-*-win64-lgpl-[0-9].[0-9].zip"
 	$Parameters = @{
 		Uri              = "https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/latest"
 		UseBasicParsing  = $true
 	}
-	$LatestFFmpegURL = ((Invoke-RestMethod @Parameters).assets | Where-Object -FilterScript {$_.browser_download_url -like "*ffmpeg-*-win64-lgpl-[0-9].[0-9].zip"}).browser_download_url
-
+	$LatestFFmpegURL = ((Invoke-RestMethod @Parameters).assets | Where-Object -FilterScript {$_.name -match "ffmpeg-n5.0-latest-win64-gpl-5.0.zip"}).browser_download_url
 	$Parameters = @{
 		Uri              = $LatestFFmpegURL
 		OutFile          = "$DownloadsFolder\FFmpeg.zip"
@@ -86,4 +86,4 @@ function youtube-dl
 		Start-Process -FilePath $Path -ArgumentList "--output `"$OutputFolder\$FileName`" --format $Format $URL"
 	}
 }
-youtube-dl -Path "D:\Downloads\youtube-dl.exe" -URLs https://youtu.be/MbpqmpK2JNM -Format "22+251"
+youtube-dl -Path "D:\Downloads\youtube-dl.exe" -URLs @("https://youtu.be/qDHBoSJe5X0") -Format "248+140"
