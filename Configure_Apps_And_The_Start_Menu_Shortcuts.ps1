@@ -272,6 +272,9 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 		Verbose         = $true
 	}
 	Invoke-WebRequest @Parameters
+
+	# Open the config file to apply all changes
+	Start-Process -FilePath "$env:APPDATA\Notepad++\config.xml"
 }
 
 # Office
