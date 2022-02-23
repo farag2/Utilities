@@ -879,3 +879,12 @@ $Parameters.Arguments = @{
 	sSubKeyName = "SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update"
 }
 (Invoke-CimMethod @invokeWmiMethodParameters).sNames -contains "RebootRequired"
+
+# Sinve Windows 22H2 22557 build
+# https://en.wikipedia.org/wiki/IETF_language_tag
+# LanguagePackManagement module
+Install-Language -Language en-US
+Get-InstalledLanguage
+Set-SystemPreferredUILanguage
+Get-SystemPreferredUILanguage
+Uninstall-Language
