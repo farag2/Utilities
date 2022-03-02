@@ -880,7 +880,7 @@ $Parameters.Arguments = @{
 }
 (Invoke-CimMethod @invokeWmiMethodParameters).sNames -contains "RebootRequired"
 
-# Sinve Windows 22H2 22557 build
+# Since Windows 22H2 22557 build
 # https://en.wikipedia.org/wiki/IETF_language_tag
 # LanguagePackManagement module
 Install-Language -Language en-US
@@ -888,3 +888,7 @@ Get-InstalledLanguage
 Set-SystemPreferredUILanguage
 Get-SystemPreferredUILanguage
 Uninstall-Language
+
+# Bypass the Internet account creation in Windows 11
+# Shift+F10
+OOBE\BYPASSNRO
