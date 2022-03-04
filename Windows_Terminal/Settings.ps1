@@ -49,7 +49,7 @@ if ($null -eq (Get-Module -Name PowerShellGet -ErrorAction Ignore))
 	try
 	{
 		Import-Module -Name PowerShellGet -Force -ErrorAction Stop
-		$CurrentPowerShellGetVersion = (Get-Module -Name PowerShellGet).Version.ToString()
+		$CurrentPowerShellGetVersion = (Get-Module -Name PowerShellGet | Select-Object -Index 0).Version.ToString()
 	}
 	catch
 	{
@@ -72,7 +72,7 @@ if ($null -eq (Get-Module -Name PowerShellGet -ErrorAction Ignore))
 }
 else
 {
-	$CurrentPowerShellGetVersion = (Get-Module -Name PowerShellGet).Version.ToString()
+	$CurrentPowerShellGetVersion = (Get-Module -Name PowerShellGet | Select-Object -Index 0).Version.ToString()
 }
 
 if ([System.Version]$CurrentPowerShellGetVersion -lt [System.Version]"2.2.5")
@@ -114,7 +114,6 @@ $Parameters = @{
 }
 $LatestPSReadLineVersion = (Invoke-RestMethod @Parameters | Where-Object -FilterScript {$_.prerelease -eq $true}).tag_name.Replace("v", "") | Select-Object -First 1
 # Remove "-beta" in the release version
-$LatestPSReadLineVersion = $LatestPSReadLineVersion.Substring(0, $LatestPSReadLineVersion.IndexOf('-'))
 
 if ($null -eq (Get-Module -Name PSReadline -ListAvailable -ErrorAction Ignore))
 {
