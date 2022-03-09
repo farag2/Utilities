@@ -3,7 +3,9 @@ exit
 $Bundles = (Get-AppXPackage -PackageTypeFilter Framework -AllUsers).PackageFullName
 Get-ChildItem -Path "HKLM:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\PackageRepository\Packages" | ForEach-Object -Process {
 	Get-ItemProperty -Path $_.PSPath
-} | Where-Object -FilterScript {$_.Path -match "Program Files"} | Where-Object -FilterScript {$_.PSChildName -notin $Bundles} | Where-Object -FilterScript {$_.Path -match "x64"} | ForEach-Object -Process {"$($_.Path)\AppxManifest.xml"} | Add-AppxPackage -Register -ForceApplicationShutdown -ForceUpdateFromAnyVersion -DisableDevelopmentMode -Verbose
+} | Where-Object -FilterScript {$_.Path -match "Program Files"} | Where-Object -FilterScript {$_.PSChildName -notin $Bundles} | Where-Object -FilterScript {$_.Path -match "x64"} | ForEach-Object -Process {
+	"$($_.Path)\AppxManifest.xml"
+} | Add-AppxPackage -Register -ForceApplicationShutdown -ForceUpdateFromAnyVersion -DisableDevelopmentMode -Verbose
 # Check for UWP apps updates
 Get-CimInstance -Namespace "Root\cimv2\mdm\dmmap" -ClassName "MDM_EnterpriseModernAppManagement_AppManagement01" | Invoke-CimMethod -MethodName UpdateScanMethod
 
