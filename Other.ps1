@@ -848,9 +848,7 @@ usoclient StartScan
 # Check whether fTPM 2.0 supported
 $CurrentVersion = (Get-CimInstance -Namespace root/cimv2/Security/MicrosoftTpm -ClassName Win32_Tpm).SpecVersion.Split(",").Trim() | Select-Object -First 1
 if ([System.Version]$CurrentVersion -lt [System.Version]"2.0")
-{
-	
-}
+{}
 
 # Exclude KB update from installing
 (New-Object -ComObject Microsoft.Update.Session).CreateUpdateSearcher().Search("IsHidden = 0").Updates | Where-Object -FilterScript {$_.KBArticleIDs -eq "5005463"} | ForEach-Object -Process {$_.IsHidden = $true}
@@ -859,7 +857,7 @@ if ([System.Version]$CurrentVersion -lt [System.Version]"2.0")
 wsreset -i
 
 # Save file in the UTF-8 without BOM encoding
-Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path $settings -Raw)) -Encoding Byte -Path $settings -Force
+Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path d:\file.txt -Raw)) -Encoding Byte -Path $settings -Force
 
 # Check for a Windows Update pending reboot
 $Parameters = @{
@@ -872,13 +870,13 @@ $Parameters.Arguments = @{
 	hDefKey     = [UInt32]2147483650
 	sSubKeyName = "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
 }
-(Invoke-CimMethod @invokeWmiMethodParameters).sNames -contains "RebootPending"
+(Invoke-CimMethod @Parameters).sNames -contains "RebootPending"
 
 $Parameters.Arguments = @{
 	hDefKey     = [UInt32]2147483650
 	sSubKeyName = "SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update"
 }
-(Invoke-CimMethod @invokeWmiMethodParameters).sNames -contains "RebootRequired"
+(Invoke-CimMethod @Parameters).sNames -contains "RebootRequired"
 
 # Since Windows 22H2 22557 build
 # https://en.wikipedia.org/wiki/IETF_language_tag
@@ -892,3 +890,12 @@ Uninstall-Language
 # Bypass the Internet account creation in Windows 11
 # Shift+F10
 OOBE\BYPASSNRO
+
+# Download the latest russia-blacklist.txt version
+# https://github.com/ValdikSS/GoodbyeDPI
+$Parameters = @{
+	Uri              = "https://antizapret.prostovpn.org/domains-export.txt"
+	UseBasicParsing  = $true
+}
+Invoke-RestMethod @Parameters | Set-Content -Encoding UTF8 -Path "$PSScriptRoot\russia-blacklist.txt" -Force
+Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path "$PSScriptRoot\russia-blacklist.txt" -Raw)) -Encoding Byte -Path "$PSScriptRoot\russia-blacklist.txt" -Force
