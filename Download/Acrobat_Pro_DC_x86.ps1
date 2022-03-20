@@ -174,7 +174,10 @@ $CmdLine = @(
 	"REMOVE_PREVIOUS=YES",
 	"IGNOREVCRT64=1",
 	"EULA_ACCEPT=YES",
-	"DISABLE_PDFMAKER=YES"
+	"DISABLE_PDFMAKER=YES",
+	"DISABLEDESKTOPSHORTCUT=2",
+	# Install updates automatically
+	"UPDATE_MODE=3"
 )
 
 $LCID = (Get-WinSystemLocale).LCID
