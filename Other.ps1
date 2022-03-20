@@ -901,3 +901,7 @@ $Parameters = @{
 }
 Invoke-RestMethod @Parameters | Set-Content -Encoding UTF8 -Path "$PSScriptRoot\russia-blacklist.txt" -Force
 Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path "$PSScriptRoot\russia-blacklist.txt" -Raw)) -Encoding Byte -Path "$PSScriptRoot\russia-blacklist.txt" -Force
+
+# Get the NVIdia driver version
+$driver = (Get-CimInstance -ClassName CIM_VideoController | Where-Object -FilterScript {$_.Name -match "NVIDIA"}).DriverVersion | Select-Object -Index 0
+([regex]"[0-9.]{6}$").Match($driver_version).Value.Replace(".","").Insert(3,".")
