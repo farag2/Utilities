@@ -859,7 +859,7 @@ if ([System.Version]$CurrentVersion -lt [System.Version]"2.0")
 wsreset -i
 
 # Save file in the UTF-8 without BOM encoding
-Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path d:\file.txt -Raw)) -Encoding Byte -Path $settings -Force
+Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path d:\file.txt -Raw)) -Encoding Byte -Path d:\file.txt -Force
 
 # Check for a Windows Update pending reboot
 $Parameters = @{
