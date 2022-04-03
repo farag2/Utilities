@@ -905,3 +905,7 @@ Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList 
 # Get the NVIdia driver version
 $driver = (Get-CimInstance -ClassName CIM_VideoController | Where-Object -FilterScript {$_.Name -match "NVIDIA"}).DriverVersion | Select-Object -Index 0
 ([regex]"[0-9.]{6}$").Match($driver_version).Value.Replace(".","").Insert(3,".")
+
+# Prevent Windows to restart automatically after a system failure
+# The parameter EnableAllPrivileges allows us to manipulate the properties of this WMI object if the current Powershell host runs as Administrator
+Get-CimInstance -ClassName Win32_OSRecoveryConfiguration | Set-CIMInstance -Arguments @{AutoReboot = $false}
