@@ -392,7 +392,8 @@ if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 
 	# Enable dark theme
 	$qbtheme = (Resolve-Path -Path "$env:APPDATA\qBittorrent\darkstylesheet.qbtheme").Path.Replace("\", "/")
-	(Get-Content -Path "$env:APPDATA\qBittorrent\qBittorrent.ini" -Encoding Default) -replace "General\\CustomUIThemePath=", "General\CustomUIThemePath=$qbtheme" | Set-Content -Path "$env:APPDATA\qBittorrent\qBittorrent.ini" -Encoding Default -Force
+	# Save qBittorrent.ini in UTF8-BOM encoding to make it work with non-latin usernames
+	(Get-Content -Path "$env:APPDATA\qBittorrent\qBittorrent.ini" -Encoding UTF8) -replace "General\\CustomUIThemePath=", "General\CustomUIThemePath=$qbtheme" | Set-Content -Path "$env:APPDATA\qBittorrent\qBittorrent.ini" -Encoding UTF8 -Force
 }
 
 # Steam
