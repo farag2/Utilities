@@ -909,3 +909,6 @@ $driver = (Get-CimInstance -ClassName CIM_VideoController | Where-Object -Filter
 # Prevent Windows to restart automatically after a system failure
 # The parameter EnableAllPrivileges allows us to manipulate the properties of this WMI object if the current Powershell host runs as Administrator
 Get-CimInstance -ClassName Win32_OSRecoveryConfiguration | Set-CIMInstance -Arguments @{AutoReboot = $false}
+
+# Send firmware to HP MFU to upgrade
+copy /b D:\firmware.rfu \\print_server\MFU
