@@ -499,4 +499,3 @@ if ([System.Version]$TerminalVersion -ge [System.Version]"1.11")
 		}
 	}
 }
-				}
