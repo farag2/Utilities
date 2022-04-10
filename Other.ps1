@@ -3,7 +3,9 @@ exit
 $Bundles = (Get-AppXPackage -PackageTypeFilter Framework -AllUsers).PackageFullName
 Get-ChildItem -Path "HKLM:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\PackageRepository\Packages" | ForEach-Object -Process {
 	Get-ItemProperty -Path $_.PSPath
-} | Where-Object -FilterScript {$_.Path -match "Program Files"} | Where-Object -FilterScript {$_.PSChildName -notin $Bundles} | Where-Object -FilterScript {$_.Path -match "x64"} | ForEach-Object -Process {"$($_.Path)\AppxManifest.xml"} | Add-AppxPackage -Register -ForceApplicationShutdown -ForceUpdateFromAnyVersion -DisableDevelopmentMode -Verbose
+} | Where-Object -FilterScript {$_.Path -match "Program Files"} | Where-Object -FilterScript {$_.PSChildName -notin $Bundles} | Where-Object -FilterScript {$_.Path -match "x64"} | ForEach-Object -Process {
+	"$($_.Path)\AppxManifest.xml"
+} | Add-AppxPackage -Register -ForceApplicationShutdown -ForceUpdateFromAnyVersion -DisableDevelopmentMode -Verbose
 # Check for UWP apps updates
 Get-CimInstance -Namespace "Root\cimv2\mdm\dmmap" -ClassName "MDM_EnterpriseModernAppManagement_AppManagement01" | Invoke-CimMethod -MethodName UpdateScanMethod
 
@@ -848,9 +850,7 @@ usoclient StartScan
 # Check whether fTPM 2.0 supported
 $CurrentVersion = (Get-CimInstance -Namespace root/cimv2/Security/MicrosoftTpm -ClassName Win32_Tpm).SpecVersion.Split(",").Trim() | Select-Object -First 1
 if ([System.Version]$CurrentVersion -lt [System.Version]"2.0")
-{
-	
-}
+{}
 
 # Exclude KB update from installing
 (New-Object -ComObject Microsoft.Update.Session).CreateUpdateSearcher().Search("IsHidden = 0").Updates | Where-Object -FilterScript {$_.KBArticleIDs -eq "5005463"} | ForEach-Object -Process {$_.IsHidden = $true}
@@ -859,7 +859,7 @@ if ([System.Version]$CurrentVersion -lt [System.Version]"2.0")
 wsreset -i
 
 # Save file in the UTF-8 without BOM encoding
-Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path $settings -Raw)) -Encoding Byte -Path $settings -Force
+Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path d:\file.txt -Raw)) -Encoding Byte -Path d:\file.txt -Force
 
 # Check for a Windows Update pending reboot
 $Parameters = @{
@@ -872,15 +872,15 @@ $Parameters.Arguments = @{
 	hDefKey     = [UInt32]2147483650
 	sSubKeyName = "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
 }
-(Invoke-CimMethod @invokeWmiMethodParameters).sNames -contains "RebootPending"
+(Invoke-CimMethod @Parameters).sNames -contains "RebootPending"
 
 $Parameters.Arguments = @{
 	hDefKey     = [UInt32]2147483650
 	sSubKeyName = "SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update"
 }
-(Invoke-CimMethod @invokeWmiMethodParameters).sNames -contains "RebootRequired"
+(Invoke-CimMethod @Parameters).sNames -contains "RebootRequired"
 
-# Sinve Windows 22H2 22557 build
+# Since Windows 22H2 22557 build
 # https://en.wikipedia.org/wiki/IETF_language_tag
 # LanguagePackManagement module
 Install-Language -Language en-US
@@ -888,3 +888,27 @@ Get-InstalledLanguage
 Set-SystemPreferredUILanguage
 Get-SystemPreferredUILanguage
 Uninstall-Language
+
+# Bypass the Internet account creation in Windows 11
+# Shift+F10
+OOBE\BYPASSNRO
+
+# Download the latest russia-blacklist.txt version
+# https://github.com/ValdikSS/GoodbyeDPI
+$Parameters = @{
+	Uri              = "https://antizapret.prostovpn.org/domains-export.txt"
+	UseBasicParsing  = $true
+}
+Invoke-RestMethod @Parameters | Set-Content -Encoding UTF8 -Path "$PSScriptRoot\russia-blacklist.txt" -Force
+Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path "$PSScriptRoot\russia-blacklist.txt" -Raw)) -Encoding Byte -Path "$PSScriptRoot\russia-blacklist.txt" -Force
+
+# Get the NVIdia driver version
+$driver = (Get-CimInstance -ClassName CIM_VideoController | Where-Object -FilterScript {$_.Name -match "NVIDIA"}).DriverVersion | Select-Object -Index 0
+([regex]"[0-9.]{6}$").Match($driver_version).Value.Replace(".","").Insert(3,".")
+
+# Prevent Windows to restart automatically after a system failure
+# The parameter EnableAllPrivileges allows us to manipulate the properties of this WMI object if the current Powershell host runs as Administrator
+Get-CimInstance -ClassName Win32_OSRecoveryConfiguration | Set-CIMInstance -Arguments @{AutoReboot = $false}
+
+# Send firmware to HP MFU to upgrade
+copy /b D:\firmware.rfu \\print_server\MFU

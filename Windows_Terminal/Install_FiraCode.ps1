@@ -4,10 +4,10 @@
 $Tag = (Invoke-RestMethod -Uri "https://api.github.com/repos/tonsky/FiraCode/releases/latest").tag_name
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
-	Uri     = "https://github.com/tonsky/FiraCode/releases/download/$Tag/Fira_Code_v$Tag.zip"
-	OutFile = "$DownloadsFolder\Fira_Code_v$Tag.zip"
+	Uri             = "https://github.com/tonsky/FiraCode/releases/download/$Tag/Fira_Code_v$Tag.zip"
+	OutFile         = "$DownloadsFolder\Fira_Code_v$Tag.zip"
 	UseBasicParsing = $true
-	Verbose = $true
+	Verbose         = $true
 }
 Invoke-WebRequest @Parameters
 

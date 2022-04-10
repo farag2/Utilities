@@ -392,7 +392,8 @@ if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 
 	# Enable dark theme
 	$qbtheme = (Resolve-Path -Path "$env:APPDATA\qBittorrent\darkstylesheet.qbtheme").Path.Replace("\", "/")
-	(Get-Content -Path "$env:APPDATA\qBittorrent\qBittorrent.ini" -Encoding Default) -replace "General\\CustomUIThemePath=", "General\CustomUIThemePath=$qbtheme" | Set-Content -Path "$env:APPDATA\qBittorrent\qBittorrent.ini" -Encoding Default -Force
+	# Save qBittorrent.ini in UTF8-BOM encoding to make it work with non-latin usernames
+	(Get-Content -Path "$env:APPDATA\qBittorrent\qBittorrent.ini" -Encoding UTF8) -replace "General\\CustomUIThemePath=", "General\CustomUIThemePath=$qbtheme" | Set-Content -Path "$env:APPDATA\qBittorrent\qBittorrent.ini" -Encoding UTF8 -Force
 }
 
 # Steam
@@ -425,6 +426,9 @@ if (Test-Path -Path "$env:ProgramFiles\WinRAR")
 	{
 		Copy-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\WinRAR\WinRAR.lnk" -Destination "$env:ProgramData\Microsoft\Windows\Start Menu\Programs" -Force
 	}
+
+	Remove-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\WinRAR" -Recurse -Force -ErrorAction Igrnore
+
 	$Remove = @(
 		"$env:ProgramData\Microsoft\Windows\Start Menu\Programs\WinRAR",
 		"$env:APPDATA\Microsoft\Windows\Start Menu\Programs\WinRAR",
@@ -438,8 +442,8 @@ if (Test-Path -Path "$env:ProgramFiles\WinRAR")
 	Remove-Item -Path $Remove -Recurse -Force -ErrorAction Ignore
 
 	$Parameters = @{
-		Uri     = "https://raw.githubusercontent.com/farag2/Utilities/master/WinRAR/WinRAR/WinRAR.ini"
-		OutFile = "$env:ProgramFiles\WinRAR\WinRAR.ini"
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/WinRAR/WinRAR/WinRAR.ini"
+		OutFile         = "$env:ProgramFiles\WinRAR\WinRAR.ini"
 		UseBasicParsing = $true
 		Verbose         = $true
 	}
