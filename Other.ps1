@@ -912,3 +912,24 @@ Get-CimInstance -ClassName Win32_OSRecoveryConfiguration | Set-CIMInstance -Argu
 
 # Send firmware to HP MFU to upgrade
 copy /b D:\firmware.rfu \\print_server\MFU
+
+# Create a table with WSL installed distros
+$Extensions = @{
+	Ubuntu         = "Ubuntu"
+	Debian         = "Debian GNU/Linux"
+	"kali-linux"   = "Kali Linux Rolling"
+	"openSUSE-42"  = "openSUSE Leap 42"
+	"SLES-12"      = "SUSE Linux Enterprise Server v12"
+	"Ubuntu-16.04" = "Ubuntu 16.04 LTS"
+	"Ubuntu-18.04" = "Ubuntu 18.04 LTS"
+	"Ubuntu-20.04" = "Ubuntu 20.04 LTS"
+}
+$Extensions.Keys | ForEach-Object -Process {(wsl --list --quiet) -contains $_}
+
+# Create a table with WSL supported distros (not Internet connection required)
+wsl --list --online | Where-Object -FilterScript {$_.Length -gt 1} | Select-Object -Skip 3 | ForEach-Object -Process {
+	[PSCustomObject]@{
+		"Key"   = $_.Substring(0, 24)
+		"Value" = $_.Substring(30)
+	}
+}
