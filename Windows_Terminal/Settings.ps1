@@ -475,3 +475,27 @@ if (-not (Test-Path -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell
 	New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked" -Force
 }
 New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked" -Name "{9F156763-7844-4DC4-B2B1-901F640F5155}" -PropertyType String -Value "WindowsTerminal" -Force
+
+# Set Windows Terminal as default terminal app to host the user interface for command-line applications
+$TerminalVersion = (Get-AppxPackage -Name Microsoft.WindowsTerminal).Version
+if ([System.Version]$TerminalVersion -ge [System.Version]"1.11")
+{
+	if (-not (Test-Path -Path "HKCU:\Console\%%Startup"))
+	{
+		New-Item -Path "HKCU:\Console\%%Startup" -Force
+	}
+
+	# Find the current GUID of Windows Terminal
+	$PackageFullName = (Get-AppxPackage -Name Microsoft.WindowsTerminal).PackageFullName
+		Get-ChildItem -Path "HKLM:\SOFTWARE\Classes\PackagedCom\Package\$PackageFullName\Class" | ForEach-Object -Process {
+		if ((Get-ItemPropertyValue -Path $_.PSPath -Name ServerId) -eq 0)
+		{
+			New-ItemProperty -Path "HKCU:\Console\%%Startup" -Name DelegationConsole -PropertyType String -Value $_.PSChildName -Force
+		}
+
+		if ((Get-ItemPropertyValue -Path $_.PSPath -Name ServerId) -eq 1)
+		{
+			New-ItemProperty -Path "HKCU:\Console\%%Startup" -Name DelegationTerminal -PropertyType String -Value $_.PSChildName -Force
+		}
+	}
+}
