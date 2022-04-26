@@ -97,7 +97,7 @@ $Ids = (Get-Content -Path "D:\Downloads\1.js" -Encoding UTF8 -Raw | ConvertFrom-
 $UniqueIds = $Ids | Select-Object -Unique
 (Compare-Object -ReferenceObject $UniqueIds -DifferenceObject $Ids).InputObject
 
-# Add new property to JSON
+# Add new "UA" property to JSON
 Remove-TypeData System.Array -ErrorAction Ignore
 $Terminal = Get-Content -Path "D:\Downloads\1.js" -Encoding UTF8 -Force | ConvertFrom-Json
 
@@ -117,14 +117,12 @@ ConvertTo-Json -InputObject $Terminal -Depth 4 | Set-Content -Path "D:\Downloads
 # Re-save in the UTF-8 without BOM encoding due to JSON must not has the BOM: https://datatracker.ietf.org/doc/html/rfc8259#section-8.1
 Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path "D:\Downloads\1.js" -Raw)) -Encoding Byte -Path "D:\Downloads\1.js" -Force
 
-# Remove property
+# Remove "RU", "EN", "DE" properties from JSON
 Remove-TypeData System.Array -ErrorAction Ignore
-
 $Parameters = @{
 	Uri             = "https://raw.githubusercontent.com/Sophia-Community/SophiApp/master/SophiApp/SophiApp/Resources/UIData.json"
 	UseBasicParsing = $true
 }
-$FilteredJson = "D:\Downloads\SophiApp\SophiApp\SophiApp\Resources\UIData_UA.json"
 
 $Terminal = Invoke-RestMethod @Parameters
 $Terminal | ForEach-Object {	
@@ -143,6 +141,44 @@ $Terminal | ForEach-Object {
 	$_
 }
 
+$FilteredJson = "D:\Downloads\SophiApp\SophiApp\SophiApp\Resources\UIData_UA.json"
 ConvertTo-Json -InputObject $Terminal -Depth 4 | Set-Content -Path $FilteredJson -Encoding UTF8 -Force
 # Re-save in the UTF-8 without BOM encoding due to JSON must not has the BOM: https://datatracker.ietf.org/doc/html/rfc8259#section-8.1
 Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path $FilteredJson -Raw)) -Encoding Byte -Path $FilteredJson -Force
+
+# Compare 2 JSONs and merge them into one
+Remove-TypeData System.Array -ErrorAction Ignore
+$Parameters = @{
+	Uri             = "https://raw.githubusercontent.com/Sophia-Community/SophiApp/master/SophiApp/SophiApp/Resources/UIData.json"
+	UseBasicParsing = $true
+}
+$Full = Invoke-RestMethod @Parameters
+
+$Parameters = @{
+	Uri             = "https://raw.githubusercontent.com/Sophia-Community/SophiApp/master/SophiApp/SophiApp/Resources/UIData_IT.json"
+	UseBasicParsing = $true
+}
+$Italian = Invoke-RestMethod @Parameters
+
+$Full | ForEach-Object -Process {
+	$UiData = $_
+	$ItData = $Italian | Where-Object -FilterScript {$_.Id -eq $UiData.Id}
+
+	$UiData.Header | Add-Member -Name IT -MemberType NoteProperty -Value $ItData.Header.IT -Force
+	$UiData.Description | Add-Member -Name IT -MemberType NoteProperty -Value $ItData.Description.IT -Force
+	
+	if ($UiData.ChildElements)
+	{
+		$UiData.ChildElements | ForEach-Object -Process {
+			$UiChild = $_
+			$ItChild = $ItData.ChildElements | Where-Object -FilterScript {$_.Id -eq $UiChild.Id}
+
+			$UiChild.ChildHeader | Add-Member -Name IT -MemberType NoteProperty -Value $ItChild.ChildHeader.IT -Force
+			$UiChild.ChildDescription | Add-Member -Name IT -MemberType NoteProperty -Value $ItChild.ChildDescription.IT -Force
+		}
+	}
+}
+
+ConvertTo-Json -InputObject $Full -Depth 4 | Set-Content -Path "D:\Desktop\3.json" -Encoding UTF8 -Force
+# Re-save in the UTF-8 without BOM encoding due to JSON must not has the BOM: https://datatracker.ietf.org/doc/html/rfc8259#section-8.1
+Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path "D:\Desktop\3.json" -Raw)) -Encoding Byte -Path "D:\Desktop\3.json" -Force
