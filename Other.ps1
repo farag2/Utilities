@@ -881,6 +881,7 @@ $Parameters.Arguments = @{
 (Invoke-CimMethod @Parameters).sNames -contains "RebootRequired"
 
 # Since Windows 22H2 22557 build
+# https://oofhours.com/2022/04/27/language-pack-handling-in-windows-11-continues-to-evolve/
 # https://en.wikipedia.org/wiki/IETF_language_tag
 # LanguagePackManagement module
 Install-Language -Language en-US
