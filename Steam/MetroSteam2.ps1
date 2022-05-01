@@ -229,7 +229,7 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\Steam")
 		Remove-Item -Path "${env:ProgramFiles(x86)}\Steam\Skins\Metro" -Recurse -Force
 	}
 
-	Get-Process -Name steam | Stop-Process -Force -ErrorAction Ignore
+	Get-Process -Name steam -ErrorAction Ignore | Stop-Process -Force -ErrorAction Ignore
 	Remove-Item -Path "${env:ProgramFiles(x86)}\Steam\Skins\Metro" -Recurse -Force -ErrorAction Ignore
 	Copy-Item -Path "$DownloadsFolder\Metro\resource\menus\steam.menu" -Destination "$DownloadsFolder\Metro\resource\menus\steam_original.menu" -Force
 	Move-Item -Path "$DownloadsFolder\Metro" -Destination "${env:ProgramFiles(x86)}\Steam\Skins\Metro" -Force
