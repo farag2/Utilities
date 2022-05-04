@@ -934,3 +934,9 @@ wsl --list --online | Where-Object -FilterScript {$_.Length -gt 1} | Select-Obje
 		"Value" = $_.Substring(30)
 	}
 }
+
+# Decode blob URL and download file
+# -y: overwrite output files
+# -bsf bitstream_filters: a comma-separated list of bitstream filters
+# -vcodec codec: force video codec ('copy' to copy stream)
+ffmpeg -y "URL.m3u88" -bsf:a aac_adtstoasc -vcodec copy -c copy -crf 50 D:\video.mkv
