@@ -44,7 +44,6 @@
 * <https://docs.microsoft.com/ru-ru/powershell/module/microsoft.powershell.core/about/about_functions_advanced_parameters>
 * <https://www.thomasmaurer.ch/tag/powershell/>
 * <https://superwidgets.wordpress.com/>
-* <https://jdhitsolutions.com/blog/powershell-tips-tricks-and-advice/>
 * <https://blog.vertigion.com>
 </details>
 
