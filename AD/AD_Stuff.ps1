@@ -96,3 +96,24 @@ Invoke-WmiMethod -Namespace Root\ccm\ClientSDK -Class CCM_ClientUXSettings -Name
 
 # Open C drive on a remote machine
 \\pcname\c$
+
+# Asign every PC in the OU to the group
+Get-ADComputer -SearchBase "OU=Laptop, OU=xx, OU=xx, OU=xx, OU=CMP, OU=CORP, DC=xx, DC=xx, DC=com" -Filter * -Properties MemberOf | Where-Object -FilterScript {[string]$_.MemberOf -notmatch "group"} | ForEach-Object -Process {
+	Add-ADGroupMember -Members (Get-ADComputer -Identity $_.Name) -Identity "group"
+}
+
+# Remove PC from group
+Remove-ADGroupMember -Members (Get-ADComputer -Identity PCName) -Identity group -Confirm:$false
+
+Get-ADComputer -Identity PCName | ForEach-Object -Process {
+	Remove-ADGroupMember -Identity group -Members $_ -Confirm:$false
+}
+
+# Get domain\userID in AD according to user's SID
+$Event = Get-WinEvent -FilterHashtable @{
+    LogName = "System"
+    ID      = 1501
+} -MaxEvents 1
+$Event.UserId.Translate([System.Security.Principal.NTAccount]).Value
+# 
+[System.Security.Principal.SecurityIdentifier]::new($SID).Translate([system.security.principal.NTAccount]).Value
