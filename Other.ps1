@@ -940,3 +940,23 @@ wsl --list --online | Where-Object -FilterScript {$_.Length -gt 1} | Select-Obje
 # -bsf bitstream_filters: a comma-separated list of bitstream filters
 # -vcodec codec: force video codec ('copy' to copy stream)
 ffmpeg -y "URL.m3u88" -bsf:a aac_adtstoasc -vcodec copy -c copy -crf 50 D:\video.mkv
+
+# Create table with scheduled tasks info that were created a week before the current day
+Get-ScheduledTask | Where-Object -FilterScript {$null -ne $_.Date} | ForEach-Object -Process {
+	$Task = $_
+
+	$_.Date.Split("T") | Where-Object -FilterScript {$_ -notmatch ":"} | ForEach-Object -Process {
+		# Convert dates into the yyyy-MM-dd format
+		$Date = [datetime]::ParseExact($_, "yyyy-MM-dd", $Null).ToString("dd.MM.yyyy")
+
+		# If task creation date is between the date that less than week ago and the current day
+		if ((Get-Date -Date $Date) -gt (Get-Date).AddDays(-8) -and ((Get-Date -Date $Date) -lt (Get-Date)))
+		{
+			[PSCustomObject]@{
+				"Task Name"     = $Task.TaskName
+				Path            = $Task.TaskPath
+				"Date Creation" = $Task.Date
+			}
+		}
+	}
+}
