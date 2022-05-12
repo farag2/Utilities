@@ -960,3 +960,6 @@ Get-ScheduledTask | Where-Object -FilterScript {$null -ne $_.Date} | ForEach-Obj
 		}
 	}
 }
+
+# Change brightness to 100%
+(Get-WmiObject -Namespace root/WMI -ClassName WmiMonitorBrightnessMethods).WmiSetBrightness(1,100)
