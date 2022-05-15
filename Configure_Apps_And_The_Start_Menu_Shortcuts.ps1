@@ -427,8 +427,6 @@ if (Test-Path -Path "$env:ProgramFiles\WinRAR")
 		Copy-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\WinRAR\WinRAR.lnk" -Destination "$env:ProgramData\Microsoft\Windows\Start Menu\Programs" -Force
 	}
 
-	Remove-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\WinRAR" -Recurse -Force -ErrorAction Igrnore
-
 	$Remove = @(
 		"$env:ProgramData\Microsoft\Windows\Start Menu\Programs\WinRAR",
 		"$env:APPDATA\Microsoft\Windows\Start Menu\Programs\WinRAR",
