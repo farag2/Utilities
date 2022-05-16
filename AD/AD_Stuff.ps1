@@ -104,7 +104,7 @@ Get-ADComputer -SearchBase "OU=Laptop, OU=xx, OU=xx, OU=xx, OU=CMP, OU=CORP, DC=
 
 # Remove PC from group
 Remove-ADGroupMember -Members (Get-ADComputer -Identity PCName) -Identity group -Confirm:$false
-
+#
 Get-ADComputer -Identity PCName | ForEach-Object -Process {
 	Remove-ADGroupMember -Identity group -Members $_ -Confirm:$false
 }
@@ -117,3 +117,26 @@ $Event = Get-WinEvent -FilterHashtable @{
 $Event.UserId.Translate([System.Security.Principal.NTAccount]).Value
 # 
 [System.Security.Principal.SecurityIdentifier]::new($SID).Translate([system.security.principal.NTAccount]).Value
+
+# Get list of emails of users assigned to a group
+# $All = @()
+Get-ADGroupMember -Identity group -Server na.domain.com | ForEach-Object -Process {
+
+    # EUR domain
+    try
+    {
+    	# $All += 
+        (Get-ADUser -Identity $_.SamAccountName -Server eur.domain.com | Where-Object -FilterScript {$_.DistinguishedName -like "*DC=eur*"}).UserPrincipalName
+    }
+    catch {}
+
+    # NA domain
+    try
+    {
+    	# $All += 
+        (Get-ADUser -Identity $_.SamAccountName -Server na.mccormick.com | Where-Object -FilterScript {$_.DistinguishedName -like "*DC=na*"}).UserPrincipalName
+    }
+    catch {}
+
+}
+# $All.Count
