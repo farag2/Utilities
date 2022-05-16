@@ -111,8 +111,8 @@ Get-ADComputer -Identity PCName | ForEach-Object -Process {
 
 # Get domain\userID in AD according to user's SID
 $Event = Get-WinEvent -FilterHashtable @{
-    LogName = "System"
-    ID      = 1501
+	LogName = "System"
+	ID      = 1501
 } -MaxEvents 1
 $Event.UserId.Translate([System.Security.Principal.NTAccount]).Value
 # 
@@ -122,21 +122,21 @@ $Event.UserId.Translate([System.Security.Principal.NTAccount]).Value
 # $All = @()
 Get-ADGroupMember -Identity group -Server na.domain.com | ForEach-Object -Process {
 
-    # EUR domain
-    try
-    {
-    	# $All += 
-        (Get-ADUser -Identity $_.SamAccountName -Server eur.domain.com | Where-Object -FilterScript {$_.DistinguishedName -like "*DC=eur*"}).UserPrincipalName
-    }
-    catch {}
+	# EUR domain
+	try
+	{
+		# $All += 
+		(Get-ADUser -Identity $_.SamAccountName -Server eur.mccormick.com | Where-Object -FilterScript {$_.DistinguishedName -like "*DC=eur*"}).UserPrincipalName
+	}
+	catch {}
 
-    # NA domain
-    try
-    {
-    	# $All += 
-        (Get-ADUser -Identity $_.SamAccountName -Server na.mccormick.com | Where-Object -FilterScript {$_.DistinguishedName -like "*DC=na*"}).UserPrincipalName
-    }
-    catch {}
+	# NA domain
+	try
+	{
+		# $All += 
+		(Get-ADUser -Identity $_.SamAccountName -Server na.mccormick.com | Where-Object -FilterScript {$_.DistinguishedName -like "*DC=na*"}).UserPrincipalName
+	}
+	catch {}
 
 }
 # $All.Count
