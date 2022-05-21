@@ -894,6 +894,16 @@ Uninstall-Language
 # Shift+F10
 OOBE\BYPASSNRO
 
+# Windows 11 Insider Preview 25120+
+# Add a new user account
+net user username /add
+# Администраторы
+net localgroup Administrators username /add
+# "Пользователи удаленного рабочего стола"
+net localgroup "Remote Desktop Users" username /add
+cd OOBE
+msoobe.exe && shutdown.exe -r
+
 # Download the latest russia-blacklist.txt version
 # https://github.com/ValdikSS/GoodbyeDPI
 $Parameters = @{
