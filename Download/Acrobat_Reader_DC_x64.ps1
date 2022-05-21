@@ -16,7 +16,7 @@ $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows
 $Parameters = @{
     Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($Version)/AcroRdrDCx64$($Version)_$($LanguageCode).exe"
     OutFile         = "$DownloadsFolder\AcroRdrDCx64$($Version)_$($LanguageCode).exe"
-	UseBasicParsing = $true
+    UseBasicParsing = $true
 }
 Invoke-RestMethod @Parameters
 
