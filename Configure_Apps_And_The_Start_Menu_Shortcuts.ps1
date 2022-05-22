@@ -10,7 +10,7 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\ABBYY FineReader 15")
 	Remove-Printer -Name *ABBYY* -ErrorAction Ignore
 }
 
-# AIMP
+# AIMP x86
 if (Test-Path -Path "${env:ProgramFiles(x86)}\AIMP")
 {
 	if (-not (Test-Path -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\AIMP.lnk"))
@@ -46,6 +46,77 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\AIMP")
 		"/REG=R2"
 	)
 	Start-Process -FilePath "${env:ProgramFiles(x86)}\AIMP\Elevator.exe" -ArgumentList $Arguments
+
+	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+	$Parameters = @{
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/AIMP.ini"
+		OutFile         = "$env:APPDATA\AIMP\AIMP.ini"
+		UseBasicParsing = $true
+		Verbose         = $true
+	}
+	Invoke-WebRequest @Parameters
+
+	$Parameters = @{
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/AIMPac.ini"
+		OutFile         = "$env:APPDATA\AIMP\AIMPac.ini"
+		UseBasicParsing = $true
+		Verbose         = $true
+	}
+	Invoke-WebRequest @Parameters
+
+	# Save the current ID in the variable
+	$ID = Get-Content -Path "$env:APPDATA\AIMP\Skins\Default.ini" | Select-Object -Index 1
+
+	$Parameters = @{
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/Default.ini"
+		OutFile         = "$env:APPDATA\AIMP\Skins\Default.ini"
+		UseBasicParsing = $true
+		Verbose         = $true
+	}
+	Invoke-WebRequest @Parameters
+
+	$Defaultini = Get-Content -Path "$env:APPDATA\AIMP\Skins\Default.ini" -Encoding Default
+	$Defaultini[1] = $ID
+	$Defaultini | Set-Content -Path "$env:APPDATA\AIMP\Skins\Default.ini" -Encoding Default -Force
+}
+
+# AIMP x64
+if (Test-Path -Path $env:ProgramFiles\AIMP)
+{
+	if (-not (Test-Path -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\AIMP.lnk"))
+	{
+		Copy-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\AIMP\AIMP*.lnk" -Destination "$env:ProgramData\Microsoft\Windows\Start Menu\Programs" -Force -ErrorAction Ignore
+	}
+
+	$Remove = @(
+		"$env:PUBLIC\Desktop\AIMP.lnk",
+		"$env:ProgramData\Microsoft\Windows\Start Menu\Programs\AIMP",
+		"$env:ProgramFiles\AIMP\!Backup",
+		"$env:ProgramFiles\AIMP\history.txt",
+		"$env:ProgramFiles\AIMP\AIMP.url",
+		"$env:ProgramFiles\AIMP\license.rtf",
+		"$env:ProgramFiles\AIMP\Help",
+		"$env:ProgramFiles\AIMP\Skins",
+		"$env:ProgramFiles\AIMP\Plugins\aimp_AnalogMeter",
+		"$env:ProgramFiles\AIMP\Plugins\aimp_infobar",
+		"$env:ProgramFiles\AIMP\Plugins\aimp_lastfm",
+		"$env:ProgramFiles\AIMP\Plugins\aimp_scheduler",
+		"$env:ProgramFiles\AIMP\Plugins\Aorta"
+	)
+	Remove-Item -Path $Remove -Recurse -Force -ErrorAction Ignore
+
+	Get-ChildItem -Path $env:ProgramFiles\AIMP\Langs -Exclude russian.lng -Force | Remove-Item -Force
+
+	$Arguments = @(
+		# Disable the context menu integration
+		"/REG=M0"
+		# Associate files with AIMP
+		"/REG=R1"
+		# Make AIMP a default audio player
+		"/REG=R2"
+	)
+	Start-Process -FilePath "$env:ProgramFiles\AIMP\Elevator.exe" -ArgumentList $Arguments
 
 	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
@@ -424,7 +495,12 @@ if (Test-Path -Path "$env:ProgramFiles\WinRAR")
 {
 	if (-not (Test-Path -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\WinRAR.lnk"))
 	{
-		Copy-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\WinRAR\WinRAR.lnk" -Destination "$env:ProgramData\Microsoft\Windows\Start Menu\Programs" -Force
+		Move-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\WinRAR\WinRAR.lnk" -Destination "$env:ProgramData\Microsoft\Windows\Start Menu\Programs" -Force
+	}
+
+	if (-not (Test-Path -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\WinRAR.lnk"))
+	{
+		Move-Item -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\WinRAR\WinRAR.lnk" -Destination "$env:APPDATA\Microsoft\Windows\Start Menu\Programs" -Force
 	}
 
 	$Remove = @(
@@ -452,4 +528,6 @@ if (Test-Path -Path "$env:ProgramFiles\WinRAR")
 
 	# Start WinRAR to apply changes
 	Start-Process -FilePath "$env:ProgramFiles\WinRAR\WinRAR.exe" -ArgumentList "-setup_integration" -Wait
+
+	Remove-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\WinRAR" -Recurse -Force -ErrorAction Ignore
 }
