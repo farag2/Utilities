@@ -143,30 +143,32 @@ function Get-ProcessAuditEvents ([long]$MaxEvents)
 Get-ProcessAuditEvents -MaxEvents 10 | Format-List
 #
 $ParentProcess = @{
-	Label = "ParentProcess"
+	Label      = "ParentProcess"
 	Expression = {$_.Properties[13].Value}
 }
 Get-WinEvent -LogName Security | Where-Object -FilterScript {$_.Id -eq "4688"} | Where-Object -FilterScript {$_.Properties[5].Value -match 'conhost'} | Select-Object TimeCreated, $ParentProcess | Select-Object -First 10
 
-# Invoke code
-$url = "https://site.com/1.js"
-Invoke-Expression (New-Object -TypeName System.Net.WebClient).DownloadString($url)
-
-# Download and show text
-(Invoke-WebRequest -Uri "https://site.com/1.js" -OutFile D:\1.js -PassThru -UseBasicParsing).Content
-
-# Get text file content
-(Invoke-WebRequest -Uri "https://site.com/1.js" -UseBasicParsing).Content
+# Download a file
+$Parameters = @{
+	Uri             = "https://site.com/1.js"
+	OutFile         = "D:\1.js"
+	UseBasicParsing = $true
+}
+Invoke-WebRequest @Parameters
 
 # Create a zip archive
-Get-ChildItem -Path D:\folder -Filter *.ps1 -Recurse | Compress-Archive -DestinationPath D:\folder2 -CompressionLevel Optimal
+$Parameters = @{
+	DestinationPath  = "https://site.com/1.js"
+	CompressionLevel = "Optimal"
+}
+Get-ChildItem -Path D:\folder -Filter *.ps1 -Recurse | Compress-Archive @Parameters
 
 # Expand zip archive
 $Parameters = @{
-	Path = "D:\1.zip"
+	Path            = "D:\1.zip"
 	DestinationPath = "D:\1"
-	Force = [switch]::Present
-	Verbose = [switch]::Present
+	Force           = $true
+	Verbose         = $true
 }
 Expand-Archive @Parameters
 
