@@ -104,4 +104,4 @@
 
 # Windows ISOs
 <https://isofiles.bd581e55.workers.dev>
-  
+<https://cloud.mail.ru/public/dUNz/Y56hnwnhZ>  
