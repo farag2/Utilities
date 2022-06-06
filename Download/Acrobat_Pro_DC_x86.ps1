@@ -8,7 +8,7 @@ $Parameters = @{
 	UseBasicParsing = $true
 	Verbose         = $true
 }
-Invoke-WebRequest @Parameters
+# Invoke-WebRequest @Parameters
 
 <#
 $Session       = New-Object -TypeName Microsoft.PowerShell.Commands.WebRequestSession
@@ -125,29 +125,32 @@ Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Force
 	won't help due to that fact it outputs the Mac patch version instead of Windows one that is always has a higher version number
 #>
 
+# Get the latest patch version
+$Parameters = @{
+    Uri             = "https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html"
+    UseBasicParsing = $true
+}
+$outerHTML = (Invoke-WebRequest @Parameters).Links.outerHTML
+[xml]$LatestPatch = $outerHTML | Where-Object -FilterScript {$_ -match "Planned"} | Select-Object -Index 0
+$LatestPatchVersion = ($LatestPatch.a.title -replace "\(.*$", "").Replace(".","").Trim()
+
+Write-Verbose -Message $LatestPatchVersion -Verbose
+
 if (Test-Path -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp")
 {
 	# Get the bare patch number to compare with the latest one
 	$CurrentPatchVersion = (Split-Path -Path (Get-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp").FullName -Leaf).Replace(".msp","").Replace("AcrobatDCUpd","")
 
-	$Parameters = @{
-		Uri             = "https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html"
-		UseBasicParsing = $true
-	}
-	$outerHTML = (Invoke-WebRequest @Parameters).Links.outerHTML
-	[xml]$LatestPatch = $outerHTML | Where-Object -FilterScript {$_ -match "Planned"} | Select-Object -Index 0
-	$LatestPatchVersion = ($LatestPatch.a.title -replace "Planned.*$", "").Replace(".","").Trim()
-
-	$Parameters = @{
-		Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$LatestPatchVersion/AcrobatDCUpd$LatestPatchVersion.msp"
-		OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$LatestPatchVersion.msp"
-		UseBasicParsing = $true
-		Verbose         = $true
-	}
-	Invoke-WebRequest @Parameters
-
 	if ($CurrentPatchVersion -lt $LatestPatchVersion)
 	{
+	    $Parameters = @{
+		    Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$LatestPatchVersion/AcrobatDCUpd$LatestPatchVersion.msp"
+		    OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$LatestPatchVersion.msp"
+		    UseBasicParsing = $true
+		    Verbose         = $true
+	    }
+	    Invoke-WebRequest @Parameters
+
 		Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$CurrentPatchVersion.msp" -Force
 	}
 }
