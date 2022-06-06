@@ -8,7 +8,7 @@ $Parameters = @{
 	UseBasicParsing = $true
 	Verbose         = $true
 }
-# Invoke-WebRequest @Parameters
+Invoke-WebRequest @Parameters
 
 <#
 $Session       = New-Object -TypeName Microsoft.PowerShell.Commands.WebRequestSession
