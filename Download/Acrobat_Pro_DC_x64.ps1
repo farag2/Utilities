@@ -106,7 +106,7 @@ Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Force
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 
 # Create the edited setup.ini
-$PatchFile = Split-Path -Path "$DownloadsFolder\AcrobatDCx64Upd$($LatestPatchVersion).msp" -Leaf
+$PatchFile = Split-Path -Path (Get-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd*.msp").FullName -Leaf
 
 # setup.ini
 # https://www.adobe.com/devnet-docs/acrobatetk/tools/AdminGuide/properties.html
