@@ -4,8 +4,9 @@
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 # Get the link to the latest Adobe Acrobat Reader DC x64 installer
+$TwoLetterISOLanguageName = (Get-WinSystemLocale).TwoLetterISOLanguageName
 $Parameters = @{
-	Uri = "https://rdc.adobe.io/reader/products?lang=en&site=enterprise&os=Windows 11&api_key=dc-get-adobereader-cdn"
+	Uri = "https://rdc.adobe.io/reader/products?lang=$($TwoLetterISOLanguageName)&site=enterprise&os=Windows 11&api_key=dc-get-adobereader-cdn"
 	UseBasicParsing = $true
 }
 $Version = (Invoke-RestMethod @Parameters).products.reader.version.Replace(".", "")
