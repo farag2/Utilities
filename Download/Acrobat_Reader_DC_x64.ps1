@@ -1,22 +1,44 @@
 # Download the latest Adobe Acrobat Reader DC x64
 # https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/reader/current_version.txt
-
+cls
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 # Get the link to the latest Adobe Acrobat Reader DC x64 installer
 $TwoLetterISOLanguageName = (Get-WinSystemLocale).TwoLetterISOLanguageName
 $Parameters = @{
-	Uri = "https://rdc.adobe.io/reader/products?lang=$($TwoLetterISOLanguageName)&site=enterprise&os=Windows 11&api_key=dc-get-adobereader-cdn"
+	Uri = "https://rdc.adobe.io/reader/products?lang=$($TwoLetterISOLanguageName)&site=enterprise&os=Windows%2011&api_key=dc-get-adobereader-cdn"
 	UseBasicParsing = $true
 }
+$displayName = (Invoke-RestMethod @Parameters).products.reader.displayName
 $Version = (Invoke-RestMethod @Parameters).products.reader.version.Replace(".", "")
-$LanguageCode = (Get-WinSystemLocale).Name.Replace("-", "_")
+
+
+$Parameters = @{
+    Uri             = "https://rdc.adobe.io/reader/downloadUrl?name=$($displayName)&os=Windows%2011&site=enterprise&lang=$($TwoLetterISOLanguageName)&api_key=dc-get-adobereader-cdn"
+    UseBasicParsing = $true
+}
+$downloadURL = (Invoke-RestMethod @Parameters).downloadURL
+$saveName = (Invoke-RestMethod @Parameters).saveName
+
+# if URl contains "reader", we need to fix the URl to download the latest version. Applicable for the Russian version
+if ($downloadURL -match "reader")
+{
+    $Parameters = @{
+	    Uri = "https://rdc.adobe.io/reader/products?lang=en&site=enterprise&os=Windows 11&api_key=dc-get-adobereader-cdn"
+	    UseBasicParsing = $true
+    }
+    $Version = (Invoke-RestMethod @Parameters).products.reader.version.Replace(".", "")
+
+    $IetfLanguageTag = (Get-WinSystemLocale).IetfLanguageTag.Replace("-", "_")
+    $downloadURL = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($Version)/AcroRdrDCx64$($Version)_$($IetfLanguageTag).exe"
+    $saveName = Split-Path -Path $downloadURL -Leaf
+}
 
 # Download the installer
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
-    Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($Version)/AcroRdrDCx64$($Version)_$($LanguageCode).exe"
-    OutFile         = "$DownloadsFolder\AcroRdrDCx64$($Version)_$($LanguageCode).exe"
+    Uri             = $downloadURL
+    OutFile         = "$DownloadsFolder\$saveName"
     UseBasicParsing = $true
 }
 Invoke-RestMethod @Parameters
@@ -28,7 +50,7 @@ $Arguments = @(
 	# Do not execute any file after installation (overrides the '-e' switch)
 	"-sfx_ne"
 )
-Start-Process -FilePath "$DownloadsFolder\AcroRdrDCx64$($Version)_$($LanguageCode).exe" -ArgumentList $Arguments -Wait
+Start-Process -FilePath "$DownloadsFolder\AcroRdrDCx64$($Version)_$($IetfLanguageTag).exe" -ArgumentList $Arguments -Wait
 
 # Extract AcroPro.msi to the "AcroPro.msi extracted" folder
 $Arguments = @(
