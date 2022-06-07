@@ -1,6 +1,6 @@
 # Download the latest Adobe Acrobat Reader DC x64
 # https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/reader/current_version.txt
-cls
+
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 # Get the link to the latest Adobe Acrobat Reader DC x64 installer
