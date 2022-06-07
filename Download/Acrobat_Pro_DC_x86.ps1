@@ -11,29 +11,6 @@ $Parameters = @{
 Invoke-WebRequest @Parameters
 
 <#
-$Session       = New-Object -TypeName Microsoft.PowerShell.Commands.WebRequestSession
-$Cookie        = New-Object -TypeName System.Net.Cookie
-$Cookie.Name   = "MM_TRIALS"
-$Cookie.Value  = "1234"
-$Cookie.Domain = ".adobe.com"
-$Session.Cookies.Add($Cookie)
-
-$Parameters = @{
-	Uri        = "https://trials3.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_WWMUI.zip"
-	OutFile    = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip"
-	WebSession = $Session
-	Verbose    = $true
-}
-Invoke-WebRequest @Parameters
-#>
-
-<#
-# Extract Acrobat_DC_Web_WWMUI.exe to the "Downloads folder\AcrobatTemp" folder
-# Do not change window focus while extracting Acrobat_DC_Web_WWMUI.exe, unless the process will be running forever
-Start-Process -FilePath "$DownloadsFolder\Acrobat_DC_Web_WWMUI.exe" -ArgumentList "/o /s /x /d `"$DownloadsFolder\AcrobatTemp`"" -PassThru -Wait
-#>
-
-<#
 	.SYNOPSIS
 	Extracting the specific folder from ZIP archive. Folder structure will be created recursively
 
@@ -117,53 +94,6 @@ Start-Process "msiexec" -ArgumentList $Arguments -Wait
 Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\Data1.cab" -Force
 Get-ChildItem -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\Adobe Acrobat" -Force
 Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Force
-
-# Download the latest patch
-# https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html
-<#
-	(Invoke-RestMethod -Uri "https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/acrobat/current_version.txt").Replace(".","").Trim()
-	won't help due to that fact it outputs the Mac patch version instead of Windows one that is always has a higher version number
-#>
-
-# Get the latest patch version
-$Parameters = @{
-    Uri             = "https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html"
-    UseBasicParsing = $true
-}
-$outerHTML = (Invoke-WebRequest @Parameters).Links.outerHTML
-[xml]$LatestPatch = $outerHTML | Where-Object -FilterScript {$_ -match "Planned"} | Select-Object -Index 0
-$LatestPatchVersion = ($LatestPatch.a.title -replace "\(.*$", "").Replace(".","").Trim()
-
-Write-Verbose -Message $LatestPatchVersion -Verbose
-
-if (Test-Path -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp")
-{
-	# Get the bare patch number to compare with the latest one
-	$CurrentPatchVersion = (Split-Path -Path (Get-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp").FullName -Leaf).Replace(".msp","").Replace("AcrobatDCUpd","")
-
-	if ($CurrentPatchVersion -lt $LatestPatchVersion)
-	{
-	    $Parameters = @{
-		    Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$LatestPatchVersion/AcrobatDCUpd$LatestPatchVersion.msp"
-		    OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$LatestPatchVersion.msp"
-		    UseBasicParsing = $true
-		    Verbose         = $true
-	    }
-	    Invoke-WebRequest @Parameters
-
-		Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$CurrentPatchVersion.msp" -Force
-	}
-}
-else
-{
-	$Parameters = @{
-		Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$LatestPatchVersion/AcrobatDCUpd$LatestPatchVersion.msp"
-		OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$LatestPatchVersion.msp"
-		UseBasicParsing = $true
-		Verbose         = $true
-	}
-	Invoke-WebRequest @Parameters
-}
 
 # Create the edited setup.ini
 $PatchFile = Split-Path -Path "$DownloadsFolder\AcrobatDCUpd$LatestPatchVersion.msp" -Leaf
