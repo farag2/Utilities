@@ -103,9 +103,27 @@ Remove-Item -Path $CABs -Force
 
 Get-ChildItem -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\Adobe Acrobat" -Force
 Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Force
-$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 
-# Create the edited setup.ini
+# Get the latest Adobe Acrobat Pro DC x64 patch version (lang=mui)
+$Parameters = @{
+	Uri = "https://rdc.adobe.io/reader/products?lang=mui&os=Windows%2011&api_key=dc-get-adobereader-cdn"
+	UseBasicParsing = $true
+}
+$Version = (Invoke-RestMethod @Parameters).products.dcPro.version.Replace(".", "")
+
+# If latest version is greater than one from archive
+if ((Get-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd*.msp").FullName -notmatch $Version)
+{
+    Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd*.msp" -Force
+
+    $Parameters = @{
+	    Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($Version)/AcrobatDCx64Upd$($Version).msp"
+	    OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd$($Version).msp"
+	    UseBasicParsing = $true
+	    Verbose         = $true
+    }
+    Invoke-WebRequest @Parameters
+}
 $PatchFile = Split-Path -Path (Get-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd*.msp").FullName -Leaf
 
 # setup.ini
@@ -126,6 +144,7 @@ $CmdLine = @(
 $LCID = (Get-WinSystemLocale).LCID
 $DisplayLanguage = (Get-WinUserLanguageList).EnglishName | Select-Object -First 1
 
+# Create the edited setup.ini
 $setupini = @"
 [Product]
 msi=AcroPro.msi
