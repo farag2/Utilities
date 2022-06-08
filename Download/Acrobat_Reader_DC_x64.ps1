@@ -70,7 +70,7 @@ Remove-Item -Path $Items -Recurse -Force -ErrorAction Ignore
 Get-ChildItem -Path "$DownloadsFolder\AcroRdrDCx64\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\AcroRdrDCx64" -Force
 Remove-Item -Path "$DownloadsFolder\AcroRdrDCx64\AcroPro.msi extracted" -Force
 
-# Get the latest Adobe Acrobat Pro DC x64 patch version (lang=mui)
+# Get the latest Adobe Acrobat Pro DC patch version (lang=mui)
 $Parameters = @{
 	Uri = "https://rdc.adobe.io/reader/products?lang=mui&os=Windows%2011&api_key=dc-get-adobereader-cdn"
 	UseBasicParsing = $true
