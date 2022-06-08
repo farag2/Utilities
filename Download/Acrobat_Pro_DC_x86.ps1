@@ -3,7 +3,7 @@
 
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
-	Uri             = "http://trials.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_WWMUI.zip"
+	Uri             = "https://trials.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_WWMUI.zip"
 	OutFile         = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip"
 	UseBasicParsing = $true
 	Verbose         = $true
@@ -95,7 +95,26 @@ Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\Data1.cab" -Force
 Get-ChildItem -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\Adobe Acrobat" -Force
 Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Force
 
-# Create the edited setup.ini
+# Get the latest Adobe Acrobat Pro DC x64 patch version (lang=mui)
+$Parameters = @{
+	Uri = "https://rdc.adobe.io/reader/products?lang=mui&os=Windows%2011&api_key=dc-get-adobereader-cdn"
+	UseBasicParsing = $true
+}
+$Version = (Invoke-RestMethod @Parameters).products.dcPro.version.Replace(".", "")
+
+# If latest version is greater than one from archive
+if ((Get-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp").FullName -notmatch $Version)
+{
+    Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp" -Force
+
+    $Parameters = @{
+	    Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($Version)/AcrobatDCUpd$($Version).msp"
+	    OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$($Version).msp"
+	    UseBasicParsing = $true
+	    Verbose         = $true
+    }
+    Invoke-WebRequest @Parameters
+}
 $PatchFile = Split-Path -Path (Get-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp").FullName -Leaf
 
 # setup.ini
@@ -116,6 +135,7 @@ $CmdLine = @(
 $LCID = (Get-WinSystemLocale).LCID
 $DisplayLanguage = (Get-WinUserLanguageList).EnglishName | Select-Object -Index 0
 
+# Create the edited setup.ini
 $setupini = @"
 [Product]
 msi=AcroPro.msi
