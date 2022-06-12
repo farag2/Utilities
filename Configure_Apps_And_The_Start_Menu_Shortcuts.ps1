@@ -388,7 +388,7 @@ if (Test-Path -Path "$env:ProgramFiles\paint.net")
 # qBittorrent
 if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 {
-	Stop-Process -Name notepad++ -Force -ErrorAction Ignore
+	Stop-Process -Name qBittorrent -Force -ErrorAction Ignore
 
 	if (-not (Test-Path -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\qBittorrent.lnk"))
 	{
