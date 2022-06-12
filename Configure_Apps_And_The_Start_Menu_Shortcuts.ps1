@@ -318,6 +318,25 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	cmd.exe --% /c assoc txtfile\DefaultIcon=%ProgramFiles%\Notepad++\notepad++.exe,0
 
 	[xml]$config = Get-Content -Path "$env:APPDATA\Notepad++\config.xml" -Force
+	$config.Save("$env:APPDATA\Notepad++\config.xml")
+
+	# It is needed to use -wait to make Notepad++ apply written settings
+	Write-Warning -Message "Close Notepad++' window manually"
+	Start-Process -FilePath "$env:APPDATA\Notepad++\config.xml" -Wait
+
+	if (-not (Test-Path -Path $env:ProgramFiles\Notepad++\localization))
+	{
+		New-Item -Path $env:ProgramFiles\Notepad++\localization -ItemType Directory -Force
+	}
+	$Parameters = @{
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Notepad%2B%2B/localization/russian.xml"
+		OutFile         = "$env:ProgramFiles\Notepad++\localization\russian.xml"
+		UseBasicParsing = $true
+		Verbose         = $true
+	}
+	Invoke-WebRequest @Parameters
+
+	[xml]$config = Get-Content -Path "$env:APPDATA\Notepad++\config.xml" -Force
 	# Fluent UI: large
 	$config.NotepadPlus.GUIConfigs.GUIConfig | Where-Object -FilterScript {$_.name -eq "ToolBar"} | ForEach-Object -Process {$_."#text" = "large"}
 	# Mute all sounds
@@ -332,20 +351,9 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	$config.NotepadPlus.GUIConfigs.GUIConfig | Where-Object -FilterScript {$_.name -eq "Backup"} | ForEach-Object -Process {$_.action = "0"}
 	$config.Save("$env:APPDATA\Notepad++\config.xml")
 
-	if (-not (Test-Path -Path $env:ProgramFiles\Notepad++\localization))
-	{
-		New-Item -Path $env:ProgramFiles\Notepad++\localization -ItemType Directory -Force
-	}
-	$Parameters = @{
-		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Notepad%2B%2B/localization/russian.xml"
-		OutFile         = "$env:ProgramFiles\Notepad++\localization\russian.xml"
-		UseBasicParsing = $true
-		Verbose         = $true
-	}
-	Invoke-WebRequest @Parameters
-
-	# Open the config file to apply all changes
 	Start-Process -FilePath "$env:APPDATA\Notepad++\config.xml"
+	Start-Sleep -Seconds 1
+	Stop-Process -Name notepad++ -ErrorAction Ignore
 }
 
 # Office
@@ -380,6 +388,8 @@ if (Test-Path -Path "$env:ProgramFiles\paint.net")
 # qBittorrent
 if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 {
+	Stop-Process -Name notepad++ -Force -ErrorAction Ignore
+
 	if (-not (Test-Path -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\qBittorrent.lnk"))
 	{
 		Copy-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\qBittorrent\qBittorrent.lnk" -Destination "$env:ProgramData\Microsoft\Windows\Start Menu\Programs" -Force
