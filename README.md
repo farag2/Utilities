@@ -103,5 +103,5 @@
 * <https://rutracker.org/forum/viewtopic.php?p=75274766#75274766>
 
 # Windows ISOs
-<https://isofiles.bd581e55.workers.dev>
-  
+* <https://isofiles.bd581e55.workers.dev>
+* <https://cloud.mail.ru/public/dUNz/Y56hnwnhZ>  

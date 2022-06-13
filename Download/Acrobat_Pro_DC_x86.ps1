@@ -3,35 +3,12 @@
 
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
-	Uri             = "http://trials.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_WWMUI.zip"
+	Uri             = "https://trials.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_WWMUI.zip"
 	OutFile         = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip"
 	UseBasicParsing = $true
 	Verbose         = $true
 }
 Invoke-WebRequest @Parameters
-
-<#
-$Session       = New-Object -TypeName Microsoft.PowerShell.Commands.WebRequestSession
-$Cookie        = New-Object -TypeName System.Net.Cookie
-$Cookie.Name   = "MM_TRIALS"
-$Cookie.Value  = "1234"
-$Cookie.Domain = ".adobe.com"
-$Session.Cookies.Add($Cookie)
-
-$Parameters = @{
-	Uri        = "https://trials3.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_WWMUI.zip"
-	OutFile    = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip"
-	WebSession = $Session
-	Verbose    = $true
-}
-Invoke-WebRequest @Parameters
-#>
-
-<#
-# Extract Acrobat_DC_Web_WWMUI.exe to the "Downloads folder\AcrobatTemp" folder
-# Do not change window focus while extracting Acrobat_DC_Web_WWMUI.exe, unless the process will be running forever
-Start-Process -FilePath "$DownloadsFolder\Acrobat_DC_Web_WWMUI.exe" -ArgumentList "/o /s /x /d `"$DownloadsFolder\AcrobatTemp`"" -PassThru -Wait
-#>
 
 <#
 	.SYNOPSIS
@@ -118,52 +95,27 @@ Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\Data1.cab" -Force
 Get-ChildItem -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\Adobe Acrobat" -Force
 Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Force
 
-# Download the latest patch
-# https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html
-<#
-	(Invoke-RestMethod -Uri "https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/acrobat/current_version.txt").Replace(".","").Trim()
-	won't help due to that fact it outputs the Mac patch version instead of Windows one that is always has a higher version number
-#>
-
-if (Test-Path -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp")
-{
-	# Get the bare patch number to compare with the latest one
-	$CurrentPatchVersion = (Split-Path -Path (Get-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp").FullName -Leaf).Replace(".msp","").Replace("AcrobatDCUpd","")
-
-	$Parameters = @{
-		Uri             = "https://www.adobe.com/devnet-docs/acrobatetk/tools/ReleaseNotesDC/index.html"
-		UseBasicParsing = $true
-	}
-	$outerHTML = (Invoke-WebRequest @Parameters).Links.outerHTML
-	[xml]$LatestPatch = $outerHTML | Where-Object -FilterScript {$_ -match "Planned"} | Select-Object -Index 0
-	$LatestPatchVersion = ($LatestPatch.a.title -replace "Planned.*$", "").Replace(".","").Trim()
-
-	$Parameters = @{
-		Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$LatestPatchVersion/AcrobatDCUpd$LatestPatchVersion.msp"
-		OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$LatestPatchVersion.msp"
-		UseBasicParsing = $true
-		Verbose         = $true
-	}
-	Invoke-WebRequest @Parameters
-
-	if ($CurrentPatchVersion -lt $LatestPatchVersion)
-	{
-		Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$CurrentPatchVersion.msp" -Force
-	}
+# Get the latest Adobe Acrobat Pro DC patch version (lang=mui)
+$Parameters = @{
+	Uri = "https://rdc.adobe.io/reader/products?lang=mui&os=Windows%2011&api_key=dc-get-adobereader-cdn"
+	UseBasicParsing = $true
 }
-else
-{
-	$Parameters = @{
-		Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$LatestPatchVersion/AcrobatDCUpd$LatestPatchVersion.msp"
-		OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$LatestPatchVersion.msp"
-		UseBasicParsing = $true
-		Verbose         = $true
-	}
-	Invoke-WebRequest @Parameters
-}
+$Version = (Invoke-RestMethod @Parameters).products.dcPro.version.Replace(".", "")
 
-# Create the edited setup.ini
-$PatchFile = Split-Path -Path "$DownloadsFolder\AcrobatDCUpd$LatestPatchVersion.msp" -Leaf
+# If latest version is greater than one from archive
+if ((Get-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp").FullName -notmatch $Version)
+{
+    Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp" -Force
+
+    $Parameters = @{
+	    Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($Version)/AcrobatDCUpd$($Version).msp"
+	    OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd$($Version).msp"
+	    UseBasicParsing = $true
+	    Verbose         = $true
+    }
+    Invoke-WebRequest @Parameters
+}
+$PatchFile = Split-Path -Path (Get-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCUpd*.msp").FullName -Leaf
 
 # setup.ini
 # https://www.adobe.com/devnet-docs/acrobatetk/tools/AdminGuide/properties.html
@@ -183,6 +135,7 @@ $CmdLine = @(
 $LCID = (Get-WinSystemLocale).LCID
 $DisplayLanguage = (Get-WinUserLanguageList).EnglishName | Select-Object -Index 0
 
+# Create the edited setup.ini
 $setupini = @"
 [Product]
 msi=AcroPro.msi

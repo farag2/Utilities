@@ -10,7 +10,7 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\ABBYY FineReader 15")
 	Remove-Printer -Name *ABBYY* -ErrorAction Ignore
 }
 
-# AIMP
+# AIMP x86
 if (Test-Path -Path "${env:ProgramFiles(x86)}\AIMP")
 {
 	if (-not (Test-Path -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\AIMP.lnk"))
@@ -46,6 +46,77 @@ if (Test-Path -Path "${env:ProgramFiles(x86)}\AIMP")
 		"/REG=R2"
 	)
 	Start-Process -FilePath "${env:ProgramFiles(x86)}\AIMP\Elevator.exe" -ArgumentList $Arguments
+
+	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+	$Parameters = @{
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/AIMP.ini"
+		OutFile         = "$env:APPDATA\AIMP\AIMP.ini"
+		UseBasicParsing = $true
+		Verbose         = $true
+	}
+	Invoke-WebRequest @Parameters
+
+	$Parameters = @{
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/AIMPac.ini"
+		OutFile         = "$env:APPDATA\AIMP\AIMPac.ini"
+		UseBasicParsing = $true
+		Verbose         = $true
+	}
+	Invoke-WebRequest @Parameters
+
+	# Save the current ID in the variable
+	$ID = Get-Content -Path "$env:APPDATA\AIMP\Skins\Default.ini" | Select-Object -Index 1
+
+	$Parameters = @{
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/Default.ini"
+		OutFile         = "$env:APPDATA\AIMP\Skins\Default.ini"
+		UseBasicParsing = $true
+		Verbose         = $true
+	}
+	Invoke-WebRequest @Parameters
+
+	$Defaultini = Get-Content -Path "$env:APPDATA\AIMP\Skins\Default.ini" -Encoding Default
+	$Defaultini[1] = $ID
+	$Defaultini | Set-Content -Path "$env:APPDATA\AIMP\Skins\Default.ini" -Encoding Default -Force
+}
+
+# AIMP x64
+if (Test-Path -Path $env:ProgramFiles\AIMP)
+{
+	if (-not (Test-Path -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\AIMP.lnk"))
+	{
+		Copy-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\AIMP\AIMP*.lnk" -Destination "$env:ProgramData\Microsoft\Windows\Start Menu\Programs" -Force -ErrorAction Ignore
+	}
+
+	$Remove = @(
+		"$env:PUBLIC\Desktop\AIMP.lnk",
+		"$env:ProgramData\Microsoft\Windows\Start Menu\Programs\AIMP",
+		"$env:ProgramFiles\AIMP\!Backup",
+		"$env:ProgramFiles\AIMP\history.txt",
+		"$env:ProgramFiles\AIMP\AIMP.url",
+		"$env:ProgramFiles\AIMP\license.rtf",
+		"$env:ProgramFiles\AIMP\Help",
+		"$env:ProgramFiles\AIMP\Skins",
+		"$env:ProgramFiles\AIMP\Plugins\aimp_AnalogMeter",
+		"$env:ProgramFiles\AIMP\Plugins\aimp_infobar",
+		"$env:ProgramFiles\AIMP\Plugins\aimp_lastfm",
+		"$env:ProgramFiles\AIMP\Plugins\aimp_scheduler",
+		"$env:ProgramFiles\AIMP\Plugins\Aorta"
+	)
+	Remove-Item -Path $Remove -Recurse -Force -ErrorAction Ignore
+
+	Get-ChildItem -Path $env:ProgramFiles\AIMP\Langs -Exclude russian.lng -Force | Remove-Item -Force
+
+	$Arguments = @(
+		# Disable the context menu integration
+		"/REG=M0"
+		# Associate files with AIMP
+		"/REG=R1"
+		# Make AIMP a default audio player
+		"/REG=R2"
+	)
+	Start-Process -FilePath "$env:ProgramFiles\AIMP\Elevator.exe" -ArgumentList $Arguments
 
 	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
@@ -247,6 +318,25 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	cmd.exe --% /c assoc txtfile\DefaultIcon=%ProgramFiles%\Notepad++\notepad++.exe,0
 
 	[xml]$config = Get-Content -Path "$env:APPDATA\Notepad++\config.xml" -Force
+	$config.Save("$env:APPDATA\Notepad++\config.xml")
+
+	# It is needed to use -wait to make Notepad++ apply written settings
+	Write-Warning -Message "Close Notepad++' window manually"
+	Start-Process -FilePath "$env:APPDATA\Notepad++\config.xml" -Wait
+
+	if (-not (Test-Path -Path $env:ProgramFiles\Notepad++\localization))
+	{
+		New-Item -Path $env:ProgramFiles\Notepad++\localization -ItemType Directory -Force
+	}
+	$Parameters = @{
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Notepad%2B%2B/localization/russian.xml"
+		OutFile         = "$env:ProgramFiles\Notepad++\localization\russian.xml"
+		UseBasicParsing = $true
+		Verbose         = $true
+	}
+	Invoke-WebRequest @Parameters
+
+	[xml]$config = Get-Content -Path "$env:APPDATA\Notepad++\config.xml" -Force
 	# Fluent UI: large
 	$config.NotepadPlus.GUIConfigs.GUIConfig | Where-Object -FilterScript {$_.name -eq "ToolBar"} | ForEach-Object -Process {$_."#text" = "large"}
 	# Mute all sounds
@@ -261,20 +351,9 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	$config.NotepadPlus.GUIConfigs.GUIConfig | Where-Object -FilterScript {$_.name -eq "Backup"} | ForEach-Object -Process {$_.action = "0"}
 	$config.Save("$env:APPDATA\Notepad++\config.xml")
 
-	if (-not (Test-Path -Path $env:ProgramFiles\Notepad++\localization))
-	{
-		New-Item -Path $env:ProgramFiles\Notepad++\localization -ItemType Directory -Force
-	}
-	$Parameters = @{
-		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Notepad%2B%2B/localization/russian.xml"
-		OutFile         = "$env:ProgramFiles\Notepad++\localization\russian.xml"
-		UseBasicParsing = $true
-		Verbose         = $true
-	}
-	Invoke-WebRequest @Parameters
-
-	# Open the config file to apply all changes
 	Start-Process -FilePath "$env:APPDATA\Notepad++\config.xml"
+	Start-Sleep -Seconds 1
+	Stop-Process -Name notepad++ -ErrorAction Ignore
 }
 
 # Office
@@ -309,6 +388,8 @@ if (Test-Path -Path "$env:ProgramFiles\paint.net")
 # qBittorrent
 if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 {
+	Stop-Process -Name qBittorrent -Force -ErrorAction Ignore
+
 	if (-not (Test-Path -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\qBittorrent.lnk"))
 	{
 		Copy-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\qBittorrent\qBittorrent.lnk" -Destination "$env:ProgramData\Microsoft\Windows\Start Menu\Programs" -Force
@@ -424,7 +505,12 @@ if (Test-Path -Path "$env:ProgramFiles\WinRAR")
 {
 	if (-not (Test-Path -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\WinRAR.lnk"))
 	{
-		Copy-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\WinRAR\WinRAR.lnk" -Destination "$env:ProgramData\Microsoft\Windows\Start Menu\Programs" -Force
+		Move-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\WinRAR\WinRAR.lnk" -Destination "$env:ProgramData\Microsoft\Windows\Start Menu\Programs" -Force
+	}
+
+	if (-not (Test-Path -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\WinRAR.lnk"))
+	{
+		Move-Item -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\WinRAR\WinRAR.lnk" -Destination "$env:APPDATA\Microsoft\Windows\Start Menu\Programs" -Force
 	}
 
 	$Remove = @(
@@ -452,4 +538,6 @@ if (Test-Path -Path "$env:ProgramFiles\WinRAR")
 
 	# Start WinRAR to apply changes
 	Start-Process -FilePath "$env:ProgramFiles\WinRAR\WinRAR.exe" -ArgumentList "-setup_integration" -Wait
+
+	Remove-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\WinRAR" -Recurse -Force -ErrorAction Ignore
 }

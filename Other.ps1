@@ -143,30 +143,32 @@ function Get-ProcessAuditEvents ([long]$MaxEvents)
 Get-ProcessAuditEvents -MaxEvents 10 | Format-List
 #
 $ParentProcess = @{
-	Label = "ParentProcess"
+	Label      = "ParentProcess"
 	Expression = {$_.Properties[13].Value}
 }
 Get-WinEvent -LogName Security | Where-Object -FilterScript {$_.Id -eq "4688"} | Where-Object -FilterScript {$_.Properties[5].Value -match 'conhost'} | Select-Object TimeCreated, $ParentProcess | Select-Object -First 10
 
-# Invoke code
-$url = "https://site.com/1.js"
-Invoke-Expression (New-Object -TypeName System.Net.WebClient).DownloadString($url)
-
-# Download and show text
-(Invoke-WebRequest -Uri "https://site.com/1.js" -OutFile D:\1.js -PassThru -UseBasicParsing).Content
-
-# Get text file content
-(Invoke-WebRequest -Uri "https://site.com/1.js" -UseBasicParsing).Content
+# Download a file
+$Parameters = @{
+	Uri             = "https://site.com/1.js"
+	OutFile         = "D:\1.js"
+	UseBasicParsing = $true
+}
+Invoke-WebRequest @Parameters
 
 # Create a zip archive
-Get-ChildItem -Path D:\folder -Filter *.ps1 -Recurse | Compress-Archive -DestinationPath D:\folder2 -CompressionLevel Optimal
+$Parameters = @{
+	DestinationPath  = "https://site.com/1.js"
+	CompressionLevel = "Optimal"
+}
+Get-ChildItem -Path D:\folder -Filter *.ps1 -Recurse | Compress-Archive @Parameters
 
 # Expand zip archive
 $Parameters = @{
-	Path = "D:\1.zip"
+	Path            = "D:\1.zip"
 	DestinationPath = "D:\1"
-	Force = [switch]::Present
-	Verbose = [switch]::Present
+	Force           = $true
+	Verbose         = $true
 }
 Expand-Archive @Parameters
 
@@ -894,6 +896,16 @@ Uninstall-Language
 # Shift+F10
 OOBE\BYPASSNRO
 
+# Windows 11 Insider Preview 25120+
+# Add a new user account
+net user username /add
+# Администраторы
+net localgroup Administrators username /add
+# "Пользователи удаленного рабочего стола"
+net localgroup "Remote Desktop Users" username /add
+cd OOBE
+msoobe.exe && shutdown.exe -r
+
 # Download the latest russia-blacklist.txt version
 # https://github.com/ValdikSS/GoodbyeDPI
 $Parameters = @{
@@ -904,7 +916,7 @@ Invoke-RestMethod @Parameters | Set-Content -Encoding UTF8 -Path "$PSScriptRoot\
 Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path "$PSScriptRoot\russia-blacklist.txt" -Raw)) -Encoding Byte -Path "$PSScriptRoot\russia-blacklist.txt" -Force
 
 # Get the NVIdia driver version
-$driver = (Get-CimInstance -ClassName CIM_VideoController | Where-Object -FilterScript {$_.Name -match "NVIDIA"}).DriverVersion | Select-Object -Index 0
+$driver_version = (Get-CimInstance -ClassName CIM_VideoController | Where-Object -FilterScript {$_.Name -match "NVIDIA"}).DriverVersion | Select-Object -Index 0
 ([regex]"[0-9.]{6}$").Match($driver_version).Value.Replace(".","").Insert(3,".")
 
 # Prevent Windows to restart automatically after a system failure
@@ -940,26 +952,6 @@ wsl --list --online | Where-Object -FilterScript {$_.Length -gt 1} | Select-Obje
 # -bsf bitstream_filters: a comma-separated list of bitstream filters
 # -vcodec codec: force video codec ('copy' to copy stream)
 ffmpeg -y "URL.m3u88" -bsf:a aac_adtstoasc -vcodec copy -c copy -crf 50 D:\video.mkv
-
-# Create table with scheduled tasks info that were created a week before the current day
-Get-ScheduledTask | Where-Object -FilterScript {$null -ne $_.Date} | ForEach-Object -Process {
-	$Task = $_
-
-	$_.Date.Split("T") | Where-Object -FilterScript {$_ -notmatch ":"} | ForEach-Object -Process {
-		# Convert dates into the yyyy-MM-dd format
-		$Date = [datetime]::ParseExact($_, "yyyy-MM-dd", $Null).ToString("dd.MM.yyyy")
-
-		# If task creation date is between the date that less than week ago and the current day
-		if ((Get-Date -Date $Date) -gt (Get-Date).AddDays(-8) -and ((Get-Date -Date $Date) -lt (Get-Date)))
-		{
-			[PSCustomObject]@{
-				"Task Name"     = $Task.TaskName
-				Path            = $Task.TaskPath
-				"Date Creation" = $Task.Date
-			}
-		}
-	}
-}
 
 # Change brightness to 100%
 (Get-WmiObject -Namespace root/WMI -ClassName WmiMonitorBrightnessMethods).WmiSetBrightness(1,100)
