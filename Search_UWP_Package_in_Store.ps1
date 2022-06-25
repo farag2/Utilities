@@ -26,7 +26,7 @@ function Search-MSStore
 	$Base = "https://storeedgefd.dsx.mp.microsoft.com/v8.0/search?"
 
 	$Parameters = [PSCustomObject]@{
-		market = (Get-UICulture).Parent.Name
+		market = (Get-UICulture).Name.Split("-")[1]
 		locale = $PSCulture
 		catalogLocales = $PSCulture
 		query = $Query
