@@ -955,3 +955,9 @@ ffmpeg -y "URL.m3u88" -bsf:a aac_adtstoasc -vcodec copy -c copy -crf 50 D:\video
 
 # Change brightness to 100%
 (Get-WmiObject -Namespace root/WMI -ClassName WmiMonitorBrightnessMethods).WmiSetBrightness(1,100)
+
+# Update Local Group Policy Editor (gpedit.msc) to make all manually created policy keys in the registry visible in the snap-in
+# https://www.brookspeppin.com/2018/11/04/modify-local-gpo-examples/
+LGPO.exe /b C:\Temp /n "Backup"
+LGPO.exe /parse /m C:\Temp\LGPO_Backup\DomainSysvol\GPO\Machine\registry.pol >> C:\Temp\lgpo.txt
+LGPO.exe /t C:\Temp\lgpo.txt
