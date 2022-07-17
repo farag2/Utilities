@@ -895,16 +895,18 @@ Uninstall-Language
 # Bypass the Internet account creation in Windows 11
 # Shift+F10
 OOBE\BYPASSNRO
-
 # Windows 11 Insider Preview 25120+
+# This method requires to invoke the following commands if user doesn't use password
+# Otherwise even if password is blank OS will ask to prolong it and block access
+# Set-LocalUser -Name $env:USERNAME -PasswordNeverExpires $true
+# net user $env:USERNAME /passwordreq:no
 # Add a new user account
 net user username /add
 # Администраторы
 net localgroup Administrators username /add
 # "Пользователи удаленного рабочего стола"
 net localgroup "Remote Desktop Users" username /add
-cd OOBE
-msoobe.exe && shutdown.exe -r
+net user $env:USERNAME /passwordreq:no
 
 # Download the latest russia-blacklist.txt version
 # https://github.com/ValdikSS/GoodbyeDPI
