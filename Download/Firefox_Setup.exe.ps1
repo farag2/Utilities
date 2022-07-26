@@ -56,6 +56,8 @@ MaintenanceService=true
 PreventRebootRequired=false
 OptionalExtensions=true
 RegisterDefaultAgent=false
+; Since 103
+TaskbarShortcut=true
 "@
 Set-Content -Path "$DownloadsFolder\Firefox Setup $LatestStableVersion\setup.ini" -Value $Setupini -Encoding Default -Force
 
