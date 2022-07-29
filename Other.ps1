@@ -963,3 +963,14 @@ ffmpeg -y "URL.m3u88" -bsf:a aac_adtstoasc -vcodec copy -c copy -crf 50 D:\video
 LGPO.exe /b C:\Temp /n "Backup"
 LGPO.exe /parse /m C:\Temp\LGPO_Backup\DomainSysvol\GPO\Machine\registry.pol >> C:\Temp\lgpo.txt
 LGPO.exe /t C:\Temp\lgpo.txt
+
+# TrueForAll
+[array]::TrueForAll(
+    [String[]](Get-Service -Name @("WSearch", "wscsvc")).Status,
+
+    [Predicate[String]]{
+        param ($Service)
+
+        $Service -eq "Running"
+    }
+)
