@@ -26,83 +26,195 @@ if ($null -eq (Get-PackageProvider -ListAvailable | Where-Object -FilterScript {
 	Install-PackageProvider -Name NuGet -Force
 }
 
-# Installing the latest PowerShellGet & PackageManagement
+# Install the latest PowerShellGet version
 # https://www.powershellgallery.com/packages/PowerShellGet
 # https://github.com/PowerShell/PowerShellGet
-# https://www.powershellgallery.com/packages/PackageManagement
-# https://devblogs.microsoft.com/powershell/powershellget-3-0-preview-1/
-$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
-$Parameters = @{
-	Uri             = "https://raw.githubusercontent.com/PowerShell/PowerShellGet/master/src/PowerShellGet.psd1"
-	OutFile         = "$DownloadsFolder\PowerShellGet.psd1"
-	UseBasicParsing = $true
-	Verbose         = $true
-}
-Invoke-WebRequest @Parameters
-
-# Get the latest PowerShellGet version
-$LatestPowerShellGetVersion = (Import-PowerShellDataFile -Path "$DownloadsFolder\PowerShellGet.psd1").ModuleVersion
-Remove-Item -Path "$DownloadsFolder\PowerShellGet.psd1" -Force
-
-if ($null -eq (Get-Module -Name PowerShellGet -ErrorAction Ignore))
+if ($null -eq (Get-Module -Name PowerShellGet -ListAvailable -ErrorAction Ignore))
 {
-	try
-	{
-		Import-Module -Name PowerShellGet -Force -ErrorAction Stop
-		$CurrentPowerShellGetVersion = (Get-Module -Name PowerShellGet | Select-Object -Index 0).Version.ToString()
+	# Get latest PackageManagement version
+	# https://www.powershellgallery.com/packages/PackageManagement
+	# https://github.com/oneget/oneget
+	$LatestPackageManagementVersion = "1.4.8.1"
+
+	<#
+	$Parameters = @{
+		Uri             = "https://raw.githubusercontent.com/OneGet/oneget/WIP/src/Microsoft.PowerShell.PackageManagement/PackageManagement.psd1"
+		OutFile         = "$DownloadsFolder\PackageManagement.psd1"
+		UseBasicParsing = $true
+		Verbose         = $true
 	}
-	catch
+	Invoke-WebRequest @Parameters
+	$LatestPackageManagementVersion = (Import-PowerShellDataFile -Path "$DownloadsFolder\PackageManagement.psd1").ModuleVersion
+	Remove-Item -Path "$DownloadsFolder\PackageManagement.psd1" -Force
+	#>
+
+	# If PackageManagement doesn't exist or its' version is lower than the latest one
+	$CurrentPackageManagementVersion = ((Get-Module -Name PackageManagement -ListAvailable).Version | Measure -Maximum).Maximum.ToString()
+	if (($null -eq (Get-Module -Name PackageManagement -ListAvailable -ErrorAction Ignore)) -or ([System.Version]$CurrentPackageManagementVersion -lt [System.Version]$LatestPackageManagementVersion))
 	{
-		Write-Verbose -Message "PowerShellGet module doesn't exist" -Verbose
-		Write-Verbose -Message "Installing PowerShellGet 2.2.5 & PackageManagement 1.4.7" -Verbose
+		Write-Verbose -Message "PackageManagement module doesn't exist" -Verbose
+		Write-Verbose -Message "Installing PackageManagement $($LatestPackageManagementVersion)" -Verbose
 
-		Install-Module -Name PowerShellGet -Force
-		Remove-Module -Name PowerShellGet -Force
+		# Download nupkg archive to expand it and install
+		$DownloadFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
+		$Parameters = @{
+			Uri             = "https://psg-prod-eastus.azureedge.net/packages/packagemanagement.$($LatestPackageManagementVersion).nupkg"
+			OutFile         = "$DownloadFolder\packagemanagement.nupkg"
+			UseBasicParsing = $true
+		}
+		Invoke-RestMethod @Parameters
 
-		# Removing all PowerShellGet folders except the latest and the default ones
-		Get-Childitem -Path "$env:ProgramFiles\WindowsPowerShell\Modules\PowerShellGet" -Force | Where-Object -FilterScript {$_.Name -ne "2.2.5"} | Remove-Item -Recurse -Force
+		Unblock-File -Path "$DownloadFolder\packagemanagement.nupkg"
 
-		Import-Module -Name PowerShellGet -RequiredVersion 2.2.5 -Force
-		Import-Module -Name PackageManagement -RequiredVersion 1.4.7 -Force
+		Rename-Item -Path "$DownloadFolder\packagemanagement.nupkg" -NewName "packagemanagement.zip" -Force
 
-		Write-Verbose -Message "PowerShellGet 2.2.5 & PackageManagement 1.4.7 installed. Restart the PowerShell session, and re-run the script" -Verbose
+		# Expanding
+		function ExtractZIPFolder
+		{
+			[CmdletBinding()]
+			param
+			(
+				[string]
+				$Source,
 
-		exit
+				[string]
+				$Destination,
+
+				[string[]]
+				$Folders,
+
+				[string[]]
+				$Files
+			)
+
+			Add-Type -Assembly System.IO.Compression.FileSystem
+
+			$ZIP = [IO.Compression.ZipFile]::OpenRead($Source)
+			$ZIP.Entries | Where-Object -FilterScript {($_.FullName -like "$($Folders)/*.*") -or ($Files -contains $_.FullName)} | ForEach-Object -Process {
+			$File = Join-Path -Path $Destination -ChildPath $_.FullName
+				$Parent = Split-Path -Path $File -Parent
+
+				if (-not (Test-Path -Path $Parent))
+				{
+					New-Item -Path $Parent -Type Directory -Force
+				}
+
+				[IO.Compression.ZipFileExtensions]::ExtractToFile($_, $File, $true)
+			}
+
+			$ZIP.Dispose()
+		}
+		$DownloadFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
+		$Parameters = @{
+			Source      = "$DownloadFolder\packagemanagement.zip"
+			Destination = "$env:ProgramFiles\WindowsPowerShell\Modules\PackageManagement"
+			Folders     = "fullclr"
+			Files       = @("PackageManagement.format.ps1xml", "PackageManagement.psd1", "PackageManagement.psm1", "PackageManagement.Resources.psd1", "PackageProviderFunctions.psm1")
+		}
+		ExtractZIPFolder @Parameters
+
+		Get-ChildItem -Path $env:ProgramFiles\WindowsPowerShell\Modules\PackageManagement\fullclr -Force | Move-Item -Destination $env:ProgramFiles\WindowsPowerShell\Modules\PackageManagement -Force
+		Remove-Item -Path $env:ProgramFiles\WindowsPowerShell\Modules\PackageManagement\fullclr -Force
 	}
+
+	$LatestPowerShellGetVersion = "2.2.5"
+	Write-Verbose -Message "PowerShellGet module doesn't exist" -Verbose
+	Write-Verbose -Message "Installing PowerShellGet $($LatestPowerShellGetVersion)" -Verbose
+
+	# Download nupkg archive to expand it and install
+	$DownloadFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
+	$Parameters = @{
+		Uri             = "https://psg-prod-eastus.azureedge.net/packages/powershellget.$($LatestPowerShellGetVersion).nupkg"
+		OutFile         = "$DownloadFolder\powershellget.nupkg"
+		UseBasicParsing = $true
+	}
+	Invoke-RestMethod @Parameters
+
+	Unblock-File -Path "$DownloadFolder\powershellget.nupkg"
+
+	Rename-Item -Path "$DownloadFolder\powershellget.nupkg" -NewName "powershellget.zip" -Force
+
+	# Expanding
+	function ExtractZIPFolder
+	{
+		[CmdletBinding()]
+		param
+		(
+			[string]
+			$Source,
+
+			[string]
+			$Destination,
+
+			[string[]]
+			$Folders,
+
+			[string[]]
+			$Files
+		)
+
+		Add-Type -Assembly System.IO.Compression.FileSystem
+
+		$ZIP = [IO.Compression.ZipFile]::OpenRead($Source)
+		$ZIP.Entries | Where-Object -FilterScript {($_.FullName -like "$($Folders)/*.*") -or ($Files -contains $_.FullName)} | ForEach-Object -Process {
+		$File = Join-Path -Path $Destination -ChildPath $_.FullName
+			$Parent = Split-Path -Path $File -Parent
+
+			if (-not (Test-Path -Path $Parent))
+			{
+				New-Item -Path $Parent -Type Directory -Force
+			}
+
+			[IO.Compression.ZipFileExtensions]::ExtractToFile($_, $File, $true)
+		}
+
+		$ZIP.Dispose()
+	}
+	$DownloadFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
+	$Parameters = @{
+		Source      = "$DownloadFolder\powershellget.zip"
+		Destination = "$env:ProgramFiles\WindowsPowerShell\Modules\PowerShellGet"
+		Folders     = "en-US"
+		Files       = @("PowerShellGet.psd1", "PSGet.Format.ps1xml", "PSGet.Resource.psd1", "PSModule.psm1")
+	}
+	ExtractZIPFolder @Parameters
+
+	# We cannot import PowerShellGet without PackageManagement. So it has to be installed first
+	Import-Module PowerShellGet -Force
+
+	Write-Verbose -Message "PowerShellGet & PackageManagement installed. Restart the PowerShell session, and re-run the script" -Verbose
+
+	exit
 }
 else
 {
-	$CurrentPowerShellGetVersion = (Get-Module -Name PowerShellGet | Select-Object -Index 0).Version.ToString()
+	$CurrentPowerShellGetVersion = ((Get-Module -Name PowerShellGet -ListAvailable).Version | Measure -Maximum).Maximum.ToString()
 }
 
-if ([System.Version]$CurrentPowerShellGetVersion -lt [System.Version]"2.2.5")
+$CurrentStablePowerShellGetVersion = "2.2.5"
+if ([System.Version]$CurrentPowerShellGetVersion -lt [System.Version]$CurrentStablePowerShellGetVersion)
 {
-		Write-Verbose -Message "Installing PowerShellGet & PackageManagement" -Verbose
+	Write-Verbose -Message "Installing PowerShellGet $($CurrentStablePowerShellGetVersion)" -Verbose
 
-		Install-Module -Name PowerShellGet -Force
-		Remove-Module -Name PowerShellGet -Force
+	Install-Module -Name PowerShellGet -Force
+	Install-Module -Name PackageManagement -Force
 
-		# Removing all PowerShellGet folders except the latest and the default ones
-		Get-Childitem -Path "$env:ProgramFiles\WindowsPowerShell\Modules\PowerShellGet" -Force | Where-Object -FilterScript {$_.Name -ne "2.2.5"} | Remove-Item -Recurse -Force
+	Write-Verbose -Message "PowerShellGet & PackageManagement installed. Restart the PowerShell session, and re-run the script" -Verbose
 
-		Import-Module -Name PowerShellGet -RequiredVersion 2.2.5 -Force
-		Import-Module -Name PackageManagement -RequiredVersion 1.4.7 -Force
-
-		Write-Verbose -Message "PowerShellGet 2.2.5 & PackageManagement 1.4.7 installed. Restart the PowerShell session, and re-run the script" -Verbose
-
-		exit
+	exit
 }
 
+$LatestPowerShellGetVersion = "3.0.16"
 if ([System.Version]$CurrentPowerShellGetVersion -lt [System.Version]$LatestPowerShellGetVersion)
 {
-		Write-Verbose -Message "Installing PowerShellGet $($LatestPowerShellGetVersion)" -Verbose
+	Write-Verbose -Message "Installing PowerShellGet $($LatestPowerShellGetVersion)" -Verbose
 
-		# We cannot install the preview build immediately due to the default 1.0.0.1 build doesn't support -AllowPrerelease
-		Install-Module -Name PowerShellGet -AllowPrerelease -Force
+	# We cannot install the preview build immediately due to the default 1.0.0.1 build doesn't support -AllowPrerelease
+	Install-Module -Name PowerShellGet -AllowPrerelease -Force
 
-		Write-Verbose -Message "PowerShellGet $($LatestPowerShellGetVersion) installed. Restart the PowerShell session, and re-run the script" -Verbose
+	Write-Verbose -Message "PowerShellGet & PackageManagement installed. Restart the PowerShell session, and re-run the script" -Verbose
 
-		exit
+	exit
 }
 
 # Installing the latest PSReadLine
@@ -121,7 +233,6 @@ if ($null -eq (Get-Module -Name PSReadline -ListAvailable -ErrorAction Ignore))
 	Write-Verbose -Message "Installing PSReadline" -Verbose
 
 	Install-Module -Name PSReadline -AllowPrerelease -Force
-	Remove-Module -Name PowerShellGet -Force
 
 	Write-Verbose -Message "PSReadline installed. Restart the PowerShell session, and re-run the script" -Verbose
 
@@ -129,7 +240,7 @@ if ($null -eq (Get-Module -Name PSReadline -ListAvailable -ErrorAction Ignore))
 }
 else
 {
-	$CurrentPSReadlineVersion = (Get-Module -Name PSReadline).Version.ToString()
+	$CurrentPSReadlineVersion = ((Get-Module -Name PSReadline -ListAvailable).Version | Measure -Maximum).Maximum.ToString()
 }
 
 # Installing the latest PSReadLine
