@@ -34,3 +34,7 @@ if (Test-Path -Path "$env:ProgramFiles\WireGuard")
 
 # Helps if the app cannot be installed
 # https://support.microsoft.com/en-us/topic/fix-problems-that-block-programs-from-being-installed-or-removed-cca7d1b6-65a9-3d98-426b-e9f927e1eb4d
+
+# The deselecting of “block untunneled traffic (kill-switch)” option changes the following line
+# AllowedIPs = 0.0.0.0/0, ::/0
+# AllowedIPs = 0.0.0.0/1, 128.0.0.0/1, ::/1, 8000::/1
