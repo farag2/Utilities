@@ -974,3 +974,15 @@ LGPO.exe /t C:\Temp\lgpo.txt
         $Service -eq "Running"
     }
 )
+
+# Disable Java autoupdate notify
+# https://www.java.com/en/download/uninstalltool.jsp
+if (-not (Test-Path -Path "HKLM:\SOFTWARE\Wow6432Node\JavaSoft\Java Update\Policy"))
+{
+	New-Item -Path "HKLM:\SOFTWARE\Wow6432Node\JavaSoft\Java Update\Policy" -Force
+}
+New-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\JavaSoft\Java Update\Policy" -Name EnableJavaUpdate -PropertyType DWord -Value 0 -Force
+New-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\JavaSoft\Java Update\Policy" -Name NotifyDownload -PropertyType DWord -Value 0 -Force
+New-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\JavaSoft\Java Update\Policy" -Name EnableAutoUpdateCheck -PropertyType DWord -Value 0 -Force
+# 
+Remove-ItemProperty -Path HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run -Name SunJavaUpdateSched -Force
