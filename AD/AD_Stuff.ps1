@@ -140,3 +140,33 @@ Get-ADGroupMember -Identity group -Server na.domain.com | ForEach-Object -Proces
 
 }
 # $All.Count
+
+# Get active Citrix accounts not older than 180 days
+Get-ChildItem -Path \\server\tsprofiles$ -Recurse -Force | ForEach-Object -Process {
+	Write-Verbose -Message $_ -Verbose
+
+	# Some profiles don't have UPMSettings.ini
+	if (Test-Path -Path "$($_.FullName)\UPMSettings.ini")
+	{
+		# Get files if they are old than 180 days (~ half of a year)
+		Get-Item -Path "$($_.FullName)\UPMSettings.ini" -Force | Where-Object -FilterScript {$_.LastWriteTime -lt (Get-Date).AddDays(-180)} | ForEach-Object -Process {
+			[PSCustomObject]@{
+				FullName      = $_.FullName
+				userID        = Split-Path -Path $_.FullName | Split-Path -Leaf
+				LastWriteTime = $_.LastWriteTime.ToString("dd.MM.yyyy")
+			}
+		} | Select-Object -Property FullName, userID, LastWriteTime | Export-Csv -Path "D:\list.csv" -NoTypeInformation -Delimiter ';' -Append
+	}
+}
+
+# Assign user to a group
+Get-ADUser -Identity $UserID | ForEach-Object -Process {
+	Add-ADGroupMember -Identity Group_Name -Members $_ -Confirm:$false
+}
+
+Get-ADGroup -Filter * -Properties * | Where-Object -FilterScript {$_.Description -match "folder1\\folder2\\folder3"} | ForEach-Object -Process {
+	[PSCustomObject]@{
+		Group = $_.SamAccountName
+		Path  = $_.Description
+	}
+}
