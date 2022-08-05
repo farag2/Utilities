@@ -34,7 +34,6 @@ if ($null -eq (Get-Module -Name PowerShellGet -ListAvailable -ErrorAction Ignore
 	# Get latest PackageManagement version
 	# https://www.powershellgallery.com/packages/PackageManagement
 	# https://github.com/oneget/oneget
-	$LatestPackageManagementVersion = "1.4.8.1"
 
 	<#
 	$Parameters = @{
@@ -50,6 +49,7 @@ if ($null -eq (Get-Module -Name PowerShellGet -ListAvailable -ErrorAction Ignore
 
 	# If PackageManagement doesn't exist or its' version is lower than the latest one
 	$CurrentPackageManagementVersion = ((Get-Module -Name PackageManagement -ListAvailable).Version | Measure -Maximum).Maximum.ToString()
+	$LatestPackageManagementVersion = "1.4.8.1"
 	if (($null -eq (Get-Module -Name PackageManagement -ListAvailable -ErrorAction Ignore)) -or ([System.Version]$CurrentPackageManagementVersion -lt [System.Version]$LatestPackageManagementVersion))
 	{
 		Write-Verbose -Message "PackageManagement module doesn't exist" -Verbose
@@ -182,7 +182,14 @@ if ($null -eq (Get-Module -Name PowerShellGet -ListAvailable -ErrorAction Ignore
 	# We cannot import PowerShellGet without PackageManagement. So it has to be installed first
 	Import-Module PowerShellGet -Force
 
-	Write-Verbose -Message "PowerShellGet & PackageManagement installed. Restart the PowerShell session, and re-run the script" -Verbose
+	if ($env:WT_SESSION)
+	{
+		Write-Verbose -Message "PowerShellGet & PackageManagement installed. Open a new Windows Terminal tab, and re-run the script" -Verbose
+	}
+	else
+	{
+		Write-Verbose -Message "PowerShellGet & PackageManagement installed. Restart the PowerShell session, and re-run the script" -Verbose
+	}
 
 	exit
 }
@@ -199,7 +206,14 @@ if ([System.Version]$CurrentPowerShellGetVersion -lt [System.Version]$CurrentSta
 	Install-Module -Name PowerShellGet -Force
 	Install-Module -Name PackageManagement -Force
 
-	Write-Verbose -Message "PowerShellGet & PackageManagement installed. Restart the PowerShell session, and re-run the script" -Verbose
+	if ($env:WT_SESSION)
+	{
+		Write-Verbose -Message "PowerShellGet $($CurrentStablePowerShellGetVersion) & PackageManagement installed. Open a new Windows Terminal tab, and re-run the script" -Verbose
+	}
+	else
+	{
+		Write-Verbose -Message "PowerShellGet $($CurrentStablePowerShellGetVersion) & PackageManagement installed. Restart the PowerShell session, and re-run the script" -Verbose
+	}
 
 	exit
 }
@@ -212,7 +226,14 @@ if ([System.Version]$CurrentPowerShellGetVersion -lt [System.Version]$LatestPowe
 	# We cannot install the preview build immediately due to the default 1.0.0.1 build doesn't support -AllowPrerelease
 	Install-Module -Name PowerShellGet -AllowPrerelease -Force
 
-	Write-Verbose -Message "PowerShellGet & PackageManagement installed. Restart the PowerShell session, and re-run the script" -Verbose
+	if ($env:WT_SESSION)
+	{
+		Write-Verbose -Message "PowerShellGet $($LatestPowerShellGetVersion) installed. Open a new Windows Terminal tab, and re-run the script" -Verbose
+	}
+	else
+	{
+		Write-Verbose -Message "PowerShellGet $($LatestPowerShellGetVersion installed. Restart the PowerShell session, and re-run the script" -Verbose
+	}
 
 	exit
 }
@@ -230,11 +251,18 @@ $LatestPSReadLineVersion = (Invoke-RestMethod @Parameters | Where-Object -Filter
 if ($null -eq (Get-Module -Name PSReadline -ListAvailable -ErrorAction Ignore))
 {
 	Write-Verbose -Message "PSReadline module doesn't exist" -Verbose
-	Write-Verbose -Message "Installing PSReadline" -Verbose
+	Write-Verbose -Message "Installing PSReadline $($LatestPSReadLineVersion)" -Verbose
 
-	Install-Module -Name PSReadline -AllowPrerelease -Force
+	Install-Module -Name PSReadline -Force
 
-	Write-Verbose -Message "PSReadline installed. Restart the PowerShell session, and re-run the script" -Verbose
+	if ($env:WT_SESSION)
+	{
+		Write-Verbose -Message "PSReadline $($LatestPSReadLineVersion) installed. Open a new Windows Terminal tab, and re-run the script" -Verbose
+	}
+	else
+	{
+		Write-Verbose -Message "PSReadline $($LatestPSReadLineVersion) installed. Restart the PowerShell session, and re-run the script" -Verbose
+	}
 
 	exit
 }
@@ -248,9 +276,16 @@ if ([System.Version]$CurrentPSReadlineVersion -lt [System.Version]$LatestPSReadL
 {
 	Write-Verbose -Message "Installing PSReadLine $($LatestPSReadLineVersion)" -Verbose
 
-	Install-Module -Name PSReadline -AllowPrerelease -Force
+	Install-Module -Name PSReadline -Force
 
-	Write-Verbose -Message "PSReadLine installed. Restart the PowerShell session and re-run the script" -Verbose
+	if ($env:WT_SESSION)
+	{
+		Write-Verbose -Message "PSReadline $($LatestPSReadLineVersion) installed. Open a new Windows Terminal tab, and re-run the script" -Verbose
+	}
+	else
+	{
+		Write-Verbose -Message "PSReadline $($LatestPSReadLineVersion) installed. Restart the PowerShell session, and re-run the script" -Verbose
+	}
 
 	exit
 }
@@ -282,7 +317,14 @@ else
 {
 	Start-Process -FilePath wt -Wait
 
-	Write-Verbose -Message "Restart the PowerShell session and re-run the script" -Verbose
+	if ($env:WT_SESSION)
+	{
+		Write-Verbose -Message "Open a new Windows Terminal tab, and re-run the script" -Verbose
+	}
+	else
+	{
+			Write-Verbose -Message "Restart the PowerShell session and re-run the script" -Verbose
+	}
 
 	exit
 }
