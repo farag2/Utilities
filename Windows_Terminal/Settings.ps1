@@ -323,7 +323,7 @@ else
 	}
 	else
 	{
-			Write-Verbose -Message "Restart the PowerShell session and re-run the script" -Verbose
+		Write-Verbose -Message "Restart the PowerShell session and re-run the script" -Verbose
 	}
 
 	exit
