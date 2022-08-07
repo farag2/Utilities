@@ -48,7 +48,7 @@ if ($null -eq (Get-Module -Name PowerShellGet -ListAvailable -ErrorAction Ignore
 	#>
 
 	# If PackageManagement doesn't exist or its' version is lower than the latest one
-	$CurrentPackageManagementVersion = ((Get-Module -Name PackageManagement -ListAvailable).Version | Measure -Maximum).Maximum.ToString()
+	$CurrentPackageManagementVersion = ((Get-Module -Name PackageManagement -ListAvailable).Version | Measure-Object -Maximum).Maximum.ToString()
 	$LatestPackageManagementVersion = "1.4.8.1"
 	if (($null -eq (Get-Module -Name PackageManagement -ListAvailable -ErrorAction Ignore)) -or ([System.Version]$CurrentPackageManagementVersion -lt [System.Version]$LatestPackageManagementVersion))
 	{
@@ -195,7 +195,7 @@ if ($null -eq (Get-Module -Name PowerShellGet -ListAvailable -ErrorAction Ignore
 }
 else
 {
-	$CurrentPowerShellGetVersion = ((Get-Module -Name PowerShellGet -ListAvailable).Version | Measure -Maximum).Maximum.ToString()
+	$CurrentPowerShellGetVersion = ((Get-Module -Name PowerShellGet -ListAvailable).Version | Measure-Object -Maximum).Maximum.ToString()
 }
 
 $CurrentStablePowerShellGetVersion = "2.2.5"
@@ -232,7 +232,7 @@ if ([System.Version]$CurrentPowerShellGetVersion -lt [System.Version]$LatestPowe
 	}
 	else
 	{
-		Write-Verbose -Message "PowerShellGet $($LatestPowerShellGetVersion installed. Restart the PowerShell session, and re-run the script" -Verbose
+		Write-Verbose -Message "PowerShellGet $($LatestPowerShellGetVersion) installed. Restart the PowerShell session, and re-run the script" -Verbose
 	}
 
 	exit
@@ -268,7 +268,7 @@ if ($null -eq (Get-Module -Name PSReadline -ListAvailable -ErrorAction Ignore))
 }
 else
 {
-	$CurrentPSReadlineVersion = ((Get-Module -Name PSReadline -ListAvailable).Version | Measure -Maximum).Maximum.ToString()
+	$CurrentPSReadlineVersion = ((Get-Module -Name PSReadline -ListAvailable).Version | Measure-Object -Maximum).Maximum.ToString()
 }
 
 # Installing the latest PSReadLine
