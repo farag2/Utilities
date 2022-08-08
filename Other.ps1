@@ -965,15 +965,23 @@ LGPO.exe /parse /m C:\Temp\LGPO_Backup\DomainSysvol\GPO\Machine\registry.pol >> 
 LGPO.exe /t C:\Temp\lgpo.txt
 
 # TrueForAll
-[array]::TrueForAll(
-    [String[]](Get-Service -Name @("WSearch", "wscsvc")).Status,
-
-    [Predicate[String]]{
-        param ($Service)
-
-        $Service -eq "Running"
-    }
-)
+try
+{
+    [array]::TrueForAll(
+        [string[]](Get-Service -Name "WinDefend", "SecurityHealthService", "wscsvc" -ErrorAction Stop),
+ 
+        [Predicate[string]]{
+            param ($Service)
+ 
+            $null -ne $Service
+        }
+    )
+}
+catch [Microsoft.PowerShell.Commands.ServiceCommandException]
+{
+    "Some services are missing"
+    # exit
+}
 
 # Disable Java autoupdate notify
 # https://www.java.com/en/download/uninstalltool.jsp
