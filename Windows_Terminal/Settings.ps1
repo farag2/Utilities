@@ -296,47 +296,18 @@ if ([System.Version]$CurrentPSReadlineVersion -eq [System.Version]$LatestPSReadL
 	Get-Childitem -Path "$env:ProgramFiles\WindowsPowerShell\Modules\PSReadLine" -Force | Where-Object -FilterScript {$_.Name -ne $LatestPSReadLineVersion} | Remove-Item -Recurse -Force
 }
 
-# Downloading Windows95.gif
-# https://github.com/farag2/Utilities/tree/master/Windows%20Terminal
-if (-not (Test-Path -Path "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\Windows95.gif"))
-{
-	$Parameters = @{
-		Uri             = "https://github.com/farag2/Utilities/raw/master/Windows_Terminal/Windows95.gif"
-		OutFile         = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\Windows95.gif"
-		UseBasicParsing = $true
-		Verbose         = $true
-	}
-	Invoke-WebRequest @Parameters
-}
-
 if (Test-Path -Path "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json")
 {
 	$settings = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 }
 else
 {
-	Start-Process -FilePath wt -Wait
+	Start-Process -FilePath wt
 
-	if ($env:WT_SESSION)
-	{
-		Write-Verbose -Message "Open a new Windows Terminal tab, and re-run the script" -Verbose
-	}
-	else
-	{
-		Write-Verbose -Message "Restart the PowerShell session and re-run the script" -Verbose
-	}
+	Write-Verbose -Message "Restart the PowerShell session and re-run the script" -Verbose
 
 	exit
 }
-
-# Removing all comments to parse JSON file
-if (Get-Content -Path $settings -Encoding UTF8 -Force | Select-String -Pattern "//" -SimpleMatch)
-{
-	Set-Content -Path $settings -Value (Get-Content -Path $settings -Encoding UTF8 -Force | Select-String -Pattern "//" -NotMatch) -Encoding UTF8 -Force
-}
-
-# Deleting all blank lines from JSON file
-(Get-Content -Path $settings -Force) | Where-Object -FilterScript {$_.Trim(" `t")} | Set-Content -Path $settings -Encoding UTF8 -Force
 
 try
 {
@@ -344,11 +315,11 @@ try
 }
 catch [System.Exception]
 {
-	Write-Verbose "JSON is not valid!" -Verbose
+	Write-Warning -Message "JSON is not valid!"
 
 	Invoke-Item -Path "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState"
 
-	break
+	exit
 }
 
 #region General
@@ -440,6 +411,18 @@ else
 
 #region defaults
 # Set Windows95.gif as a background image
+# https://github.com/farag2/Utilities/tree/master/Windows_Terminal
+if (-not (Test-Path -Path "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\Windows95.gif"))
+{
+	$Parameters = @{
+		Uri             = "https://github.com/farag2/Utilities/raw/master/Windows_Terminal/Windows95.gif"
+		OutFile         = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\Windows95.gif"
+		UseBasicParsing = $true
+		Verbose         = $true
+	}
+	Invoke-WebRequest @Parameters
+}
+
 if ($Terminal.profiles.defaults.backgroundImage)
 {
 	$Terminal.profiles.defaults.backgroundImage = "ms-appdata:///roaming/Windows95.gif"
