@@ -242,7 +242,7 @@ if ([System.Version]$CurrentPowerShellGetVersion -lt [System.Version]$LatestPowe
 # https://github.com/PowerShell/PSReadLine/releases
 # https://www.powershellgallery.com/packages/PSReadLine
 $Parameters = @{
-	Uri            = "https://api.github.com/repos/PowerShell/PSReadLine/releases"
+	Uri            = "https://api.github.com/repos/PowerShell/PSReadLine/releases/latest"
 	UseBasicParsing = $true
 }
 $LatestPSReadLineVersion = (Invoke-RestMethod @Parameters | Where-Object -FilterScript {$_.prerelease -eq $true}).tag_name.Replace("v", "") | Select-Object -First 1
