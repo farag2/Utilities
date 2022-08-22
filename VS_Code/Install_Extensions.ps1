@@ -9,17 +9,14 @@ $Extensions = @(
 	# PowerShell
 	"ms-vscode.PowerShell",
 
-	# Code Runner
-	"formulahendry.code-runner",
-
-	# Regex Previewer
-	"chrmarti.regex",
-
-	# SVG Viewer
-	"cssho.vscode-svgviewer",
-
 	# Gremlins tracker
-	"nhoizey.gremlins"
+	"nhoizey.gremlins",
+
+	# Run selected PowerShell script
+	"bvanderhorn.run-selected-powershell-script",
+
+	# Symbols
+	"miguelsolorio.symbols"
 )
 foreach ($Extension in $Extensions)
 {
