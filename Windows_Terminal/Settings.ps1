@@ -323,6 +323,26 @@ catch [System.Exception]
 }
 
 #region General
+# Copy
+if (-not ($Terminal.actions | Where-Object -FilterScript {$_.command -eq "copy"} | Where-Object -FilterScript {$_.keys -eq "ctrl+c"}))
+{
+	$closeTab = [PSCustomObject]@{
+		"command" = "copy"
+		"keys" = "ctrl+c"
+	}
+	$Terminal.actions += $closeTab
+}
+
+# Paste
+if (-not ($Terminal.actions | Where-Object -FilterScript {$_.command -eq "paste"} | Where-Object -FilterScript {$_.keys -eq "ctrl+v"}))
+{
+	$closeTab = [PSCustomObject]@{
+		"command" = "paste"
+		"keys" = "ctrl+v"
+	}
+	$Terminal.actions += $closeTab
+}
+
 # Close tab
 if (-not ($Terminal.actions | Where-Object -FilterScript {$_.command -eq "closeTab"} | Where-Object -FilterScript {$_.keys -eq "ctrl+w"}))
 {
