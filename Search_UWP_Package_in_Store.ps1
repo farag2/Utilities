@@ -1,4 +1,4 @@
-#Requires -Version 7.1
+#Requires -Version 5.1
 
 <#
 	.SYNOPSIS
@@ -12,6 +12,8 @@
 	.NOTES
 	Originally coded by antidisestablishmentarianism
 	https://dev.to/antidisestablishmentarianism/search-microsoft-store-from-powershell-2bjj
+	
+	https://github.com/ThomasPe/MS-Store-API
 #>
 function Search-MSStore
 {
@@ -72,6 +74,8 @@ function Search-MSStore
 	.NOTES
 	Originally coded by antidisestablishmentarianism
 	https://dev.to/antidisestablishmentarianism/search-microsoft-store-from-powershell-2bjj
+
+	https://github.com/ThomasPe/MS-Store-API
 #>
 function Search-MSStore
 {
@@ -86,7 +90,7 @@ function Search-MSStore
 	$Base = "https://storeedgefd.dsx.mp.microsoft.com/v8.0/search?"
 
 	$Parameters = @{
-		market = (Get-UICulture).Parent.Name
+		market = (Get-UICulture).TwoLetterISOLanguageName
 		locale = $PSCulture
 		catalogLocales = $PSCulture
 		query = $Query
