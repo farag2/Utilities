@@ -954,7 +954,7 @@ wsl --list --online | Where-Object -FilterScript {$_.Length -gt 1} | Select-Obje
 # -y: overwrite output files
 # -bsf bitstream_filters: a comma-separated list of bitstream filters
 # -vcodec codec: force video codec ('copy' to copy stream)
-ffmpeg -y "URL.m3u88" -bsf:a aac_adtstoasc -vcodec copy -c copy -crf 50 D:\video.mkv
+ffmpeg -i "URL.m3u88" -bsf:a aac_adtstoasc -vcodec copy -c copy -crf 50 D:\video.mkv -y
 
 # Change brightness to 100%
 (Get-WmiObject -Namespace root/WMI -ClassName WmiMonitorBrightnessMethods).WmiSetBrightness(1,100)
@@ -966,23 +966,15 @@ LGPO.exe /parse /m C:\Temp\LGPO_Backup\DomainSysvol\GPO\Machine\registry.pol >> 
 LGPO.exe /t C:\Temp\lgpo.txt
 
 # TrueForAll
-try
-{
-    [array]::TrueForAll(
-        [string[]](Get-Service -Name "WinDefend", "SecurityHealthService", "wscsvc" -ErrorAction Stop),
- 
-        [Predicate[string]]{
-            param ($Service)
- 
-            $null -ne $Service
-        }
-    )
-}
-catch [Microsoft.PowerShell.Commands.ServiceCommandException]
-{
-    "Some services are missing"
-    # exit
-}
+[array]::TrueForAll(
+    [string[]](Get-Service -Name WinDefend, SecurityHealthService, wisvc).Status,
+    
+    [Predicate[string]]{
+        param ($Status)
+
+        $Status -eq "Running"
+    }
+)
 
 # Disable Java autoupdate notify
 # https://www.java.com/en/download/uninstalltool.jsp
