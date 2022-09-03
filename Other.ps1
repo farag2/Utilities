@@ -954,7 +954,7 @@ wsl --list --online | Where-Object -FilterScript {$_.Length -gt 1} | Select-Obje
 # -y: overwrite output files
 # -bsf bitstream_filters: a comma-separated list of bitstream filters
 # -vcodec codec: force video codec ('copy' to copy stream)
-ffmpeg -i "URL.m3u88" -bsf:a aac_adtstoasc -vcodec copy -c copy -crf 50 D:\video.mkv -y
+ffmpeg -i "URL.m3u8" -bsf:a aac_adtstoasc -vcodec copy -c copy -crf 50 D:\video.mkv -y
 
 # Change brightness to 100%
 (Get-WmiObject -Namespace root/WMI -ClassName WmiMonitorBrightnessMethods).WmiSetBrightness(1,100)
