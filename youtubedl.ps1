@@ -51,11 +51,12 @@ function youtube-dl
 
 	# Get the latest FFmpeg URL
 	# "ffmpeg-*-win64-lgpl-[0-9].[0-9].zip"
+	# gpl includes all dependencies, even those that require full GPL instead of just LGPL
 	$Parameters = @{
 		Uri              = "https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/latest"
 		UseBasicParsing  = $true
 	}
-	$LatestFFmpegURL = ((Invoke-RestMethod @Parameters).assets | Where-Object -FilterScript {$_.name -match "ffmpeg-n5.0-latest-win64-gpl-5.0.zip"}).browser_download_url
+	$LatestFFmpegURL = ((Invoke-RestMethod @Parameters).assets | Where-Object -FilterScript {$_.name -match "ffmpeg-n5.1-latest-win64-gpl-5.1.zip"}).browser_download_url
 	$Parameters = @{
 		Uri              = $LatestFFmpegURL
 		OutFile          = "$DownloadsFolder\FFmpeg.zip"
