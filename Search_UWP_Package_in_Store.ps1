@@ -25,7 +25,7 @@ function Search-MSStore
 		market       = "US"
 		locale       = "en-US"
 		deviceFamily = "windows.desktop"
-		query        = "calculator"
+		query        = $Query
 	}
 
 	[string]$Keys = (-join ($Keys.psobject.Properties.Name | ForEach-Object -Process {$_ + "=" + $Keys.$_ + "&"})).TrimEnd("&")
