@@ -29,6 +29,8 @@ function Search-MSStore
 	}
 
 	[string]$Keys = (-join ($Keys.psobject.Properties.Name | ForEach-Object -Process {$_ + "=" + $Keys.$_ + "&"})).TrimEnd("&")
+	# To use without creating Search-MSStore function
+	# [string]$Keys = (-join ($Tables.Keys | ForEach-Object -Process {$_ + "=" + $Tables[$_] + "&"})).TrimEnd("&")
 
 	$Parameters = @{
 		Uri             = "https://storeedgefd.dsx.mp.microsoft.com/v9.0/pages/searchResults?$($Keys)"
