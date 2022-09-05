@@ -38,6 +38,7 @@ $Parameters = @{
 	Verbose         = $true
 }
 $LatestStableVersion = (Invoke-RestMethod @Parameters).LATEST_FIREFOX_VERSION
+
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
 	Uri             = "https://download.mozilla.org/?product=firefox-msi-latest-ssl&os=win64&lang=$Language"
