@@ -32,7 +32,13 @@ else
 	$Language = (Get-WinSystemLocale).Parent.Name
 }
 
-$LatestStableVersion = (Invoke-RestMethod -Uri "https://product-details.mozilla.org/1.0/firefox_versions.json" -UseBasicParsing).LATEST_FIREFOX_VERSION
+$Parameters = @{
+	Uri             = "https://product-details.mozilla.org/1.0/firefox_versions.json"
+	UseBasicParsing = $true
+	Verbose         = $true
+}
+$LatestStableVersion = (Invoke-RestMethod @Parameters).LATEST_FIREFOX_VERSION
+
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
 	Uri             = "https://ftp.mozilla.org/pub/firefox/releases/$LatestStableVersion/win64-EME-free/$Language/Firefox%20Setup%20$LatestStableVersion.exe"
