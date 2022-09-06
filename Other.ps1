@@ -148,38 +148,11 @@ $ParentProcess = @{
 }
 Get-WinEvent -LogName Security | Where-Object -FilterScript {$_.Id -eq "4688"} | Where-Object -FilterScript {$_.Properties[5].Value -match 'conhost'} | Select-Object TimeCreated, $ParentProcess | Select-Object -First 10
 
-# Download a file
-$Parameters = @{
-	Uri             = "https://site.com/1.js"
-	OutFile         = "D:\1.js"
-	UseBasicParsing = $true
-}
-Invoke-WebRequest @Parameters
-
-# Create a zip archive
-$Parameters = @{
-	DestinationPath  = "https://site.com/1.js"
-	CompressionLevel = "Optimal"
-}
-Get-ChildItem -Path D:\folder -Filter *.ps1 -Recurse | Compress-Archive @Parameters
-
-# Expand zip archive
-$Parameters = @{
-	Path            = "D:\1.zip"
-	DestinationPath = "D:\1"
-	Force           = $true
-	Verbose         = $true
-}
-Expand-Archive @Parameters
-
 # Split the drive letter
 Split-Path -Path "D:\file.mp3" -Qualifier
 
 # Get error description
 certutil -error 0xc0000409
-
-# Get file hash
-Get-FileHash -Path D:\1.txt -Algorithm MD5
 
 # Get string hash
 function Get-StringHash
@@ -372,11 +345,7 @@ $int = [System.BitConverter]::ToInt32($bytes, 0)
 '0x{0:x}' -f $int
 
 # Disable net protocols
-$ComponentIDs = @(
-	"ms_tcpip6",
-	"ms_pacer"
-)
-Disable-NetAdapterBinding -Name Ethernet -ComponentID $ComponentIDs
+Disable-NetAdapterBinding -Name Ethernet -ComponentID @("ms_tcpip6", "ms_pacer")
 
 # Calculate videofiles' length in a folder
 function Get-Duration
@@ -558,32 +527,6 @@ foreach ($AppxPackage in $AppxPackages)
 }
 Write-Progress -Activity "Uninstalling UWP apps" -Completed
 
-# Arrays
-$Fruits = "Apple","Pear","Banana","Orange"
-$Fruits.GetType()
-
-$Fruits.Add("Kiwi")
-$Fruits.Remove("Apple")
-$Fruits.IsFixedSize
-
-[System.Collections.ArrayList]$ArrayList = $Fruits
-$ArrayList.GetType()
-
-$ArrayList.Add("Kiwi")
-$ArrayList
-$ArrayList.Remove("Apple")
-$ArrayList
-
-# Conver an array into System.Collections.ObjectModel.Collection`1
-$Collection = {$Fruits}.Invoke()
-$Collection
-$Collection.GetType()
-
-$Collection.Add("Melon")
-$Collection
-$Collection.Remove("Apple")
-$Collection
-
 # Waiting for a process
 do
 {
@@ -648,7 +591,7 @@ slmgr.vbs /skms <servername>
 slmgr.vbs /ato
 
 # Get exception name
-$Error[0].Exception.GetType().FullName
+$Error.Exception.GetType().FullName
 (Get-Error).Exception.InnerException.Message
 
 # Close all windows without killing the File Explorer process
@@ -764,47 +707,31 @@ $Collection.Add("Melon")
 $Collection.Remove("Apple")
 $Collection
 
-# Set start-up powershell.exe location for Desktop
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
+# Arrays
+$Fruits = "Apple","Pear","Banana","Orange"
+$Fruits.GetType()
 
-if (-not (Test-Path -Path $profile))
-{
-	New-Item -Path $profile -Force
-}
+$Fruits.Add("Kiwi")
+$Fruits.Remove("Apple")
+$Fruits.IsFixedSize
 
-$Value = "Set-Location -Path (Get-ItemPropertyValue -Path `"HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders`" -Name Desktop)"
-Add-Content -Path $profile -Value $Value -Force
+[System.Collections.ArrayList]$ArrayList = $Fruits
+$ArrayList.GetType()
 
-# Restart script by itself
-try
-{
-	. $PSCommandPath
-}
-catch
-{
-	$Error.Exception.Message
+$ArrayList.Add("Kiwi")
+$ArrayList
+$ArrayList.Remove("Apple")
+$ArrayList
 
-	continue
-}
+# Convert an array into System.Collections.ObjectModel.Collection`1
+$Collection = {$Fruits}.Invoke()
+$Collection
+$Collection.GetType()
 
-# Check if Microsoft Defender is enabled
-$cimParams = @{
-	Namespace = "root/SecurityCenter2"
-	ClassName = "Antivirusproduct"
-}
-$productState = (Get-CimInstance @CimParams | Where-Object -FilterScript {$_.displayName -match "Defender"}).productState
-
-$AVState = ('0x{0:x}' -f $productState).Substring(3, 2)
-if ($AVState -match "00|01")
-{
-	$false
-}
-else
-{
-	$true
-}
-
-(Get-MpComputerStatus).AntivirusEnabled -eq $true
+$Collection.Add("Melon")
+$Collection
+$Collection.Remove("Apple")
+$Collection
 
 # Disable NTFS compression in all subfolders
 # https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/compact
@@ -823,37 +750,11 @@ $ParentFolder = Split-Path -Path $Paths.FullName -Parent
 $Array = @('Handshake', 'Success', 'Status', 200, '192.30.253.113', 'OK', 0xF, "2001:4860:4860::8888")
 $Array | Where-Object -FiletScript {-not ($_ -as [Double]) -and ($_ -as [IPAddress])}
 
-# Get the latest GitHub release version via GitHub API
-try
-{
-	$LatestRelease = (Invoke-RestMethod -Uri "https://api.github.com/repos/farag2/Sophia-Script-for-Windows/releases/latest").tag_name
-	$CurrentRelease = (Get-Module -Name Sophia).Version.ToString()
-	switch ([System.Version]$LatestRelease -gt [System.Version]$CurrentRelease)
-	{
-		$true
-		{
-
-		}
-	}
-}
-catch [System.Net.WebException]
-{
-	
-}
-	
-# Parse PowerShell manifest
-Import-PowerShellDataFile -Path D:\Manifest.psd1
-
 # Trigger Windows Update for detecting new updates
 # https://michlstechblog.info/blog/windows-10-trigger-detecting-updates-from-command-line
 # https://omgdebugging.com/2017/10/09/command-line-equivalent-of-wuauclt-in-windows-10-windows-server-2016/
 (New-Object -ComObject Microsoft.Update.AutoUpdate).DetectNow()
 usoclient StartScan
-
-# Check whether fTPM 2.0 supported
-$CurrentVersion = (Get-CimInstance -Namespace root/cimv2/Security/MicrosoftTpm -ClassName Win32_Tpm).SpecVersion.Split(",").Trim() | Select-Object -First 1
-if ([System.Version]$CurrentVersion -lt [System.Version]"2.0")
-{}
 
 # Exclude KB update from installing
 (New-Object -ComObject Microsoft.Update.Session).CreateUpdateSearcher().Search("IsHidden = 0").Updates | Where-Object -FilterScript {$_.KBArticleIDs -eq "5005463"} | ForEach-Object -Process {$_.IsHidden = $true}
@@ -917,10 +818,6 @@ $Parameters = @{
 }
 Invoke-RestMethod @Parameters | Set-Content -Encoding UTF8 -Path "$PSScriptRoot\russia-blacklist.txt" -Force
 Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path "$PSScriptRoot\russia-blacklist.txt" -Raw)) -Encoding Byte -Path "$PSScriptRoot\russia-blacklist.txt" -Force
-
-# Get the NVIdia driver version
-$driver_version = (Get-CimInstance -ClassName CIM_VideoController | Where-Object -FilterScript {$_.Name -match "NVIDIA"}).DriverVersion | Select-Object -Index 0
-([regex]"[0-9.]{6}$").Match($driver_version).Value.Replace(".","").Insert(3,".")
 
 # Prevent Windows to restart automatically after a system failure
 # The parameter EnableAllPrivileges allows us to manipulate the properties of this WMI object if the current Powershell host runs as Administrator
