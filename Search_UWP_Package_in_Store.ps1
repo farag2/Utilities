@@ -20,17 +20,14 @@ function Search-MSStore
 		$Query
 	)
 
-	$Keys = [PSCustomObject]@{
+	$Parameters = @{
 		appVersion   = "22203.1401.0.0"
 		market       = "US"
 		locale       = "en-US"
 		deviceFamily = "windows.desktop"
 		query        = $Query
 	}
-
-	[string]$Keys = (-join ($Keys.psobject.Properties.Name | ForEach-Object -Process {$_ + "=" + $Keys.$_ + "&"})).TrimEnd("&")
-	# To use without creating Search-MSStore function
-	# [string]$Keys = (-join ($Tables.Keys | ForEach-Object -Process {$_ + "=" + $Tables[$_] + "&"})).TrimEnd("&")
+	[string]$Keys = (-join ($Parameters.Keys | ForEach-Object -Process {$_ + "=" + $Parameters[$_] + "&"})).TrimEnd("&")
 
 	$Parameters = @{
 		Uri             = "https://storeedgefd.dsx.mp.microsoft.com/v9.0/pages/searchResults?$($Keys)"
