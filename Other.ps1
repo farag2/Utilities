@@ -151,9 +151,6 @@ Get-WinEvent -LogName Security | Where-Object -FilterScript {$_.Id -eq "4688"} |
 # Split the drive letter
 Split-Path -Path "D:\file.mp3" -Qualifier
 
-# Get error description
-certutil -error 0xc0000409
-
 # Get string hash
 function Get-StringHash
 {
@@ -637,6 +634,9 @@ function Convert-Error ([int]$ErrorCode)
 	New-Object -TypeName System.ComponentModel.Win32Exception($ErrorCode)
 }
 Convert-Error -2147287037
+
+# Get error description
+certutil -error 0xc0000409
 
 # Remove lines starting with "//" and blank spaces
 Get-Content -Path $settings | Where-Object -FilterScript {$_ -notmatch "//"} | Where-Object -FilterScript {$_.Trim(" `t")} | Set-Content -Path $settings -Force
