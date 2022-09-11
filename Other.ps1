@@ -884,3 +884,22 @@ New-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\JavaSoft\Java Update\Policy" 
 New-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\JavaSoft\Java Update\Policy" -Name EnableAutoUpdateCheck -PropertyType DWord -Value 0 -Force
 # 
 Remove-ItemProperty -Path HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run -Name SunJavaUpdateSched -Force
+
+# Download Windows.winmd from Windows 10 SDK
+# https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/
+$Parameters = @{
+	Uri             = "https://software-download.microsoft.com/download/pr/19041.685.201201-2105.vb_release_svc_prod1_WindowsSDK.iso"
+	OutFile         = "$PSScriptRoot\WindowsSDK.iso"
+	UseBasicParsing = $true
+}
+Invoke-RestMethod @Parameters
+
+# Mount ISO
+$Mount = Mount-DiskImage -ImagePath "$PSScriptRoot\WindowsSDK.iso" -PassThru
+$DriveLetter = ($Mount | Get-Volume).DriveLetter
+
+# Install "Windows SDK for UWP Managed Apps" only
+Start-Process -FilePath ($DriveLetter + ":\" + "WinSDKSetup.exe") @("/features", "OptionId.UWPManaged", "/quiet", "/norestart") -Wait
+
+# Unmount ISO
+Dismount-DiskImage -ImagePath "$PSScriptRoot\WindowsSDK.iso"
