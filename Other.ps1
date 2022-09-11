@@ -352,7 +352,10 @@ function Get-Duration
 	Param
 	(
 		[Parameter(Mandatory = $true)]
+		[string]
 		$Path,
+
+		[string]
 		$Extention
 	)
 
@@ -364,8 +367,9 @@ function Get-Duration
 		$File = $Folder.ParseName($_.Name)
 		$Duration = [timespan]$Folder.GetDetailsOf($File, 27)
 		$TotalDuration += $Duration
-		[PSCustomObject] @{
-			File = $_.Name
+
+		[PSCustomObject]@{
+			File     = $_.Name
 			Duration = $Duration
 		}
 	}
