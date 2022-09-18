@@ -22,6 +22,16 @@ $Parameters = @{
 }
 Invoke-Webrequest @Parameters
 
+# https://github.com/rauenzi/BDPluginLibrary/blob/master/release/0PluginLibrary.plugin.js
+# Needed for HideDisabledEmojis
+$Parameters = @{
+	Uri             = "https://raw.githubusercontent.com/rauenzi/BDPluginLibrary/master/release/0PluginLibrary.plugin.js"
+	OutFile         = "$env:APPDATA\BetterDiscord\plugins\0PluginLibrary.plugin.js"
+	UseBasicParsing = $true
+	Verbose         = $true
+}
+Invoke-Webrequest @Parameters
+
 # https://github.com/mwittrien/BetterDiscordAddons/blob/master/Plugins/ReadAllNotificationsButton/ReadAllNotificationsButton.plugin.js
 $Parameters = @{
 	Uri             = "https://raw.githubusercontent.com/mwittrien/BetterDiscordAddons/master/Plugins/ReadAllNotificationsButton/ReadAllNotificationsButton.plugin.js"
@@ -35,16 +45,6 @@ Invoke-Webrequest @Parameters
 $Parameters = @{
 	Uri             = "https://raw.githubusercontent.com/rauenzi/BetterDiscordAddons/master/Plugins/DoNotTrack/DoNotTrack.plugin.js"
 	OutFile         = "$env:APPDATA\BetterDiscord\plugins\DoNotTrack.plugin.jss"
-	UseBasicParsing = $true
-	Verbose         = $true
-}
-Invoke-Webrequest @Parameters
-
-# https://github.com/rauenzi/BDPluginLibrary/blob/master/release/0PluginLibrary.plugin.js
-# Needed for HideDisabledEmojis
-$Parameters = @{
-	Uri             = "https://raw.githubusercontent.com/rauenzi/BDPluginLibrary/master/release/0PluginLibrary.plugin.js"
-	OutFile         = "$env:APPDATA\BetterDiscord\plugins\0PluginLibrary.plugin.js"
 	UseBasicParsing = $true
 	Verbose         = $true
 }
