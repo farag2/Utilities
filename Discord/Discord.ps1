@@ -73,3 +73,12 @@ $Parameters = @{
 	Verbose         = $true
 }
 Invoke-Webrequest @Parameters
+
+# https://github.com/oSumAtrIX/BetterDiscordPlugins/blob/master/NitroEmoteAndScreenShareBypass.plugin.js
+$Parameters = @{
+	Uri             = "https://raw.githubusercontent.com/oSumAtrIX/BetterDiscordPlugins/master/NitroEmoteAndScreenShareBypass.plugin.js"
+	OutFile         = "$env:APPDATA\BetterDiscord\plugins\NitroEmoteAndScreenShareBypass.plugin.js"
+	UseBasicParsing = $true
+	Verbose         = $true
+}
+Invoke-Webrequest @Parameters
