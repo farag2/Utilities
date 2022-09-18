@@ -1,5 +1,3 @@
-Stop-Process -Name Discord -Force -ErrorAction Ignore
-
 # https://github.com/BetterDiscord/BetterDiscord
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
