@@ -68,7 +68,7 @@ function youtube-dl
 	# Expand ffmpeg.exe from the ZIP archive
 	Add-Type -Assembly System.IO.Compression.FileSystem
 
-	$ZIP = [IO.Compression.ZipFile]::OpenRead("D:\Downloads\FFmpeg.zip")
+	$ZIP = [IO.Compression.ZipFile]::OpenRead("$DownloadsFolder\FFmpeg.zip")
 	$Entries = $ZIP.Entries | Where-Object -FilterScript {$_.FullName -like "ffmpeg*/bin/ffmpeg.exe"}
 	$Entries | ForEach-Object -Process {[IO.Compression.ZipFileExtensions]::ExtractToFile($_, "$DownloadsFolder\ffmpeg.exe", $true)}
 	$ZIP.Dispose()
