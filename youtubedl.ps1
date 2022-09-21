@@ -1,12 +1,12 @@
 <#
 	.SYNOPSIS
-	Download videos from YoutTube via youtube-dl
+	Download videos from YoutTube via yt-dlp
 
 	.EXAMPLE
-	youtube-dl -Path "D:\youtube-dl.exe" -URLs @() -Format "22+251"
+	youtube-dl -Path "D:\yt-dlp.exe" -URLs @() -Format "22+251"
 
 	.NOTES
-	Invoke "D:\youtube-dl.exe" --list-formats URL
+	Invoke "D:\yt-dlp.exe" --list-formats URL
 
 	.NOTES
 	--username $username
@@ -14,10 +14,10 @@
 	--video-password $videopassword
 
 	.LINKS
-	https://github.com/ytdl-org/youtube-dl
+	https://github.com/yt-dlp/yt-dlp
 	https://github.com/BtbN/FFmpeg-Builds
 #>
-function youtube-dl
+function yt-dlp
 {
 	[CmdletBinding()]
 	param
@@ -34,16 +34,16 @@ function youtube-dl
 
 	# Get the latest youtube-dl build tag
 	$Parameters = @{
-		Uri              = "https://api.github.com/repos/ytdl-org/youtube-dl/releases/latest"
+		Uri              = "https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest"
 		UseBasicParsing  = $true
 	}
-	$LatestyoutubedlRelease = (Invoke-RestMethod @Parameters).tag_name
+	$LatestytdlplRelease = (Invoke-RestMethod @Parameters).tag_name
 
 	$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 
 	$Parameters = @{
-		Uri              = "https://github.com/ytdl-org/youtube-dl/releases/download/$LatestyoutubedlRelease/youtube-dl.exe"
-		OutFile          = "$DownloadsFolder\youtube-dl.exe"
+		Uri              = "https://github.com/yt-dlp/yt-dlp/releases/download/$LatestytdlplRelease/yt-dlp.exe"
+		OutFile          = "$DownloadsFolder\yt-dlp.exe"
 		UseBasicParsing  = $true
 		Verbose          = $true
 	}
@@ -87,4 +87,4 @@ function youtube-dl
 		Start-Process -FilePath $Path -ArgumentList "--output `"$OutputFolder\$FileName`" --format $Format $URL"
 	}
 }
-youtube-dl -Path "D:\Downloads\youtube-dl.exe" -URLs @("https://youtu.be/qDHBoSJe5X0") -Format "248+140"
+yt-dlp -Path "D:\Downloads\yt-dlp.exe" -URLs @("https://youtu.be/qDHBoSJe5X0") -Format "248+140"
