@@ -246,10 +246,7 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	cmd.exe --% /c assoc .xml=txtfile
 	cmd.exe --% /c assoc txtfile\DefaultIcon=%ProgramFiles%\Notepad++\notepad++.exe,0
 
-	[xml]$config = Get-Content -Path "$env:APPDATA\Notepad++\config.xml" -Force
-	$config.Save("$env:APPDATA\Notepad++\config.xml")
-
-	# It is needed to use -wait to make Notepad++ apply written settings
+	# It is needed to use -Wait to make Notepad++ apply written settings
 	Write-Warning -Message "Close Notepad++' window manually"
 	Start-Process -FilePath "$env:APPDATA\Notepad++\config.xml" -Wait
 
