@@ -236,7 +236,7 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 
 	if ((Get-WinSystemLocale).Name -eq "ru-RU")
 	{
-		if ($Host.Version.Major -ne 5)
+		if ($Host.Version.Major -eq 5)
 		{
 			$OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 			$OutputEncoding
