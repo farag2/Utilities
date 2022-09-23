@@ -238,7 +238,8 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	{
 		if ($Host.Version.Major -eq 5)
 		{
-			$OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
+			$PSDefaultParameterValues['*:Encoding'] = 'Default'
+			$OutputEncoding = [System.Text.Utf8Encoding]::new($false)
 			$OutputEncoding
 			New-ItemProperty -Path "Registry::HKEY_CLASSES_ROOT\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings" -Name Title -PropertyType String -Value "Открыть с помощью &Notepad++" -Force
 		}
