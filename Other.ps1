@@ -898,14 +898,11 @@ $Parameters = @{
 	UseBasicParsing = $true
 }
 Invoke-RestMethod @Parameters
-
 # Mount ISO
 $Mount = Mount-DiskImage -ImagePath "$PSScriptRoot\WindowsSDK.iso" -PassThru
 $DriveLetter = ($Mount | Get-Volume).DriveLetter
-
 # Install "Windows SDK for UWP Managed Apps" only
 Start-Process -FilePath ($DriveLetter + ":\" + "WinSDKSetup.exe") @("/features", "OptionId.UWPManaged", "/quiet", "/norestart") -Wait
-
 # Unmount ISO
 Dismount-DiskImage -ImagePath "$PSScriptRoot\WindowsSDK.iso"
 
@@ -918,3 +915,6 @@ if (-not $IsAdmin)
 }
 
 & "$PSScriptRoot\File.ps1"
+
+# Get NVidia videocard temperature
+nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader
