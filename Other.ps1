@@ -926,7 +926,7 @@ catch [System.ComponentModel.Win32Exception] {}
 # Remove string in file by its' number
 $Number = 5
 Get-Item -Path "D:\1.txt" | ForEach-Object -Process {
-	(Get-Content -Path $_) | Where-Object -FilterScript {$_.ReadCount -notmatch $Number} | Set-Content -Path $_ -Force
+	(Get-Content -Path $_ -Encoding UTF8) | Where-Object -FilterScript {$_.ReadCount -notmatch $Number} | Set-Content -Path $_ -Encoding UTF8 -Force
 }
 
 # Remove string in file by text in it
