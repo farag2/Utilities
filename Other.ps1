@@ -906,7 +906,8 @@ if (-not $IsAdmin)
 # Get NVidia videocard temperature
 nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader
 
-# Check Internet connection. Works even if ICMP echo is disabled.
+# Check Internet connection. Works even if ICMP echo is disabled
+# https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol
 try
 {
 	$Parameters = @{
@@ -922,3 +923,11 @@ try
 }
 catch [System.ComponentModel.Win32Exception] {}
 
+# Remove string in file by its' number
+$Number = 5
+Get-Item -Path "D:\1.txt" | ForEach-Object -Process {
+	(Get-Content -Path $_) | Where-Object -FilterScript {$_.ReadCount -notmatch $Number} | Set-Content -Path $_ -Force
+}
+
+# Remove string in file by text in it
+(Get-Content -Path "D:\1.txt") | Where-Object -FilterScript {$_ -notmatch "text"} | Set-Content -Path "D:\1.txt" -Force
