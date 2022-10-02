@@ -878,18 +878,6 @@ LGPO.exe /t C:\Temp\lgpo.txt
     }
 )
 
-# Disable Java autoupdate notify
-# https://www.java.com/en/download/uninstalltool.jsp
-if (-not (Test-Path -Path "HKLM:\SOFTWARE\Wow6432Node\JavaSoft\Java Update\Policy"))
-{
-	New-Item -Path "HKLM:\SOFTWARE\Wow6432Node\JavaSoft\Java Update\Policy" -Force
-}
-New-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\JavaSoft\Java Update\Policy" -Name EnableJavaUpdate -PropertyType DWord -Value 0 -Force
-New-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\JavaSoft\Java Update\Policy" -Name NotifyDownload -PropertyType DWord -Value 0 -Force
-New-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\JavaSoft\Java Update\Policy" -Name EnableAutoUpdateCheck -PropertyType DWord -Value 0 -Force
-# 
-Remove-ItemProperty -Path HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run -Name SunJavaUpdateSched -Force
-
 # Download Windows.winmd from Windows 10 SDK
 # https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/
 $Parameters = @{
@@ -913,8 +901,14 @@ if (-not $IsAdmin)
 	Start-Process -FilePath powershell.exe -ArgumentList "-ExecutionPolicy Bypass -NoProfile -NoLogo -File `"$PSCommandPath`"" -Verb Runas
 	exit
 }
-
 & "$PSScriptRoot\File.ps1"
 
 # Get NVidia videocard temperature
 nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader
+
+# Check Internet connection. Works even if ICMP echo is disabled.
+try
+{
+	Resolve-DnsName -Name dns.msftncsi.com -Type A -Server 1.1.1.1 -DnsOnly -ErrorAction Stop
+}
+catch {}
