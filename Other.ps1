@@ -909,6 +909,16 @@ nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader
 # Check Internet connection. Works even if ICMP echo is disabled.
 try
 {
-	Resolve-DnsName -Name dns.msftncsi.com -Type A -Server 1.1.1.1 -DnsOnly -ErrorAction Stop
+	$Parameters = @{
+		Name             = "dns.msftncsi.com"
+		Server           = "1.1.1.1"
+		DnsOnly          = $true
+		ErrorAction      = "Stop"
+	}
+	if ((Resolve-DnsName @Parameters).IPAddress -notcontains "131.107.255.255")
+	{
+		return
+	}
 }
-catch {}
+catch [System.ComponentModel.Win32Exception] {}
+
