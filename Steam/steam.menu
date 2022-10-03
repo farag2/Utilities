@@ -3,6 +3,10 @@
 	Store
 	{
 		text = ""
+		SkinVersion
+		{
+			text="Metro for Steam 4.x"  shellcmd="steam://openurl/https://github.com/redsigma/UPMetroSkin"
+		}
 		Divider {}
 		CheckForUpdates
 		{
