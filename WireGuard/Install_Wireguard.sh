@@ -12,3 +12,4 @@ apt install curl -y
 passwd
 
 # /etc/wireguard/clients
+# /var/backups
