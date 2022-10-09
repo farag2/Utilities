@@ -87,4 +87,9 @@ function yt-dlp
 		Start-Process -FilePath $Path -ArgumentList "--output `"$OutputFolder\$FileName`" --format $Format $URL"
 	}
 }
-yt-dlp -Path "D:\Downloads\yt-dlp.exe" -URLs @("https://youtu.be/qDHBoSJe5X0") -Format "248+140"
+# Run first to get URL's IDs to use
+& "D:\Downloads\yt-dlp.exe" --list-formats "https://www.youtube.com/watch?v=DqTEVmed0Bc"
+
+# Uncomment and run next when you got on the previous step URL's IDs
+# yt-dlp -Path "D:\Downloads\yt-dlp.exe" -URLs @("https://www.youtube.com/watch?v=DqTEVmed0Bc") -Format "248+140"
+
