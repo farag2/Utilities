@@ -35,19 +35,15 @@ function yt-dlp
 	$LatestytdlplRelease = (Invoke-RestMethod @Parameters).tag_name
 
 	$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
-    if (Test-Path -Path "$DownloadsFolder\yt-dlp.exe")
+    if (-not (Test-Path -Path "$DownloadsFolder\yt-dlp.exe"))
     {
-        $CurrentVersion = (Get-Item -Path "$DownloadsFolder\yt-dlp.exe").VersionInfo.FileVersion
-        if ([System.Version]$LatestytdlplRelease -gt [System.Version]$CurrentVersion)
-        {
-	        $Parameters = @{
-		        Uri              = "https://github.com/yt-dlp/yt-dlp/releases/download/$LatestytdlplRelease/yt-dlp.exe"
-		        OutFile          = "$DownloadsFolder\yt-dlp.exe"
-		        UseBasicParsing  = $true
-		        Verbose          = $true
-	        }
-	        Invoke-WebRequest @Parameters
+        $Parameters = @{
+            Uri              = "https://github.com/yt-dlp/yt-dlp/releases/download/$LatestytdlplRelease/yt-dlp.exe"
+            OutFile          = "$DownloadsFolder\yt-dlp.exe"
+            UseBasicParsing  = $true
+            Verbose          = $true
         }
+        Invoke-WebRequest @Parameters
     }
 
 	# Get the latest FFmpeg URL
