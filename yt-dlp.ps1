@@ -17,7 +17,6 @@
 	https://github.com/yt-dlp/yt-dlp
 	https://github.com/BtbN/FFmpeg-Builds
 #>
-cls
 function yt-dlp
 {
 	[CmdletBinding()]
@@ -35,16 +34,16 @@ function yt-dlp
 	$LatestytdlplRelease = (Invoke-RestMethod @Parameters).tag_name
 
 	$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
-    if (-not (Test-Path -Path "$DownloadsFolder\yt-dlp.exe"))
-    {
-        $Parameters = @{
-            Uri              = "https://github.com/yt-dlp/yt-dlp/releases/download/$LatestytdlplRelease/yt-dlp.exe"
-            OutFile          = "$DownloadsFolder\yt-dlp.exe"
-            UseBasicParsing  = $true
-            Verbose          = $true
-        }
-        Invoke-WebRequest @Parameters
-    }
+	if (-not (Test-Path -Path "$DownloadsFolder\yt-dlp.exe"))
+	{
+		$Parameters = @{
+			Uri              = "https://github.com/yt-dlp/yt-dlp/releases/download/$LatestytdlplRelease/yt-dlp.exe"
+			OutFile          = "$DownloadsFolder\yt-dlp.exe"
+			UseBasicParsing  = $true
+			Verbose          = $true
+		}
+		Invoke-WebRequest @Parameters
+	}
 
 	# Get the latest FFmpeg URL
 	# "ffmpeg-*-win64-lgpl-[0-9].[0-9].zip"
@@ -55,36 +54,36 @@ function yt-dlp
 	}
 	$LatestFFmpegURL = ((Invoke-RestMethod @Parameters).assets | Where-Object -FilterScript {$_.name -match "ffmpeg-n5.1-latest-win64-gpl-5.1.zip"}).browser_download_url
 
-    if (-not (Test-Path -Path "$DownloadsFolder\ffmpeg.exe"))
-    {
-	    $Parameters = @{
-		    Uri              = $LatestFFmpegURL
-		    OutFile          = "$DownloadsFolder\FFmpeg.zip"
-		    UseBasicParsing  = $true
-		    Verbose          = $true
-	    }
-	    Invoke-WebRequest @Parameters
+	if (-not (Test-Path -Path "$DownloadsFolder\ffmpeg.exe"))
+	{
+		$Parameters = @{
+			Uri              = $LatestFFmpegURL
+			OutFile          = "$DownloadsFolder\FFmpeg.zip"
+			UseBasicParsing  = $true
+			Verbose          = $true
+		}
+		Invoke-WebRequest @Parameters
 
-	    # Expand ffmpeg.exe from the ZIP archive
-	    Add-Type -Assembly System.IO.Compression.FileSystem
+		# Expand ffmpeg.exe from the ZIP archive
+		Add-Type -Assembly System.IO.Compression.FileSystem
 
-	    $ZIP = [IO.Compression.ZipFile]::OpenRead("$DownloadsFolder\FFmpeg.zip")
-	    $Entries = $ZIP.Entries | Where-Object -FilterScript {$_.FullName -like "ffmpeg*/bin/ffmpeg.exe"}
-	    $Entries | ForEach-Object -Process {[IO.Compression.ZipFileExtensions]::ExtractToFile($_, "$DownloadsFolder\ffmpeg.exe", $true)}
-	    $ZIP.Dispose()
+		$ZIP = [IO.Compression.ZipFile]::OpenRead("$DownloadsFolder\FFmpeg.zip")
+		$Entries = $ZIP.Entries | Where-Object -FilterScript {$_.FullName -like "ffmpeg*/bin/ffmpeg.exe"}
+		$Entries | ForEach-Object -Process {[IO.Compression.ZipFileExtensions]::ExtractToFile($_, "$DownloadsFolder\ffmpeg.exe", $true)}
+		$ZIP.Dispose()
 
-	    Remove-Item -Path "$DownloadsFolder\FFmpeg.zip" -Force
-    }
+		Remove-Item -Path "$DownloadsFolder\FFmpeg.zip" -Force
+	}
 
 	$Title = "%(title)s.mp4"
 	$n = 1
 
 	foreach ($URL in $URLs)
 	{
-        # Getting URL's IDs
-        & "$DownloadsFolder\yt-dlp.exe" --list-formats $URLs
-        $AudioID = Read-Host -Prompt "`nType prefered audio ID"
-        $VideoID = Read-Host -Prompt "`nType prefered video ID"
+		# Getting URL's IDs
+		& "$DownloadsFolder\yt-dlp.exe" --list-formats $URLs
+		$AudioID = Read-Host -Prompt "`nType prefered audio ID"
+		$VideoID = Read-Host -Prompt "`nType prefered video ID"
 
 		# 1. FileName.mp4
 		$FileName = "{0}. {1}" -f $n++, $Title
