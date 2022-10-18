@@ -931,3 +931,8 @@ Get-Item -Path "D:\1.txt" | ForEach-Object -Process {
 
 # Remove string in file by text in it
 (Get-Content -Path "D:\1.txt") | Where-Object -FilterScript {$_ -notmatch "text"} | Set-Content -Path "D:\1.txt" -Force
+
+# Get sub keys' value kind recursively
+(Get-Item -Path "HKCU:\Control Panel\Cursors").Property.Split([System.Environment]::NewLine) | ForEach-Object -Process {
+	(Get-Item -Path "HKCU:\Control Panel\Cursors").GetValueKind($_)
+}
