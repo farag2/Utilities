@@ -936,3 +936,9 @@ Get-Item -Path "D:\1.txt" | ForEach-Object -Process {
 (Get-Item -Path "HKCU:\Control Panel\Cursors").Property.Split([System.Environment]::NewLine) | ForEach-Object -Process {
 	(Get-Item -Path "HKCU:\Control Panel\Cursors").GetValueKind($_)
 }
+
+# Close a process by its' argument
+$gpedit_Process_ID = (Get-CimInstance -ClassName CIM_Process | Where-Object -FilterScript {$_.Name -eq "mmc.exe"} | Where-Object -FilterScript {
+	$_.CommandLine -match "GPEDIT.MSC"
+}).Handle
+Get-Process -Id $gpedit_Process_ID | Stop-Process -Force
