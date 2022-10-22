@@ -942,6 +942,3 @@ $gpedit_Process_ID = (Get-CimInstance -ClassName CIM_Process | Where-Object -Fil
 	$_.CommandLine -match "GPEDIT.MSC"
 }).Handle
 Get-Process -Id $gpedit_Process_ID | Stop-Process -Force
-
-# Get registry value kind
-(Get-Item -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\TaskManager).GetValueKind("Preferences")
