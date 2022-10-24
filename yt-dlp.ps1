@@ -81,14 +81,15 @@ function yt-dlp
 	foreach ($URL in $URLs)
 	{
 		# Getting URL's IDs
+		# https://www.reddit.com/r/youtubedl/comments/fzv58p/comment/fn6hass/?context=3
 		& "$DownloadsFolder\yt-dlp.exe" --list-formats $URLs
-		$AudioID = Read-Host -Prompt "`nType prefered audio ID"
 		$VideoID = Read-Host -Prompt "`nType prefered video ID"
+		$AudioID = Read-Host -Prompt "`nType prefered audio ID"
 
 		# 1. FileName.mp4
 		$FileName = "{0}. {1}" -f $n++, $Title
 
-		Start-Process -FilePath "$DownloadsFolder\yt-dlp.exe" -ArgumentList "--output `"$DownloadsFolder\$FileName`" --format `"$($AudioID)+$($VideoID)`" $URL"
+		Start-Process -FilePath "$DownloadsFolder\yt-dlp.exe" -ArgumentList "--output `"$DownloadsFolder\$FileName`" --format `"$($VideoID)+$($AudioID)`" $URL"
 	}
 }
 yt-dlp -URLs @("https://www.youtube.com/watch?v=DqTEVmed0Bc")
