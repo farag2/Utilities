@@ -22,13 +22,8 @@ $ftypeMap = @{}
 #>
 
 $Extensions = @(
-	".cfg",
-	".ini",
-	".json",
-	".log",
-	".nfo",
-	".txt",
-	".xml"
+	".cfg", ".ini", ".json",
+	".log", ".nfo", ".txt", ".xml"
 )
 foreach ($Extension in $Extensions)
 {
