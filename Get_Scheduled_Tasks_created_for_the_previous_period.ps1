@@ -1,3 +1,5 @@
+#Requires -RunAsAdministrator
+
 # Create table with scheduled tasks info that were created a week before the current day
 Get-ScheduledTask | Where-Object -FilterScript {$null -ne $_.Date} | ForEach-Object -Process {
 	$Task = $_
