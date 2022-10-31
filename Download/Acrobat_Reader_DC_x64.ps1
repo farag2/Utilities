@@ -1,4 +1,3 @@
-cls
 # Download the latest Adobe Acrobat Reader DC x64
 # https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/reader/current_version.txt
 
@@ -14,8 +13,8 @@ $displayName = (Invoke-RestMethod @Parameters).products.reader.displayName
 $Version = (Invoke-RestMethod @Parameters).products.reader.version.Replace(".", "")
 
 $Parameters = @{
-    Uri             = "https://rdc.adobe.io/reader/downloadUrl?name=$($displayName)&os=Windows%2011&site=enterprise&lang=$($TwoLetterISOLanguageName)&api_key=dc-get-adobereader-cdn"
-    UseBasicParsing = $true
+	Uri             = "https://rdc.adobe.io/reader/downloadUrl?name=$($displayName)&os=Windows%2011&site=enterprise&lang=$($TwoLetterISOLanguageName)&api_key=dc-get-adobereader-cdn"
+	UseBasicParsing = $true
 }
 $downloadURL = (Invoke-RestMethod @Parameters).downloadURL
 $saveName = (Invoke-RestMethod @Parameters).saveName
@@ -23,23 +22,23 @@ $saveName = (Invoke-RestMethod @Parameters).saveName
 # if URl contains "reader", we need to fix the URl to download the latest version. Applicable for the Russian version
 if ($downloadURL -match "reader")
 {
-    $Parameters = @{
-	    Uri = "https://rdc.adobe.io/reader/products?lang=en&site=enterprise&os=Windows 11&api_key=dc-get-adobereader-cdn"
-	    UseBasicParsing = $true
-    }
-    $Version = (Invoke-RestMethod @Parameters).products.reader.version.Replace(".", "")
+	$Parameters = @{
+		Uri = "https://rdc.adobe.io/reader/products?lang=en&site=enterprise&os=Windows 11&api_key=dc-get-adobereader-cdn"
+		UseBasicParsing = $true
+	}
+	$Version = (Invoke-RestMethod @Parameters).products.reader.version.Replace(".", "")
 
-    $IetfLanguageTag = (Get-WinSystemLocale).IetfLanguageTag.Replace("-", "_")
-    $downloadURL = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($Version)/AcroRdrDCx64$($Version)_$($IetfLanguageTag).exe"
-    $saveName = Split-Path -Path $downloadURL -Leaf
+	$IetfLanguageTag = (Get-WinSystemLocale).IetfLanguageTag.Replace("-", "_")
+	$downloadURL = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($Version)/AcroRdrDCx64$($Version)_$($IetfLanguageTag).exe"
+	$saveName = Split-Path -Path $downloadURL -Leaf
 }
 
 # Download the installer
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
-    Uri             = $downloadURL
-    OutFile         = "$DownloadsFolder\$saveName"
-    UseBasicParsing = $true
+	Uri             = $downloadURL
+	OutFile         = "$DownloadsFolder\$saveName"
+	UseBasicParsing = $true
 }
 Invoke-RestMethod @Parameters
 
@@ -80,15 +79,15 @@ $Version = ((Invoke-RestMethod @Parameters).products.reader | Where-Object -Filt
 # If latest version is greater than one from archive
 if ((Get-Item -Path "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd*.msp").FullName -notmatch $Version)
 {
-    Remove-Item -Path "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd*.msp" -Force
+	Remove-Item -Path "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd*.msp" -Force
 
-    $Parameters = @{
-	    Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($Version)/AcroRdrDCx64Upd$($Version).msp"
-	    OutFile         = "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd$($Version).msp"
-	    UseBasicParsing = $true
-	    Verbose         = $true
-    }
-    Invoke-WebRequest @Parameters
+	$Parameters = @{
+		Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($Version)/AcroRdrDCx64Upd$($Version).msp"
+		OutFile         = "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd$($Version).msp"
+		UseBasicParsing = $true
+		Verbose         = $true
+	}
+	Invoke-WebRequest @Parameters
 }
 $PatchFile = Split-Path -Path (Get-Item -Path "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd*.msp").FullName -Leaf
 
