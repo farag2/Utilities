@@ -1,3 +1,4 @@
+cls
 # Download the latest Adobe Acrobat Reader DC x64
 # https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/reader/current_version.txt
 
@@ -11,7 +12,6 @@ $Parameters = @{
 }
 $displayName = (Invoke-RestMethod @Parameters).products.reader.displayName
 $Version = (Invoke-RestMethod @Parameters).products.reader.version.Replace(".", "")
-
 
 $Parameters = @{
     Uri             = "https://rdc.adobe.io/reader/downloadUrl?name=$($displayName)&os=Windows%2011&site=enterprise&lang=$($TwoLetterISOLanguageName)&api_key=dc-get-adobereader-cdn"
@@ -68,14 +68,14 @@ $Items = @(
 )
 Remove-Item -Path $Items -Recurse -Force -ErrorAction Ignore
 Get-ChildItem -Path "$DownloadsFolder\AcroRdrDCx64\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\AcroRdrDCx64" -Force
-Remove-Item -Path "$DownloadsFolder\AcroRdrDCx64\AcroPro.msi extracted" -Force
+Remove-Item -Path "$DownloadsFolder\AcroRdrDCx64\AcroPro.msi extracted" -Recurse -Force
 
 # Get the latest Adobe Acrobat Pro DC patch version (lang=mui)
 $Parameters = @{
-	Uri = "https://rdc.adobe.io/reader/products?lang=mui&os=Windows%2011&api_key=dc-get-adobereader-cdn"
+	Uri = "https://rdc.adobe.io/reader/products?lang=mui&site=enterprise&os=Windows%2011&api_key=dc-get-adobereader-cdn"
 	UseBasicParsing = $true
 }
-$Version = (Invoke-RestMethod @Parameters).products.reader.version.Replace(".", "")
+$Version = ((Invoke-RestMethod @Parameters).products.reader | Where-Object -FilterScript {$_.displayName -match "64bit"}).version.Replace(".", "")
 
 # If latest version is greater than one from archive
 if ((Get-Item -Path "$DownloadsFolder\AcroRdrDCx64\AcroRdrDCx64Upd*.msp").FullName -notmatch $Version)
