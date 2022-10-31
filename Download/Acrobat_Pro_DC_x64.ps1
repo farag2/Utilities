@@ -92,12 +92,12 @@ $Arguments = @(
 Start-Process "msiexec" -ArgumentList $Arguments -Wait
 
 $CABs = @(
-    "$DownloadsFolder\Adobe Acrobat\AlfSdPack.cab",
-    "$DownloadsFolder\Adobe Acrobat\Core.cab",
-    "$DownloadsFolder\Adobe Acrobat\Extras.cab",
-    "$DownloadsFolder\Adobe Acrobat\Intermediate.cab",
-    "$DownloadsFolder\Adobe Acrobat\Languages.cab",
-    "$DownloadsFolder\Adobe Acrobat\Optional.cab"
+	"$DownloadsFolder\Adobe Acrobat\AlfSdPack.cab",
+	"$DownloadsFolder\Adobe Acrobat\Core.cab",
+	"$DownloadsFolder\Adobe Acrobat\Extras.cab",
+	"$DownloadsFolder\Adobe Acrobat\Intermediate.cab",
+	"$DownloadsFolder\Adobe Acrobat\Languages.cab",
+	"$DownloadsFolder\Adobe Acrobat\Optional.cab"
 )
 Remove-Item -Path $CABs -Force
 
@@ -106,23 +106,23 @@ Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Force
 
 # Get the latest Adobe Acrobat Pro DC patch version (lang=mui)
 $Parameters = @{
-	Uri = "https://rdc.adobe.io/reader/products?lang=mui&os=Windows%2011&api_key=dc-get-adobereader-cdn"
+	Uri = "https://rdc.adobe.io/reader/products?lang=mui&site=enterprise&os=Windows%2011&api_key=dc-get-adobereader-cdn"
 	UseBasicParsing = $true
 }
-$Version = (Invoke-RestMethod @Parameters).products.dcPro.version.Replace(".", "")
+$Version = ((Invoke-RestMethod @Parameters).products.reader | Where-Object -FilterScript {$_.displayName -match "64bit"}).version.Replace(".", "")
 
 # If latest version is greater than one from archive
 if ((Get-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd*.msp").FullName -notmatch $Version)
 {
-    Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd*.msp" -Force
+	Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd*.msp" -Force
 
-    $Parameters = @{
-	    Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($Version)/AcrobatDCx64Upd$($Version).msp"
-	    OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd$($Version).msp"
-	    UseBasicParsing = $true
-	    Verbose         = $true
-    }
-    Invoke-WebRequest @Parameters
+	$Parameters = @{
+		Uri             = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/$($Version)/AcrobatDCx64Upd$($Version).msp"
+		OutFile         = "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd$($Version).msp"
+		UseBasicParsing = $true
+		Verbose         = $true
+	}
+	Invoke-WebRequest @Parameters
 }
 $PatchFile = Split-Path -Path (Get-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd*.msp").FullName -Leaf
 
