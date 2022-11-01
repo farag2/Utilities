@@ -222,6 +222,13 @@ if (Test-Path -Path "$env:ProgramFiles\MPC-BE x64")
 # Notepad++
 if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 {
+	if (-not (Test-Path -Path "$env:APPDATA\Notepad++\config.xml"))
+	{
+		Start-Process -FilePath "$env:ProgramFiles\Notepad++\notepad++.exe"
+		Write-Verbose -Message "`"$env:ProgramFiles\Notepad++\notepad++.exe`" doesn't exist. Re-run the script" -Verbose
+		break
+	}
+
 	Stop-Process -Name notepad++ -Force -ErrorAction Ignore
 
 	$Remove = @(
@@ -238,8 +245,7 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	{
 		if ($Host.Version.Major -eq 5)
 		{
-			$OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
-			$OutputEncoding
+			$OutputEncoding = [System.Console]::InputEncoding = [System.Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($true)
 			New-ItemProperty -Path "Registry::HKEY_CLASSES_ROOT\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings" -Name Title -PropertyType String -Value "Открыть с помощью &Notepad++" -Force
 		}
 	}
@@ -256,7 +262,7 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 
 	# It is needed to use -Wait to make Notepad++ apply written settings
 	Write-Warning -Message "Close Notepad++' window manually"
-	Start-Process -FilePath "$env:APPDATA\Notepad++\config.xml" -Wait
+	Start-Process -FilePath "$env:ProgramFiles\Notepad++\notepad++.exe" -ArgumentList "$env:APPDATA\Notepad++\config.xml" -Wait
 
 	if (-not (Test-Path -Path $env:ProgramFiles\Notepad++\localization))
 	{
@@ -285,7 +291,7 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	$config.NotepadPlus.GUIConfigs.GUIConfig | Where-Object -FilterScript {$_.name -eq "Backup"} | ForEach-Object -Process {$_.action = "0"}
 	$config.Save("$env:APPDATA\Notepad++\config.xml")
 
-	Start-Process -FilePath "$env:APPDATA\Notepad++\config.xml"
+	Start-Process -FilePath "$env:ProgramFiles\Notepad++\notepad++.exe" -ArgumentList "$env:APPDATA\Notepad++\config.xml" -Wait
 	Start-Sleep -Seconds 1
 	Stop-Process -Name notepad++ -ErrorAction Ignore
 }
