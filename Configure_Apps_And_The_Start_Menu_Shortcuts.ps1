@@ -1,4 +1,4 @@
-﻿# ABBYY FineReader
+# ABBYY FineReader
 if (Test-Path -Path "${env:ProgramFiles(x86)}\ABBYY FineReader 15")
 {
 	if (-not (Test-Path -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\ABBYY FineReader 15 OCR-редактор.lnk"))
@@ -262,18 +262,6 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	# It is needed to use -Wait to make Notepad++ apply written settings
 	Write-Warning -Message "Close Notepad++' window manually"
 	Start-Process -FilePath "$env:ProgramFiles\Notepad++\notepad++.exe" -ArgumentList "$env:APPDATA\Notepad++\config.xml" -Wait
-
-	if (-not (Test-Path -Path $env:ProgramFiles\Notepad++\localization))
-	{
-		New-Item -Path $env:ProgramFiles\Notepad++\localization -ItemType Directory -Force
-	}
-	$Parameters = @{
-		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Notepad%2B%2B/localization/russian.xml"
-		OutFile         = "$env:ProgramFiles\Notepad++\localization\russian.xml"
-		UseBasicParsing = $true
-		Verbose         = $true
-	}
-	Invoke-WebRequest @Parameters
 
 	[xml]$config = Get-Content -Path "$env:APPDATA\Notepad++\config.xml" -Force
 	# Fluent UI: large
