@@ -1,4 +1,4 @@
-# ABBYY FineReader
+﻿# ABBYY FineReader
 if (Test-Path -Path "${env:ProgramFiles(x86)}\ABBYY FineReader 15")
 {
 	if (-not (Test-Path -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\ABBYY FineReader 15 OCR-редактор.lnk"))
@@ -245,7 +245,6 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	{
 		if ($Host.Version.Major -eq 5)
 		{
-			$OutputEncoding = [System.Console]::InputEncoding = [System.Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($true)
 			New-ItemProperty -Path "Registry::HKEY_CLASSES_ROOT\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings" -Name Title -PropertyType String -Value "Открыть с помощью &Notepad++" -Force
 		}
 	}
