@@ -560,7 +560,22 @@ while
 	Write-Host "Running: $($Process.Name)"
 	Start-Sleep -Milliseconds 500
 }
+#
+while ($true)
+{
+	if ((Get-Process -Name notepad++ -ErrorAction Ignore) -and (-not (Get-Process -Name notepad -ErrorAction Ignore)))
+	{
+		# if notepad++ is running, and notepad is not, then run notepad.exe
+		Start-Process -FilePath "$env:SystemRoot\system32\notepad.exe"
+	}
+	elseif ((-not (Get-Process -Name notepad++ -ErrorAction Ignore)) -and (Get-Process -Name notepad -ErrorAction Ignore))
+	{
+		# notepad++ isn't runn, and notepad.exe is, then kill notepad.exe
+		Stop-Process -Name notepad -Force -ErrorAction Ignore
+	}
 
+	Start-Sleep -Milliseconds 500
+}
 # for
 do
 {
