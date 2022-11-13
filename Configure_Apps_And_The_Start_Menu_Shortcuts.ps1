@@ -1,15 +1,3 @@
-# ABBYY FineReader
-if (Test-Path -Path "${env:ProgramFiles(x86)}\ABBYY FineReader 15")
-{
-	if (-not (Test-Path -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\ABBYY FineReader 15 OCR-редактор.lnk"))
-	{
-		Copy-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\ABBYY FineReader 15\ABBYY FineReader 15 OCR-редактор.lnk" -Destination "$env:ProgramData\Microsoft\Windows\Start Menu\Programs" -Force -ErrorAction Ignore
-	}
-	Remove-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\ABBYY FineReader 15" -Recurse -Force -ErrorAction Ignore
-
-	Remove-Printer -Name *ABBYY* -ErrorAction Ignore
-}
-
 # AIMP x64
 if (Test-Path -Path $env:ProgramFiles\AIMP)
 {
@@ -235,8 +223,7 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 		"$env:ProgramFiles\Notepad++\change.log",
 		"$env:ProgramFiles\Notepad++\LICENSE",
 		"$env:ProgramFiles\Notepad++\readme.txt",
-		"$env:ProgramFiles\Notepad++\autoCompletion",
-		"$env:ProgramFiles\Notepad++\plugins"
+		"$env:ProgramFiles\Notepad++\autoCompletion"
 	)
 	Remove-Item -Path $Remove -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "$env:ProgramFiles\Notepad++\localization" -Exclude russian.xml -Recurse -Force -ErrorAction Ignore
@@ -332,7 +319,13 @@ if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 	}
 	Invoke-WebRequest @Parameters
 
-	$LatestVersion = (Invoke-RestMethod -Uri "https://api.github.com/repos/jagannatharjun/qbt-theme/releases/latest").assets.browser_download_url
+	$Parameters = @{
+		Uri             = "https://api.github.com/repos/jagannatharjun/qbt-theme/releases/latest"
+		UseBasicParsing = $true
+		Verbose         = $true
+	}
+	$LatestVersion = (Invoke-RestMethod @Parameters).assets.browser_download_url
+
 	$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 	$Parameters = @{
 		Uri     = $LatestVersion
