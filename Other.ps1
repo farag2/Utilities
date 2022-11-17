@@ -960,3 +960,9 @@ Get-Process -Id $gpedit_Process_ID | Stop-Process -Force
 
 # https://stackoverflow.com/a/57134096/8315671
 $OutputEncoding = [System.Console]::InputEncoding = [System.Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($true)
+
+# Expand %TEMP% path
+[Environment]::GetEnvironmentVariable("TEMP", "User")
+(Get-ItemProperty -Path HKCU:\Environment -Name TEMP).TEMP
+
+[System.IO.Path]::GetTempPath()
