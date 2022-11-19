@@ -963,6 +963,6 @@ $OutputEncoding = [System.Console]::InputEncoding = [System.Console]::OutputEnco
 
 # Expand %TEMP% path
 [Environment]::GetEnvironmentVariable("TEMP", "User")
-(Get-ItemProperty -Path HKCU:\Environment -Name TEMP).TEMP
-
+Get-ItemPropertyValue -Path HKCU:\Environment -Name TEMP
+(Get-Item -Path $env:TEMP).FullName
 [System.IO.Path]::GetTempPath()
