@@ -966,3 +966,11 @@ $OutputEncoding = [System.Console]::InputEncoding = [System.Console]::OutputEnco
 Get-ItemPropertyValue -Path HKCU:\Environment -Name TEMP
 (Get-Item -Path $env:TEMP).FullName
 [System.IO.Path]::GetTempPath()
+
+# Extract strings from mui files using Resource Hacker
+# http://www.angusj.com/resourcehacker
+Get-ChildItem -Path D:\Downloads\LanguagePack -Recurse -Force -Filter *.mui -File | ForEach-Object -Process {
+    $_.FullName
+    Start-Process -FilePath "D:\ResourceHacker.exe" -ArgumentList @("-open", $_.FullName, "-save", "D:\extract\$_.Name.rc", "-action extract", "-mask MESSAGETABLE") -Wait
+}
+
