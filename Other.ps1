@@ -974,3 +974,7 @@ Get-ChildItem -Path D:\Downloads\LanguagePack -Recurse -Force -Filter *.mui -Fil
     Start-Process -FilePath "D:\ResourceHacker.exe" -ArgumentList @("-open", $_.FullName, "-save", "D:\extract\$_.Name.rc", "-action extract", "-mask MESSAGETABLE") -Wait
 }
 
+# Extract strings from pri files using makepri.exe from "Windows SDK for UWP Managed Apps"
+# https://learn.microsoft.com/en-us/windows/uwp/app-resources/makepri-exe-command-options
+# https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/
+& D:\makepri.exe dump /if D:\Windows.UI.SettingsAppThreshold.en-US.pri /of D:\resources.pri.xml
