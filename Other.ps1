@@ -978,3 +978,21 @@ Get-ChildItem -Path D:\Downloads\LanguagePack -Recurse -Force -Filter *.mui -Fil
 # https://learn.microsoft.com/en-us/windows/uwp/app-resources/makepri-exe-command-options
 # https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/
 & D:\makepri.exe dump /if D:\Windows.UI.SettingsAppThreshold.en-US.pri /of D:\resources.pri.xml
+
+# Create a table with UWP apps installed with their local native logo paths
+$AppxPackages = @(Get-AppxPackage -PackageTypeFilter Bundle -AllUsers)
+$PackagesIds = [Windows.Management.Deployment.PackageManager, Windows.Web, ContentType = WindowsRuntime]::new().FindPackages() | Select-Object -Property DisplayName, Logo -ExpandProperty Id
+foreach ($AppxPackage in $AppxPackages)
+{
+	$PackageId = $PackagesIds | Where-Object -FilterScript {$_.Name -eq $AppxPackage.Name}
+
+	if (-not $PackageId)
+	{
+		continue
+	}
+
+	[PSCustomObject]@{
+		DisplayName = $PackageId.DisplayName
+		Logo        = $PackageId.Logo -replace "file:///", ""
+	}
+}
