@@ -8,27 +8,21 @@ $Parameters = @{
 	UseBasicParsing = $true
 	Verbose         = $true
 }
-Invoke-WebRequest @Parameters
+#Invoke-WebRequest @Parameters
 
 <#
 	.SYNOPSIS
 	Extracting the specific folder from ZIP archive. Folder structure will be created recursively
-
 	.Parameter Source
 	The source ZIP archive
-
 	.Parameter Destination
 	Where to extracting folder
-
 	.Parameter Folder
 	Assign the folder to extracting to
-
 	.Parameter ExcludedFiles
 	Exclude files from extracting
-
 	.Parameter ExcludedFolders
 	Exclude folders from extracting
-
 	.Example
 	ExtractZIPFolder -Source "D:\Folder\File.zip" -Destination "D:\Folder" -Folder "Folder1/Folder2" -ExcludedFiles @("file1.ext", "file2.ext") -ExcludedFolders @("folder1", "folder2")
 #>
@@ -101,7 +95,7 @@ $CABs = @(
 )
 Remove-Item -Path $CABs -Force
 
-Get-ChildItem -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\Adobe Acrobat" -Force
+Get-ChildItem -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\Adobe Acrobat" -Recurse -Force
 Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Force
 
 # Get the latest Adobe Acrobat Pro DC patch version (lang=mui)
