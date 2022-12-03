@@ -8,21 +8,27 @@ $Parameters = @{
 	UseBasicParsing = $true
 	Verbose         = $true
 }
-#Invoke-WebRequest @Parameters
+Invoke-WebRequest @Parameters
 
 <#
 	.SYNOPSIS
 	Extracting the specific folder from ZIP archive. Folder structure will be created recursively
+
 	.Parameter Source
 	The source ZIP archive
+
 	.Parameter Destination
 	Where to extracting folder
+
 	.Parameter Folder
 	Assign the folder to extracting to
+
 	.Parameter ExcludedFiles
 	Exclude files from extracting
+
 	.Parameter ExcludedFolders
 	Exclude folders from extracting
+
 	.Example
 	ExtractZIPFolder -Source "D:\Folder\File.zip" -Destination "D:\Folder" -Folder "Folder1/Folder2" -ExcludedFiles @("file1.ext", "file2.ext") -ExcludedFolders @("folder1", "folder2")
 #>
