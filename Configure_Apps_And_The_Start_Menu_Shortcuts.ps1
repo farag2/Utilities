@@ -157,6 +157,16 @@ if (Test-Path -Path "$env:ProgramFiles\Mozilla Firefox")
 	Remove-Item -Path "$env:PUBLIC\Desktop\Firefox.lnk" -Force -ErrorAction Ignore
 }
 
+# Remove shortcut to launch Private browsing
+$Shell = New-Object -ComObject Shell.Application
+foreach ($File in @(Get-ChildItem -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs" -Filter *Firefox*.lnk -File -Force))
+{
+    $Target = $Shell.Namespace($File.Directory.FullName).ParseName($File.Name)
+    $folder.GetDetailsOf($Target, 203) | Where-Object -FilterScript {$_ -match "private_browsing.exe"} | ForEach-Object -Process {
+        Remove-Item -Path $Target.Path -Force
+    }
+}
+
 # Icaros
 if (Test-Path -Path "$env:ProgramFiles\Icaros")
 {
