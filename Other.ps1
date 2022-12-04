@@ -996,3 +996,21 @@ foreach ($AppxPackage in $AppxPackages)
 		Logo        = $PackageId.Logo -replace "file:///", ""
 	}
 }
+
+# Retrieve all available details list of an item
+# https://stackoverflow.com/a/62279888/8315671
+# https://learn.microsoft.com/en-us/windows/win32/shell/folder-getdetailsof
+$Shell = (New-Object -ComObject Shell.Application).Namespace($env:SystemDrive)
+for ($columnNumber = 0; $columnNumber -lt 500; ++$columnNumber) 
+{
+	$columnName = $Shell.GetDetailsOf($Shell.Items, $columnNumber)
+	if ($columnName)
+	{
+		$columnName | ForEach-Object -Process {
+			[PSCustomObject]@{
+				Number = $columnNumber
+				Name   = $columnName
+			}
+		}
+	}
+}
