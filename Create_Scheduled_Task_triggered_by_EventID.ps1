@@ -26,5 +26,4 @@ $Parameters = @{
 	Settings    = $Settings
 	Trigger     = $Trigger
 }
-
 Register-ScheduledTask @Parameters -Force
