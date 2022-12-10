@@ -4,7 +4,6 @@
 # https://docs.nxlog.co/userguide/integrate/windows-usb-auditing.html
 # https://www.netscylla.com/blog/2020/02/03/Windows-Event-Logs-and-USB-Tracking.html
 # https://www.techrepublic.com/article/how-to-track-down-usb-flash-drive-usage-in-windows-10s-event-viewer/
-# https://www.techrepublic.com/article/how-to-track-down-usb-flash-drive-usage-in-windows-10s-event-viewer/
 # https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-6416
 
 # Set UTF-8 encoding to console
