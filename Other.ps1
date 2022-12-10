@@ -344,41 +344,6 @@ $int = [System.BitConverter]::ToInt32($bytes, 0)
 # Disable net protocols
 Disable-NetAdapterBinding -Name Ethernet -ComponentID @("ms_tcpip6", "ms_pacer")
 
-# Calculate videofiles' length in a folder
-function Get-Duration
-{
-	[CmdletBinding()]
-	[OutputType([string])]
-	Param
-	(
-		[Parameter(Mandatory = $true)]
-		[string]
-		$Path,
-
-		[string]
-		$Extention
-	)
-
-	$Shell = New-Object -ComObject Shell.Application
-	$TotalDuration = [timespan]0
-
-	Get-ChildItem -Path $Path -Filter "*.$Extention" | ForEach-Object -Process {
-		$Folder = $Shell.Namespace($_.DirectoryName)
-		$File = $Folder.ParseName($_.Name)
-		$Duration = [timespan]$Folder.GetDetailsOf($File, 27)
-		$TotalDuration += $Duration
-
-		[PSCustomObject]@{
-			File     = $_.Name
-			Duration = $Duration
-		}
-	}
-
-	"`nTotal duration $TotalDuration"
-}
-(Get-Duration -Path D:\folder -Extention mp4 | Sort-Object Duration | Out-String).Trim()
-
-
 # Find all uninstalled updates
 $UpdateSession = New-Object -ComObject Microsoft.Update.Session
 $UpdateSearcher = $UpdateSession.CreateupdateSearcher()
