@@ -6,7 +6,7 @@ $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows
 $Parameters = @{
 	Uri     = "https://dl.google.com/dl/chrome/install/googlechromestandaloneenterprise64.msi"
 	OutFile = "$DownloadsFolder\googlechromestandaloneenterprise64.msi"
-	Verbose = [switch]::Present
+	Verbose = $true
 }
 Invoke-WebRequest @Parameters
 
