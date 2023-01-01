@@ -14,7 +14,7 @@ foreach ($folder in @(Get-ChildItem -Path "${env:ProgramFiles(x86)}\Steam\userda
 	}
 	else
 	{
-		Write-Verbose -Message test -Verbose
+		Write-Verbose -Message "No userdata folder" -Verbose
 	}
 }
 
