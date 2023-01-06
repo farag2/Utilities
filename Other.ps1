@@ -886,6 +886,14 @@ if (-not $IsAdmin)
 # Get NVidia videocard temperature
 nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader
 
+# Get disks temperature
+Get-PhysicalDisk | Get-Disk | ForEach-Object -Process {
+	[PSCustomObject]@{
+		Disk        = $_.FriendlyName
+		Temperature = (Get-PhysicalDisk -DeviceNumber $_.DiskNumber | Get-StorageReliabilityCounter).Temperature
+	}
+}
+
 # Check Internet connection. Works even if ICMP echo is disabled
 # https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol
 try
