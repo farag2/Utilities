@@ -22,6 +22,7 @@ $Worksheets = $Workbooks.Worksheets.Item(1)
 $Worksheets.PageSetup.Zoom = $false
 $Worksheets.PageSetup.FitToPagesWide = 1
 $Worksheets.PageSetup.FitToPagesTall = 1
+$Worksheets.PageSetup.Orientation = 1
 # $xl.ActivePrinter = "Printer name"
 # Print
 $Workbooks.PrintOut()
