@@ -3,7 +3,8 @@ Stop-Process -Name steam -Force -ErrorAction Ignore
 # Enable "Fluent for Steam" skin
 if (Test-Path -Path "${env:ProgramFiles(x86)}\Steam\skins\Fluent-for-Steam*")
 {
-	New-ItemProperty -Path HKCU:\Software\Valve\Steam -Name SkinV5 -PropertyType String -Value "Fluent-for-Steam (Early Acess - Experimental)" -Force
+	$Theme = (Get-ChildItem -Path "${env:ProgramFiles(x86)}\Steam\skins\Fluent-for-Steam*").Name
+	New-ItemProperty -Path HKCU:\Software\Valve\Steam -Name SkinV5 -PropertyType String -Value $Theme -Force
 }
 
 foreach ($folder in @(Get-ChildItem -Path "${env:ProgramFiles(x86)}\Steam\userdata" -Force -Directory))
