@@ -11,10 +11,14 @@ foreach ($folder in @(Get-ChildItem -Path "${env:ProgramFiles(x86)}\Steam\userda
 {
 	if (Test-Path -Path $folder.FullName)
 	{
-		# Do not notify me about additions or changes to my games, new releases, and upcoming releases
-		(Get-Content -Path "$($folder.FullName)\config\localconfig.vdf" -Encoding UTF8) | ForEach-Object -Process {
-			$_ -replace "`"NotifyAvailableGames`"		`"1`"", "`"NotifyAvailableGames`"		`"0`""
-		} | Set-Content -Path "$($folder.FullName)\config\localconfig.vdf" -Encoding UTF8 -Force
+		(Get-Content -Path "C:\Program Files (x86)\Steam\userdata\896165839\config\localconfig.vdf" -Encoding UTF8) | ForEach-Object -Process {
+			$_.replace(
+				# Do not notify me about additions or changes to my games, new releases, and upcoming releases
+				"`"NotifyAvailableGames`"		`"1`"", "`"NotifyAvailableGames`"		`"0`"").replace(
+				# Display Steam URL address bar when available
+				"`"NavUrlBar`"		`"0`"", "`"NavUrlBar`"		`"1`""
+			)
+		} | Set-Content -Path "C:\Program Files (x86)\Steam\userdata\896165839\config\localconfig.vdf" -Encoding UTF8 -Force
 	}
 	else
 	{
