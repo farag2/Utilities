@@ -11,14 +11,19 @@ foreach ($folder in @(Get-ChildItem -Path "${env:ProgramFiles(x86)}\Steam\userda
 {
 	if (Test-Path -Path $folder.FullName)
 	{
-		(Get-Content -Path "C:\Program Files (x86)\Steam\userdata\896165839\config\localconfig.vdf" -Encoding UTF8) | ForEach-Object -Process {
+		(Get-Content -Path "$($folder.PSPath)\config\localconfig.vdf" -Encoding UTF8) | ForEach-Object -Process {
 			$_.replace(
 				# Do not notify me about additions or changes to my games, new releases, and upcoming releases
 				"`"NotifyAvailableGames`"		`"1`"", "`"NotifyAvailableGames`"		`"0`"").replace(
 				# Display Steam URL address bar when available
 				"`"NavUrlBar`"		`"0`"", "`"NavUrlBar`"		`"1`""
 			)
-		} | Set-Content -Path "C:\Program Files (x86)\Steam\userdata\896165839\config\localconfig.vdf" -Encoding UTF8 -Force
+		} | Set-Content -Path "$($folder.PSPath)\config\localconfig.vdf" -Encoding UTF8 -Force
+
+		# Select which Steam window appears when the program starts: Library
+		(Get-Content -Path "$($folder.PSPath)\7\remote\sharedconfig.vdf" -Encoding UTF8) | ForEach-Object -Process {
+			$_.replace("`"SteamDefaultDialog`"		`"#app_store`"", "`"SteamDefaultDialog`"		`"#app_games`"")
+		} | Set-Content -Path "$($folder.PSPath)\7\remote\sharedconfig.vdf" -Encoding UTF8 -Force
 	}
 	else
 	{
