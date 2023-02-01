@@ -1,4 +1,4 @@
-# Convert Word files to PDF. If a corrputed file is found it will be written to to variable
+# Convert Word files to PDF. If a corrputed file is found it will be written to variable
 
 # Remove all records about corrupted files
 Remove-ItemProperty -Path HKCU:\Software\Microsoft\Office\16.0\Word\Resiliency\DisabledItems -Name * -ErrorAction Ignore
