@@ -823,13 +823,17 @@ $Extensions = @{
 }
 $Extensions.Keys | ForEach-Object -Process {(wsl --list --quiet) -contains $_}
 
-# Create a table with WSL supported distros (not Internet connection required)
-wsl --list --online | Where-Object -FilterScript {$_.Length -gt 1} | Select-Object -Skip 3 | ForEach-Object -Process {
+# Create a table with WSL supported distros (no Internet connection required)
+[System.Console]::OutputEncoding = [System.Text.Encoding]::Unicode
+
+$Distros = (wsl --list --online | Select-Object -Skip 8).Replace("  ", "").Replace("* ", "") | ForEach-Object -Process {
 	[PSCustomObject]@{
-		"Key"   = $_.Substring(0, 24)
-		"Value" = $_.Substring(30)
+		"Distro" = $_ -split " ", 2 | Select-Object -Last 1
+		"Alias"  = $_ -split " ", 2 | Select-Object -First 1
 	}
 }
+$Distros
+# $Distros | ConvertTo-Json
 
 # Decode blob URL and download file
 # https://github.com/BtbN/FFmpeg-Builds/releases/latest
