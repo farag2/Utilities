@@ -825,6 +825,9 @@ $Extensions = @{
 }
 $Extensions.Keys | ForEach-Object -Process {(wsl --list --quiet) -contains $_}
 
+#[System.Console]::OutputEncoding = [System.Text.Encoding]::Unicode
+#$Distros | ForEach-Object -Process {(wsl --list --quiet) -contains $_.Alias}
+
 # Create a table with WSL supported distros (no Internet connection required)
 [System.Console]::OutputEncoding = [System.Text.Encoding]::Unicode
 
