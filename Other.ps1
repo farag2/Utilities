@@ -812,14 +812,16 @@ copy /b D:\firmware.rfu \\print_server\MFU
 
 # Create a table with WSL installed distros
 $Extensions = @{
-	Ubuntu         = "Ubuntu"
-	Debian         = "Debian GNU/Linux"
-	"kali-linux"   = "Kali Linux Rolling"
-	"openSUSE-42"  = "openSUSE Leap 42"
-	"SLES-12"      = "SUSE Linux Enterprise Server v12"
-	"Ubuntu-16.04" = "Ubuntu 16.04 LTS"
-	"Ubuntu-18.04" = "Ubuntu 18.04 LTS"
-	"Ubuntu-20.04" = "Ubuntu 20.04 LTS"
+    "Ubuntu"                      = "Ubuntu"               
+    "Debian GNU/Linux"            = "Debian"               
+    "Kali Linux Rolling"          = "kali-linux"           
+    "Linux Enterprise Server v12" = "SLES-12SUSE"          
+    "Linux Enterprise Server v15" = "SLES-15SUSE"          
+    "Ubuntu 18.04 LTS"            = "Ubuntu-18.04"         
+    "Ubuntu 20.04 LTS"            = "Ubuntu-20.04"         
+    "Ubuntu 22.04 LTS "           = "Ubuntu-22.04"         
+    "Linux 8.5"                   = "OracleLinux_8_5Oracle"
+    "Linux 7.9"                   = "OracleLinux_7_9Oracle"
 }
 $Extensions.Keys | ForEach-Object -Process {(wsl --list --quiet) -contains $_}
 
@@ -832,8 +834,19 @@ $Distros = (wsl --list --online | Select-Object -Skip 8).Replace("  ", "").Repla
 		"Alias"  = $_ -split " ", 2 | Select-Object -First 1
 	}
 }
-$Distros
+($Distros | Where-Object -FilterScript {$_.Distro -eq "Ubuntu"}).Alias
 # $Distros | ConvertTo-Json
+
+# Save PSCustomObject to a variable
+$ActiveDirectoryList = @()
+"Testvm1", "Testvm2", "Testvm3" | ForEach-Object -Process {
+	$Var = [PSCustomObject]@{
+		VMName   = $_
+		Location = 'EastUS'
+	}
+	$ActiveDirectoryList += $Var
+}
+$ActiveDirectoryList
 
 # Decode blob URL and download file
 # https://github.com/BtbN/FFmpeg-Builds/releases/latest
