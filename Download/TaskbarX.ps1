@@ -1,4 +1,5 @@
-cls
+# https://github.com/ChrisAnd1998/TaskbarX
+
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $Parameters = @{
