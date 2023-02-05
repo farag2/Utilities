@@ -963,7 +963,7 @@ Get-ItemPropertyValue -Path HKCU:\Environment -Name TEMP
 # Extract strings from mui files using Resource Hacker
 # http://www.angusj.com/resourcehacker
 Get-ChildItem -Path D:\Downloads\LanguagePack -Recurse -Force -Filter *.mui -File | ForEach-Object -Process {
-    $_.FullName
+    Write-Verbose -Message $_.FullName -Verbose
     Start-Process -FilePath "D:\ResourceHacker.exe" -ArgumentList @("-open", $_.FullName, "-save", "D:\extract\$_.Name.rc", "-action extract", "-mask MESSAGETABLE") -Wait
 }
 
@@ -1007,3 +1007,6 @@ for ($columnNumber = 0; $columnNumber -lt 500; ++$columnNumber)
 		}
 	}
 }
+
+# Display all environment variables
+Get-ChildItem -Path env:
