@@ -1,15 +1,26 @@
 # Download 7Zip
+
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
+# Get the latest 7-Zip download URL
+$Parameters = @{
+	Uri             = "https://sourceforge.net/projects/sevenzip/best_release.json"
+	UseBasicParsing = $true
+	Verbose         = $true
+}
+$bestRelease = (Invoke-RestMethod @Parameters).platform_releases.windows.filename.replace("exe", "msi")
+
+# Download the latest 7-Zip x64
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
-	Uri     = "https://deac-ams.dl.sourceforge.net/project/sevenzip/7-Zip/21.02/7z2102-x64.msi"
-	OutFile = "$DownloadsFolder\7z2102-x64.msi"
-	Verbose = $true
+	Uri             = "https://nchc.dl.sourceforge.net/project/sevenzip$($bestRelease)"
+	OutFile         = "$DownloadsFolder\7-Zip.msi"
+	UseBasicParsing = $true
+	Verbose         = $true
 }
 Invoke-WebRequest @Parameters
 
-Start-Process -FilePath "$DownloadsFolder\7z2102-x64.msi" -ArgumentList "/quiet" -Wait
+Start-Process -FilePath "$DownloadsFolder\7-Zip.msi" -ArgumentList "/quiet" -Wait
 
 if (-not (Test-Path -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\7-Zip File Manager.lnk"))
 {
