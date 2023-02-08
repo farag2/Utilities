@@ -1010,3 +1010,9 @@ for ($columnNumber = 0; $columnNumber -lt 500; ++$columnNumber)
 
 # Display all environment variables
 Get-ChildItem -Path env:
+
+# Remove first X strings in file
+$File = Get-Content -Path D:\1.txt -Encoding UTF8
+$LineNumber = ($File | Select-String -Pattern "Pattern").LineNumber
+$x[($LineNumber-1)..($File.Count)] | Set-Content -Path D:\1.txt -Encoding UTF8 -Force
+
