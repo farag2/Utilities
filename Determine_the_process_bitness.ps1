@@ -11,8 +11,8 @@ function ProcessBitness
 
 	$Signature = @{
 		Namespace = "Kernel32"
-		Name = "Bitness"
-		Language = "CSharp"
+		Name      = "Bitness"
+		Language  = "CSharp"
 		MemberDefinition = @"
 [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
 [return: MarshalAs(UnmanagedType.Bool)]
@@ -26,7 +26,7 @@ public static extern bool IsWow64Process(
 		Add-Type @Signature
 	}
 
-	Get-Process -Id (Get-Process -Name $ProcessName).id | ForEach-Object -Process {
+	Get-Process -Name $ProcessName | ForEach-Object -Process {
 		$is32Bit = [int]0
 		if ([Kernel32.Bitness]::IsWow64Process($_.Handle, [ref]$is32Bit))
 		{
