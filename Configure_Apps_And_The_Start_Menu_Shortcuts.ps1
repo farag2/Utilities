@@ -249,7 +249,7 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 				UseBasicParsing = $true
 				Verbose         = $true
 			}
-			Invoke-WebRequest @Parameters
+			Invoke-WebRequest @Parameters | Invoke-Expression
 
 			# We cannot invoke an expression with non-latin words to avoid "??????"
 			New-ItemProperty -Path "Registry::HKEY_CLASSES_ROOT\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings" -Name Title -PropertyType String -Value "Открыть с помощью &Notepad++" -Force | ConvertTo-BodyWithEncoding | Invoke-Expression
