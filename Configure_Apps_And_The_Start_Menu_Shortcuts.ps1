@@ -241,12 +241,9 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 
 	if ((Get-WinSystemLocale).Name -eq "ru-RU")
 	{
-		if ($Host.Version.Major -eq 5)
-		{
-			New-ItemProperty -Path "Registry::HKEY_CLASSES_ROOT\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings" -Name Title -PropertyType String -Value "Открыть с помощью &Notepad++" -Force | Set-Content -Path "$env:TEMP\Temp.ps1" -Encoding UTF8 -Force
-			& "$env:TEMP\Temp.ps1"
-			# Remove-Item -Path "$env:TEMP\Temp.ps1" -Force
-		}
+		"New-ItemProperty -Path `"Registry::HKEY_CLASSES_ROOT\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings`" -Name Title -PropertyType String -Value `"Открыть с помощью &Notepad++`" -Force" | Set-Content -Path "$env:TEMP\Temp.ps1" -Encoding UTF8 -Force
+		& "$env:TEMP\Temp.ps1"
+		Remove-Item -Path "$env:TEMP\Temp.ps1" -Force
 	}
 	New-ItemProperty -Path "HKCU:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache" -Name "C:\Program Files\Notepad++\notepad++.exe.FriendlyAppName" -PropertyType String -Value "Notepad++" -Force
 
