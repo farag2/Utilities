@@ -7,7 +7,7 @@ Get-ChildItem -Path "HKLM:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Wi
 	"$($_.Path)\AppxManifest.xml"
 } | Add-AppxPackage -Register -ForceApplicationShutdown -ForceUpdateFromAnyVersion -DisableDevelopmentMode -Verbose
 # Check for UWP apps updates
-Get-CimInstance -Namespace "Root\cimv2\mdm\dmmap" -ClassName "MDM_EnterpriseModernAppManagement_AppManagement01" | Invoke-CimMethod -MethodName UpdateScanMethod
+Get-CimInstance -Namespace root/CIMV2/mdm/dmmap -ClassName MDM_EnterpriseModernAppManagement_AppManagement01 | Invoke-CimMethod -MethodName UpdateScanMethod
 
 # Restore all UWP apps
 $DamagedPackages = @()
@@ -27,7 +27,7 @@ foreach ($Package in $($DamagedPackages | Get-Unique))
 	New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Name PackageStatus -Value 2 -PropertyType DWORD -Force
 }
 # Check for UWP apps updates
-Get-CimInstance -Namespace "Root\cimv2\mdm\dmmap" -ClassName "MDM_EnterpriseModernAppManagement_AppManagement01" | Invoke-CimMethod -MethodName UpdateScanMethod
+Get-CimInstance -Namespace root/CIMV2/mdm/dmmap -ClassName MDM_EnterpriseModernAppManagement_AppManagement01 | Invoke-CimMethod -MethodName UpdateScanMethod
 
 foreach ($Package in $($DamagedPackages | Get-Unique))
 {
@@ -869,13 +869,13 @@ LGPO.exe /t C:\Temp\lgpo.txt
 
 # TrueForAll
 [array]::TrueForAll(
-    [string[]](Get-Service -Name WinDefend, SecurityHealthService, wisvc).Status,
-    
-    [Predicate[string]]{
-        param ($Status)
+	[string[]](Get-Service -Name WinDefend, SecurityHealthService, wisvc).Status,
 
-        $Status -eq "Running"
-    }
+	[Predicate[string]]{
+		param ($Status)
+
+		$Status -eq "Running"
+	}
 )
 
 # Download Windows.winmd from Windows 10 SDK
@@ -1015,4 +1015,3 @@ Get-ChildItem -Path env:
 $File = Get-Content -Path D:\1.txt -Encoding UTF8
 $LineNumber = ($File | Select-String -Pattern "Pattern").LineNumber
 $x[($LineNumber-1)..($File.Count)] | Set-Content -Path D:\1.txt -Encoding UTF8 -Force
-
