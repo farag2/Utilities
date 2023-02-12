@@ -22,6 +22,6 @@ bash -c "echo World"
 wsl --exec bash -c "echo Hello World"
 
 # Install desktop GUI for WSL distro
-<https://www.makeuseof.com/tag/linux-desktop-windows-subsystem>
-<https://www.davecwright.org/post/wsl-gui/win10-wsl-setup>
-<https://hub.tcno.co/windows/wsl/desktop-gui>
+https://www.makeuseof.com/tag/linux-desktop-windows-subsystem
+https://www.davecwright.org/post/wsl-gui/win10-wsl-setup
+https://hub.tcno.co/windows/wsl/desktop-gui
