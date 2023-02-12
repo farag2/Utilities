@@ -13,7 +13,10 @@ cp /mnt/d/temp.txt $HOME
 # Print all env variables
 printenv
 
+# Update WSL distro
+sudo apt-get update --yes && sudo apt-get upgrade --yes
+wsl sudo apt-get update --yes && sudo apt-get upgrade --yes
+
 # Send command to WSL from Windows
-wsl sudo apt-get upgrade --yes
-wsl --exec bash -c "echo Hello World"
 bash -c "echo World"
+wsl --exec bash -c "echo Hello World"
