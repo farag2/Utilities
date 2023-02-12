@@ -221,6 +221,7 @@ if (Test-Path -Path "$env:ProgramFiles\MPC-BE x64")
 # Notepad++
 if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 {
+	<#
 	if (-not (Test-Path -Path "$env:APPDATA\Notepad++\config.xml"))
 	{
 		Start-Process -FilePath "$env:ProgramFiles\Notepad++\notepad++.exe"
@@ -229,6 +230,7 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	}
 
 	Stop-Process -Name notepad++ -Force -ErrorAction Ignore
+	#>
 
 	$Remove = @(
 		"$env:ProgramFiles\Notepad++\change.log",
@@ -299,6 +301,7 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	cmd.exe --% /c assoc .xml=txtfile
 	cmd.exe --% /c assoc txtfile\DefaultIcon=%ProgramFiles%\Notepad++\notepad++.exe,0
 
+	<#
 	# It is needed to use -Wait to make Notepad++ apply written settings
 	Write-Warning -Message "Close Notepad++' window manually"
 	Start-Process -FilePath "$env:ProgramFiles\Notepad++\notepad++.exe" -ArgumentList "$env:APPDATA\Notepad++\config.xml" -Wait
@@ -321,6 +324,7 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 	Start-Process -FilePath "$env:ProgramFiles\Notepad++\notepad++.exe" -ArgumentList "$env:APPDATA\Notepad++\config.xml" -Wait
 	Start-Sleep -Seconds 1
 	Stop-Process -Name notepad++ -ErrorAction Ignore
+	#>
 }
 
 # Office
