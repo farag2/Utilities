@@ -244,15 +244,48 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 		if ($Host.Version.Major -eq 5)
 		{
 			# https://gist.github.com/mklement0/209a9506b8ba32246f95d1cc238d564d
+			function ConvertTo-BodyWithEncoding
+			{
+				[CmdletBinding(PositionalBinding = $false)]
+				param
+				(
+					[Parameter(Mandatory, ValueFromPipeline)]
+					[Microsoft.PowerShell.Commands.WebResponseObject]
+					$InputObject,
+
+					# The encoding to use; defaults to UTF-8
+					[Parameter(Position = 0)]
+					$Encoding = [System.Text.Encoding]::Utf8
+				)
+
+				begin
+				{
+					if ($Encoding -isnot [System.Text.Encoding])
+					{
+						try
+						{
+							$Encoding = [System.Text.Encoding]::GetEncoding($Encoding)
+						}
+						catch
+						{
+							throw
+						}
+					}
+				}
+
+				process
+				{
+					$Encoding.GetString($InputObject.RawContentStream.ToArray())
+				}
+			}
+
+			# We cannot invoke an expression with non-latin words to avoid "??????"
 			$Parameters = @{
-				Uri             = "https://gist.githubusercontent.com/mklement0/209a9506b8ba32246f95d1cc238d564d/raw/96d634efc897c1a43809be73068fb2a3ee270ced/ConvertTo-BodyWithEncoding.ps1"
+				Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Notepad%2B%2B_context_menu.ps1"
 				UseBasicParsing = $true
 				Verbose         = $true
 			}
-			Invoke-WebRequest @Parameters | Invoke-Expression
-
-			# We cannot invoke an expression with non-latin words to avoid "??????"
-			New-ItemProperty -Path "Registry::HKEY_CLASSES_ROOT\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings" -Name Title -PropertyType String -Value "Открыть с помощью &Notepad++" -Force | ConvertTo-BodyWithEncoding | Invoke-Expression
+			Invoke-WebRequest @Parameters | ConvertTo-BodyWithEncoding | Invoke-Expression
 		}
 	}
 	New-ItemProperty -Path "HKCU:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache" -Name "C:\Program Files\Notepad++\notepad++.exe.FriendlyAppName" -PropertyType String -Value "Notepad++" -Force
