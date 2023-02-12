@@ -23,8 +23,6 @@ if (Test-Path -Path $env:ProgramFiles\AIMP)
 	)
 	Remove-Item -Path $Remove -Recurse -Force -ErrorAction Ignore
 
-	Get-ChildItem -Path $env:ProgramFiles\AIMP\Langs -Exclude russian.lng -Force | Remove-Item -Force
-
 	$Arguments = @(
 		# Disable the context menu integration
 		"/REG=M0"
@@ -89,7 +87,6 @@ if (Test-Path -Path "$env:ProgramFiles\CCleaner")
 	)
 	Remove-Item -Path $Remove -Recurse -Force -ErrorAction Ignore
 
-	Remove-Item -Path "$env:ProgramFiles\CCleaner\Lang" -Exclude lang-1049.dll -Recurse -Force -ErrorAction Ignore
 	Unregister-ScheduledTask -TaskName *CCleaner* -Confirm:$false
 	Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "CCleaner Smart Cleaning" -Force -ErrorAction Ignore
 
@@ -178,8 +175,6 @@ if (Test-Path -Path "$env:ProgramFiles\Icaros")
 	)
 	Remove-Item -Path $Remove -Recurse -Force -ErrorAction Ignore
 
-	Remove-Item -Path "$env:ProgramFiles\Icaros\Resources\Localize" -Exclude Config.ru.po -Recurse -Force -ErrorAction Ignore
-
 	if (-not (Test-Path -Path HKLM:\SOFTWARE\Icaros))
 	{
 		New-Item -Path HKLM:\SOFTWARE\Icaros -Force
@@ -207,8 +202,6 @@ if (Test-Path -Path "$env:ProgramFiles\MPC-BE x64")
 		"$env:ProgramFiles\MPC-BE x64\Readme.txt"
 	)
 	Remove-Item -Path $Remove -Recurse -Force -ErrorAction Ignore
-
-	Remove-Item -Path "$env:ProgramFiles\MPC-BE x64\Lang" -Exclude mpcresources.ru.dll -Recurse -Force -ErrorAction Ignore
 
 	$Parameters = @{
 		Uri     = "https://raw.githubusercontent.com/farag2/Utilities/master/MPC-BE/mpc-be64.ini"
@@ -239,7 +232,6 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 		"$env:ProgramFiles\Notepad++\autoCompletion"
 	)
 	Remove-Item -Path $Remove -Recurse -Force -ErrorAction Ignore
-	Remove-Item -Path "$env:ProgramFiles\Notepad++\localization" -Exclude russian.xml -Recurse -Force -ErrorAction Ignore
 
 	if ((Get-WinSystemLocale).Name -eq "ru-RU")
 	{
@@ -336,7 +328,6 @@ if (Test-Path -Path "$env:ProgramFiles\Microsoft Office\root")
 # Paint.net
 if (Test-Path -Path "$env:ProgramFiles\paint.net")
 {
-	Remove-Item -Path "$env:ProgramFiles\paint.net\Resources" -Exclude ru -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "$env:ProgramFiles\paint.net\License.txt" -Force -ErrorAction Ignore
 	Remove-Item -Path "$env:PUBLIC\Desktop\paint.net.lnk" -Force -ErrorAction Ignore
 
@@ -366,7 +357,6 @@ if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 		Copy-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\qBittorrent\qBittorrent.lnk" -Destination "$env:ProgramData\Microsoft\Windows\Start Menu\Programs" -Force
 	}
 	Remove-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\qBittorrent" -Recurse -Force -ErrorAction Ignore
-	Remove-Item -Path "$env:ProgramFiles\qBittorrent\translations" -Exclude qt_ru.qm, qtbase_ru.qm -Recurse -Force -ErrorAction Ignore
 
 	$Parameters = @{
 		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/qBittorrent/qBittorrent.ini"
