@@ -255,7 +255,7 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 
 					# The encoding to use; defaults to UTF-8
 					[Parameter(Position = 0)]
-					$Encoding = [System.Text.Encoding]::Utf8
+					$Encoding = [System.Text.Encoding]::UTF8
 				)
 
 				begin
