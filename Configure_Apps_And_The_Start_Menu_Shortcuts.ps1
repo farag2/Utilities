@@ -241,9 +241,19 @@ if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 
 	if ((Get-WinSystemLocale).Name -eq "ru-RU")
 	{
-		"New-ItemProperty -Path `"Registry::HKEY_CLASSES_ROOT\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings`" -Name Title -PropertyType String -Value `"Открыть с помощью &Notepad++`" -Force" | Set-Content -Path "$env:TEMP\Temp.ps1" -Encoding UTF8 -Force
-		& "$env:TEMP\Temp.ps1"
-		Remove-Item -Path "$env:TEMP\Temp.ps1" -Force
+		if ($Host.Version.Major -eq 5)
+		{
+			# https://gist.github.com/mklement0/209a9506b8ba32246f95d1cc238d564d
+			$Parameters = @{
+				Uri             = "https://gist.githubusercontent.com/mklement0/209a9506b8ba32246f95d1cc238d564d/raw/96d634efc897c1a43809be73068fb2a3ee270ced/ConvertTo-BodyWithEncoding.ps1"
+				UseBasicParsing = $true
+				Verbose         = $true
+			}
+			Invoke-WebRequest @Parameters
+
+			# We cannot invoke an expression with non-latin words to avoid "??????"
+			New-ItemProperty -Path "Registry::HKEY_CLASSES_ROOT\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings" -Name Title -PropertyType String -Value "Открыть с помощью &Notepad++" -Force | ConvertTo-BodyWithEncoding | Invoke-Expression
+		}
 	}
 	New-ItemProperty -Path "HKCU:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache" -Name "C:\Program Files\Notepad++\notepad++.exe.FriendlyAppName" -PropertyType String -Value "Notepad++" -Force
 
