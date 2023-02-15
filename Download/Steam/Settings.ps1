@@ -1,6 +1,7 @@
 Stop-Process -Name steam -Force -ErrorAction Ignore
 
 # Enable "Fluent for Steam" skin
+# https://discord.com/channels/993975348930818178/993980186041262191
 if (Test-Path -Path "${env:ProgramFiles(x86)}\Steam\skins\Fluent-for-Steam*")
 {
 	$Theme = (Get-ChildItem -Path "${env:ProgramFiles(x86)}\Steam\skins\Fluent-for-Steam*").Name
