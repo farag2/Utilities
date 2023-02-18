@@ -372,7 +372,7 @@ if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 		UseBasicParsing = $true
 		Verbose         = $true
 	}
-	$LatestVersion = (Invoke-RestMethod @Parameters).assets.browser_download_url | Where-Object -FilterScript {$_ -match "fluent-dark-no-mica.qbtheme"}
+	$LatestVersion = ((Invoke-RestMethod @Parameters).assets.browser_download_url | Where-Object -FilterScript {$_ -match "fluent-dark-no-mica.qbtheme"})[1]
 
 	$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 	$Parameters = @{
