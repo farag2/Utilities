@@ -4,84 +4,14 @@
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
 	Uri             = "https://trials.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_x64_WWMUI.zip"
-	OutFile         = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip"
+	OutFile         = "$DownloadsFolder\Acrobat_DC_Web_x64_WWMUI.zip"
 	UseBasicParsing = $true
 	Verbose         = $true
 }
 Invoke-WebRequest @Parameters
 
-<#
-	.SYNOPSIS
-	Extracting the specific folder from ZIP archive. Folder structure will be created recursively
-
-	.Parameter Source
-	The source ZIP archive
-
-	.Parameter Destination
-	Where to extracting folder
-
-	.Parameter Folder
-	Assign the folder to extracting to
-
-	.Parameter ExcludedFiles
-	Exclude files from extracting
-
-	.Parameter ExcludedFolders
-	Exclude folders from extracting
-
-	.Example
-	ExtractZIPFolder -Source "D:\Folder\File.zip" -Destination "D:\Folder" -Folder "Folder1/Folder2" -ExcludedFiles @("file1.ext", "file2.ext") -ExcludedFolders @("folder1", "folder2")
-#>
-function ExtractZIPFolder
-{
-	[CmdletBinding()]
-	param
-	(
-		[string]
-		$Source,
-
-		[string]
-		$Destination,
-
-		[string]
-		$Folder,
-
-		[string[]]
-		$ExcludedFiles,
-
-		[string[]]
-		$ExcludedFolders
-	)
-
-	Add-Type -Assembly System.IO.Compression.FileSystem
-
-	$ZIP = [IO.Compression.ZipFile]::OpenRead($Source)
-
-	$ExcludedFolders = ($ExcludedFolders | ForEach-Object -Process {$_ + "/.*?"}) -join '|'
-
-	$ZIP.Entries | Where-Object -FilterScript {($_.FullName -like "$($Folder)/*.*") -and ($ExcludedFiles -notcontains $_.Name) -and ($_.FullName -notmatch $ExcludedFolders)} | ForEach-Object -Process {
-		$File   = Join-Path -Path $Destination -ChildPath $_.FullName
-		$Parent = Split-Path -Path $File -Parent
-
-		if (-not (Test-Path -Path $Parent))
-		{
-			New-Item -Path $Parent -Type Directory -Force
-		}
-
-		[IO.Compression.ZipFileExtensions]::ExtractToFile($_, $File, $true)
-	}
-
-	$ZIP.Dispose()
-}
-
-$Parameters = @{
-	Source          = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip"
-	Destination     = "$DownloadsFolder"
-	Folder          = "Adobe Acrobat"
-	ExcludedFiles   = @("WindowsInstaller-KB893803-v2-x86.exe")
-	ExcludedFolders = @("Adobe Acrobat/VCRT_x64")
-}
-ExtractZIPFolder @Parameters
+# Extract archive
+& tar.exe -x -f "$DownloadsFolder\Acrobat_DC_Web_x64_WWMUI.zip" -C $DownloadsFolder --exclude "WindowsInstaller-KB893803-v2-x86.exe" --exclude "VCRT_x64" -v
 
 # Extract AcroPro.msi to the "AcroPro.msi extracted" folder
 $Arguments = @(
