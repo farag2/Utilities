@@ -10,78 +10,8 @@ $Parameters = @{
 }
 Invoke-WebRequest @Parameters
 
-<#
-	.SYNOPSIS
-	Extracting the specific folder from ZIP archive. Folder structure will be created recursively
-
-	.Parameter Source
-	The source ZIP archive
-
-	.Parameter Destination
-	Where to extracting folder
-
-	.Parameter Folder
-	Assign the folder to extracting to
-
-	.Parameter ExcludedFiles
-	Exclude files from extracting
-
-	.Parameter ExcludedFolders
-	Exclude folders from extracting
-
-	.Example
-	ExtractZIPFolder -Source "D:\Folder\File.zip" -Destination "D:\Folder" -Folder "Folder1/Folder2" -ExcludedFiles @("file1.ext", "file2.ext") -ExcludedFolders @("folder1", "folder2")
-#>
-function ExtractZIPFolder
-{
-	[CmdletBinding()]
-	param
-	(
-		[string]
-		$Source,
-
-		[string]
-		$Destination,
-
-		[string]
-		$Folder,
-
-		[string[]]
-		$ExcludedFiles,
-
-		[string[]]
-		$ExcludedFolders
-	)
-
-	Add-Type -Assembly System.IO.Compression.FileSystem
-
-	$ZIP = [IO.Compression.ZipFile]::OpenRead($Source)
-
-	$ExcludedFolders = ($ExcludedFolders | ForEach-Object -Process {$_ + "/.*?"}) -join '|'
-
-	$ZIP.Entries | Where-Object -FilterScript {($_.FullName -like "$($Folder)/*.*") -and ($ExcludedFiles -notcontains $_.Name) -and ($_.FullName -notmatch $ExcludedFolders)} | ForEach-Object -Process {
-		$File   = Join-Path -Path $Destination -ChildPath $_.FullName
-		$Parent = Split-Path -Path $File -Parent
-
-		if (-not (Test-Path -Path $Parent))
-		{
-			New-Item -Path $Parent -Type Directory -Force
-		}
-
-		[IO.Compression.ZipFileExtensions]::ExtractToFile($_, $File, $true)
-	}
-
-	$ZIP.Dispose()
-}
-
-$Parameters = @{
-	Source          = "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip"
-	Destination     = "$DownloadsFolder"
-	Folder          = "Adobe Acrobat"
-	ExcludedFiles   = @("WindowsInstaller-KB893803-v2-x86.exe")
-	ExcludedFolders = @("Adobe Acrobat/VCRT_x64")
-}
-ExtractZIPFolder @Parameters
+# Extract archive
+& tar.exe -x -f "$DownloadsFolder\Acrobat_DC_Web_WWMUI.zip" -C $DownloadsFolder --exclude "WindowsInstaller-KB893803-v2-x86.exe" --exclude "VCRT_x64" -v
 
 # Extract AcroPro.msi to the "AcroPro.msi extracted" folder
 $Arguments = @(
@@ -91,9 +21,8 @@ $Arguments = @(
 )
 Start-Process "msiexec" -ArgumentList $Arguments -Wait
 
-Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\Data1.cab" -Force
 Get-ChildItem -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\Adobe Acrobat" -Force
-Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Recurse -Force
+Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted", "$DownloadsFolder\Adobe Acrobat\Data1.cab" -Recurse -Force
 
 # Get the latest Adobe Acrobat Pro DC patch version (lang=mui)
 $Parameters = @{
