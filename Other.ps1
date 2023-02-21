@@ -1015,3 +1015,17 @@ Get-ChildItem -Path env:
 $File = Get-Content -Path D:\1.txt -Encoding UTF8
 $LineNumber = ($File | Select-String -Pattern "Pattern").LineNumber
 $x[($LineNumber-1)..($File.Count)] | Set-Content -Path D:\1.txt -Encoding UTF8 -Force
+
+# Retrive items from hashtable
+$Items = @{
+	"Parameter1" = "Value1"
+	"Parameter2" = "Value2"
+	"Parameter3" = @(
+		"Value3",
+		"Value4"
+	)
+}
+foreach ($Item in $Items.Keys)
+{
+	$Items[$Item]
+}
