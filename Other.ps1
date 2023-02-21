@@ -34,15 +34,6 @@ foreach ($Package in $($DamagedPackages | Get-Unique))
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Force
 }
 
-<#
-	Install Microsoft Store from appxbundle
-	SW_DVD9_NTRL_Win_10_20H2_32_64_ARM64_MultiLang_Inbox_Apps_X22-36106.ISO
-	https://store.rg-adguard.net
-	https://yadi.sk/d/10Ttj2IVOKQ0Og
-#>
-Add-AppxPackage -Path D:\Microsoft.DesktopAppInstaller.appxbundle
-Add-AppxPackage -Path D:\Microsoft.StorePurchaseApp.appxbundle
-
 # Allow to connect to a single label domain
 New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters -Name AllowSingleLabelDnsDomain -Value 1 -Force
 
