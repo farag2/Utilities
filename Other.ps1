@@ -1020,3 +1020,6 @@ foreach ($Item in $Items.Keys)
 {
 	$Items[$Item]
 }
+
+# Export all hidden arguments for .MSI installer to a file
+& "D:\file.msi" /lp! "D:\arguments.txt"
