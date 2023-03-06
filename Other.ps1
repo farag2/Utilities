@@ -1023,3 +1023,13 @@ foreach ($Item in $Items.Keys)
 
 # Export all hidden arguments for .MSI installer to a file
 & "D:\file.msi" /lp! "D:\arguments.txt"
+
+# Patch shortcut to make it run as Run as Administrator
+[byte[]]$bytes = Get-Content -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\shortcut.lnk" -Encoding Byte -Raw
+# PowerShell 7
+# [byte[]]$bytes = Get-Content -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\shortcut.lnk.lnk" -AsByteStream -Raw
+# Elevated
+$bytes[0x15] = $bytes[0x15] -bor 0x20
+# Non elevated
+# $bytes[0x15] = $bytes[0x15] -bxor 0x20
+Set-Content -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\shortcut.lnk.lnk" -Value $bytes -Encoding Byte -Force
