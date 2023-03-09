@@ -816,20 +816,22 @@ $Extensions = @{
 }
 $Extensions.Keys | ForEach-Object -Process {(wsl --list --quiet) -contains $_}
 
-#[System.Console]::OutputEncoding = [System.Text.Encoding]::Unicode
-#$Distros | ForEach-Object -Process {(wsl --list --quiet) -contains $_.Alias}
-
-# Create a table with WSL supported distros (no Internet connection required)
 [System.Console]::OutputEncoding = [System.Text.Encoding]::Unicode
 
-$Distros = (wsl --list --online | Select-Object -Skip 8).Replace("  ", "").Replace("* ", "") | ForEach-Object -Process {
+$wsl = wsl --list --online
+# We need to get the string number where the "FRIENDLY NAME" header begins to truncate all other unnecessary strings in the beginning
+$LineNumber = ($wsl | Select-String -Pattern "FRIENDLY NAME" -CaseSensitive).LineNumber
+# Remove first strings in output from the first to the $LineNumber
+$Distros = ($wsl).Replace("* ", "")[($LineNumber)..(($wsl).Count)] | ForEach-Object -Process {
 	[PSCustomObject]@{
-		"Distro" = $_ -split " ", 2 | Select-Object -Last 1
-		"Alias"  = $_ -split " ", 2 | Select-Object -First 1
+		"Distro" = ($_ -split " ", 2 | Select-Object -Last 1).Trim()
+		"Alias"  = ($_ -split " ", 2 | Select-Object -First 1).Trim()
 	}
 }
+
 ($Distros | Where-Object -FilterScript {$_.Distro -eq "Ubuntu"}).Alias
 # $Distros | ConvertTo-Json
+#$Distros | ForEach-Object -Process {(wsl --list --quiet) -contains $_.Alias}
 
 # Save PSCustomObject to a variable
 $ActiveDirectoryList = @()
@@ -928,6 +930,11 @@ Get-Item -Path "D:\1.txt" | ForEach-Object -Process {
 	(Get-Content -Path $_ -Encoding UTF8) | Where-Object -FilterScript {$_.ReadCount -notmatch $Number} | Set-Content -Path $_ -Encoding UTF8 -Force
 }
 
+# Remove first X strings in file
+$File = Get-Content -Path D:\1.txt -Encoding UTF8
+$LineNumber = ($File | Select-String -Pattern "Pattern").LineNumber
+$x[($LineNumber-1)..($File.Count)] | Set-Content -Path D:\1.txt -Encoding UTF8 -Force
+
 # Remove string in file by text in it
 (Get-Content -Path "D:\1.txt") | Where-Object -FilterScript {$_ -notmatch "text"} | Set-Content -Path "D:\1.txt" -Force
 
@@ -1001,11 +1008,6 @@ for ($columnNumber = 0; $columnNumber -lt 500; ++$columnNumber)
 
 # Display all environment variables
 Get-ChildItem -Path env:
-
-# Remove first X strings in file
-$File = Get-Content -Path D:\1.txt -Encoding UTF8
-$LineNumber = ($File | Select-String -Pattern "Pattern").LineNumber
-$x[($LineNumber-1)..($File.Count)] | Set-Content -Path D:\1.txt -Encoding UTF8 -Force
 
 # Retrive items from hashtable
 $Items = @{
