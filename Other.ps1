@@ -221,19 +221,19 @@ function WindowState
 	)
 
 	$WindowStates = @{
-		"HIDE"				=	0 # Скрыть окно и активизировать другое окно
-		"SHOWNORMAL"		=	1 # Активизировать и отобразить окно, если окно свернуто или развернуто
-		"SHOWMINIMIZED"		=	2 # Отобразить окно в свернутом виде
-		"MAXIMIZE"			=	3 # Maximizes the specified window
-		"SHOWMAXIMIZED"		=	3 # Activates the window and displays it as a maximized window
-		"SHOWNOACTIVATE"	=	4 # Отобразить окно в соответствии с последними значениями позиции и размера. Активное окно остается активным
-		"SHOW"				=	5 # Активизировать окно
-		"MINIMIZE"			=	6 # Свернуть окно и активизировать следующее окно в Z-порядке (следующее под свернутым окном)
-		"SHOWMINNOACTIVE"	=	7
-		"SHOWNA"			=	8 # Отобразить окно в текущем состоянии. Активное окно остается активным
-		"RESTORE"			=	9 # Активизировать и отобразить окно. Если окно свернуто или развернуто, Windows восстанавливает его исходный размер и положение
-		"SHOWDEFAULT"		=	10 # (1+9) Активизировать и отобразить окно на переднем плане, если было свернуто или скрыто
-		"FORCEMINIMIZE"		=	11 # Minimizes a window, even if the thread that owns the window is not responding. This flag should only be used when minimizing windows from a different thread
+		"HIDE"            = 0 # Скрыть окно и активизировать другое окно
+		"SHOWNORMAL"      = 1 # Активизировать и отобразить окно, если окно свернуто или развернуто
+		"SHOWMINIMIZED"   = 2 # Отобразить окно в свернутом виде
+		"MAXIMIZE"        = 3 # Maximizes the specified window
+		"SHOWMAXIMIZED"   = 3 # Activates the window and displays it as a maximized window
+		"SHOWNOACTIVATE"  = 4 # Отобразить окно в соответствии с последними значениями позиции и размера. Активное окно остается активным
+		"SHOW"            = 5 # Активизировать окно
+		"MINIMIZE"        = 6 # Свернуть окно и активизировать следующее окно в Z-порядке (следующее под свернутым окном)
+		"SHOWMINNOACTIVE" = 7
+		"SHOWNA"          = 8 # Отобразить окно в текущем состоянии. Активное окно остается активным
+		"RESTORE"         = 9 # Активизировать и отобразить окно. Если окно свернуто или развернуто, Windows восстанавливает его исходный размер и положение
+		"SHOWDEFAULT"     = 10 # (1+9) Активизировать и отобразить окно на переднем плане, если было свернуто или скрыто
+		"FORCEMINIMIZE"   = 11 # Minimizes a window, even if the thread that owns the window is not responding. This flag should only be used when minimizing windows from a different thread
 	}
 
 	$Win32ShowWindowAsync = @{
