@@ -405,12 +405,16 @@ if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 	<#
 		.SYNOPSIS
 		Expand the specific file from ZIP archive. Folder structure will be created recursively
+
 		.Parameter Source
 		The source ZIP archive
+
 		.Parameter Destination
 		Where to expand file
+
 		.Parameter File
 		Assign the file to expand
+
 		.Example
 		ExtractZIPFile -Source "D:\Folder\File.zip" -Destination "D:\Folder" -File "Folder1/Folder2/File.txt"
 	#>
