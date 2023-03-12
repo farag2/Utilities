@@ -372,17 +372,17 @@ if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 		UseBasicParsing = $true
 		Verbose         = $true
 	}
-	$LatestVersion = ((Invoke-RestMethod @Parameters).assets.browser_download_url | Where-Object -FilterScript {$_ -match "fluent-dark-no-mica.qbtheme"})[1]
+	$LatestVersion = (Invoke-RestMethod @Parameters).assets.browser_download_url | Where-Object -FilterScript {$_ -match "defaulticons-fluent-dark-no-mica.qbtheme"}
 
 	$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 	$Parameters = @{
 		Uri     = $LatestVersion
-		OutFile = "$env:APPDATA\qBittorrent\fluent-dark-no-mica.qbtheme"
+		OutFile = "$env:APPDATA\qBittorrent\defaulticons-fluent-dark-no-mica.qbtheme"
 		Verbose = $true
 	}
 	Invoke-WebRequest @Parameters
 
-	$qbtheme = (Resolve-Path -Path "$env:APPDATA\qBittorrent\fluent-dark-no-mica.qbtheme").Path.Replace("\", "/")
+	$qbtheme = (Resolve-Path -Path "$env:APPDATA\qBittorrent\defaulticons-fluent-dark-no-mica.qbtheme").Path.Replace("\", "/")
 	# Save qBittorrent.ini in UTF8-BOM encoding to make it work with non-latin usernames
 	(Get-Content -Path "$env:APPDATA\qBittorrent\qBittorrent.ini" -Encoding UTF8) -replace "General\\CustomUIThemePath=", "General\CustomUIThemePath=$qbtheme" | Set-Content -Path "$env:APPDATA\qBittorrent\qBittorrent.ini" -Encoding UTF8 -Force
 
@@ -394,7 +394,6 @@ if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 		Verbose         = $true
 	}
 	$LatestVersion = (Invoke-RestMethod @Parameters).assets.browser_download_url
-
 	$DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 	$Parameters = @{
 		Uri     = $LatestVersion
@@ -406,16 +405,12 @@ if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 	<#
 		.SYNOPSIS
 		Expand the specific file from ZIP archive. Folder structure will be created recursively
-
 		.Parameter Source
 		The source ZIP archive
-
 		.Parameter Destination
 		Where to expand file
-
 		.Parameter File
 		Assign the file to expand
-
 		.Example
 		ExtractZIPFile -Source "D:\Folder\File.zip" -Destination "D:\Folder" -File "Folder1/Folder2/File.txt"
 	#>
@@ -427,40 +422,29 @@ if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 		(
 			[string]
 			$Source,
-
 			[string]
 			$Destination,
-
 			[string]
 			$File
 		)
-
 		Add-Type -Assembly System.IO.Compression.FileSystem
-
 		$ZIP = [IO.Compression.ZipFile]::OpenRead($Source)
 		$Entries = $ZIP.Entries | Where-Object -FilterScript {$_.FullName -eq $File}
-
 		$Destination = "$Destination\$(Split-Path -Path $File -Parent)"
-
 		if (-not (Test-Path -Path $Destination))
 		{
 			New-Item -Path $Destination -ItemType Directory -Force
 		}
-
 		$Entries | ForEach-Object -Process {[IO.Compression.ZipFileExtensions]::ExtractToFile($_, "$($Destination)\$($_.Name)", $true)}
-
 		$ZIP.Dispose()
 	}
-
 	$Parameters = @{
 		Source      = "$DownloadsFolder\qbt-theme.zip"
 		Destination = "$env:APPDATA\qBittorrent"
 		File        = "darkstylesheet.qbtheme"
 	}
 	ExtractZIPFile @Parameters
-
 	Remove-Item -Path "$DownloadsFolder\qbt-theme.zip" -Force
-
 	# Enable dark theme
 	$qbtheme = (Resolve-Path -Path "$env:APPDATA\qBittorrent\darkstylesheet.qbtheme").Path.Replace("\", "/")
 	# Save qBittorrent.ini in UTF8-BOM encoding to make it work with non-latin usernames
