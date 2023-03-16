@@ -1044,3 +1044,8 @@ Set-Content -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\shortcut.l
 
 # Get Windows special folders list
 [System.Enum]::GetValues([Environment+SpecialFolder])
+
+# Check if all files does not exist, not only one of them
+$Files = @("D:\file1.txt", "D:\file2.txt", "D:\file3.txt")
+if (-not (($Files | Test-Path) -contains $true))
+{}
