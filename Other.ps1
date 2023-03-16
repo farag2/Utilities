@@ -1041,3 +1041,6 @@ $bytes[0x15] = $bytes[0x15] -bor 0x20
 # Non elevated
 # $bytes[0x15] = $bytes[0x15] -bxor 0x20
 Set-Content -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\shortcut.lnk.lnk" -Value $bytes -Encoding Byte -Force
+
+# Get Windows special folders list
+[System.Enum]::GetValues([Environment+SpecialFolder])
