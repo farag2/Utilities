@@ -145,6 +145,12 @@ $ParentProcess = @{
 }
 Get-WinEvent -LogName Security | Where-Object -FilterScript {$_.Id -eq "4688"} | Where-Object -FilterScript {$_.Properties[5].Value -match 'conhost'} | Select-Object TimeCreated, $ParentProcess | Select-Object -First 10
 
+# Enable Event Log
+$Log = Get-LogProperties -Name Application
+$Log.Enabled = $true
+Set-LogProperties -LogDetails $logsource
+# & wevtutil.exe set-log Application /e
+
 # Split the drive letter
 Split-Path -Path "D:\file.mp3" -Qualifier
 
