@@ -133,7 +133,7 @@ function Get-ProcessAuditEvents ([long]$MaxEvents)
 	Get-WinEvent -MaxEvents $MaxEvents -FilterHashtable $Security | Sort-Object -Property TimeCreated | ForEach-Object {
 		[pscustomobject] @{
 			TimeCreated = $_.TimeCreated
-			Message		= $_.Message
+			Message     = $_.Message
 		}
 	}
 }
@@ -176,7 +176,7 @@ function Get-StringHash
 	}
 	$StringBuilder.ToString()
 }
-Get-StringHash -String "2" -HashName SHA1
+Get-StringHash -String 2 -HashName SHA1
 
 # Expand the window with "Task manager" title but others to minimize
 $Win32ShowWindowAsync = @{
@@ -194,8 +194,7 @@ if (-not ("WinAPI.Win32ShowWindowAsync" -as [type]))
 	Add-Type @Win32ShowWindowAsync
 }
 
-$title = "Диспетчер задач"
-
+$title = "Task Manager"
 Get-Process | Where-Object -FilterScript {$_.MainWindowHandle -ne 0} | ForEach-Object -Process {
 	if ($_.MainWindowTitle -eq $title)
 	{
@@ -372,9 +371,9 @@ $Verb.DoIt()
 
 # Convert hash table into objects
 $hash = @{
-	Name = 'Tobias'
-	Age = 66
-	Status = 'Online'
+	Name   = "Tobias"
+	Age    = 66
+	Status = "Online"
 }
 New-Object -TypeName PSObject -Property $hash
 
@@ -393,11 +392,11 @@ Get-PhysicalDisk | Get-StorageReliabilityCounter | Select-Object -Property *
 # Show all autostarts. Even drivers
 Get-EventLog -LogName System -InstanceId 1073748869 | ForEach-Object {
 	[PSCustomObject]@{
-		Date = $_.TimeGenerated
-		Name = $_.ReplacementStrings[0]
-		Path = $_.ReplacementStrings[1]
+		Date      = $_.TimeGenerated
+		Name      = $_.ReplacementStrings[0]
+		Path      = $_.ReplacementStrings[1]
 		StartMode = $_.ReplacementStrings[3]
-		User = $_.ReplacementStrings[4]
+		User      = $_.ReplacementStrings[4]
 	}
 }
 
@@ -409,10 +408,10 @@ function Test-Function
 	{
 		if ($fish -eq 7)
 		{
-			# break		# abort loop
-			# continue	# skip just this iteration, but continue loop
-			# return	# abort code, and continue in caller scope
-			# exit		# abort code at caller scope
+			# break    # abort loop
+			# continue # skip just this iteration, but continue loop
+			# return   # abort code, and continue in caller scope
+			# exit     # abort code at caller scope
 		}
 		"fishing fish #$fish"
 	}
@@ -427,9 +426,9 @@ Test-Function
 # Compare hashes from .cat files
 $HT = @{
 	CatalogFilePath = "D:\file.cat"
-	Path = "D:\folder"
-	Detailed = $true
-	FilesToSkip = "file.xml"
+	Path            = "D:\folder"
+	Detailed        = $true
+	FilesToSkip     = "file.xml"
 }
 Test-FileCatalog @HT
 
@@ -484,7 +483,6 @@ if ($PSCommandPath)
 
 # Write-Progress
 $ExcludedAppxPackages = @(
-	# ...
 	"NVIDIACorp.NVIDIAControlPanel"
 )
 $OFS = "|"
@@ -607,9 +605,9 @@ Get-ChildItem -Path "D:\Folder" -Recurse -File -Force | Where-Object -FilterScri
 # Count the total number of lines in all files in all subfolders
 $i = 0
 Get-ChildItem -Path "D:\folder" -Depth 0 -Exclude *.dll, *.winmd, *.ps1 -File -Recurse -Force | ForEach-Object -Process {
-    (Get-Content -Path $_.FullName -Raw | Measure-Object -Line).Lines | ForEach-Object -Process {
-        $i += $_
-    }
+	(Get-Content -Path $_.FullName -Raw | Measure-Object -Line).Lines | ForEach-Object -Process {
+		$i += $_
+	}
 }
 Write-Verbose -Message "Total number of lines is: $i" -Verbose
 
@@ -827,23 +825,22 @@ $Extensions = @{
     "Linux 7.9"                   = "OracleLinux_7_9Oracle"
 }
 $Extensions.Keys | ForEach-Object -Process {(wsl --list --quiet) -contains $_}
-
+#
 [System.Console]::OutputEncoding = [System.Text.Encoding]::Unicode
-
 $wsl = wsl --list --online
-# We need to get the string number where the "FRIENDLY NAME" header begins to truncate all other unnecessary strings in the beginning
+# Calculate the string number where the "FRIENDLY NAME" header begins to truncate all other unnecessary strings in the beginning
 $LineNumber = ($wsl | Select-String -Pattern "FRIENDLY NAME" -CaseSensitive).LineNumber
 # Remove first strings in output from the first to the $LineNumber
-$Distros = ($wsl).Replace("* ", "")[($LineNumber)..(($wsl).Count)] | ForEach-Object -Process {
+$Distros = ($wsl).Replace("  ", "").Replace("* ", "")[($LineNumber)..(($wsl).Count)] | ForEach-Object -Process {
 	[PSCustomObject]@{
 		"Distro" = ($_ -split " ", 2 | Select-Object -Last 1).Trim()
 		"Alias"  = ($_ -split " ", 2 | Select-Object -First 1).Trim()
 	}
 }
-
 ($Distros | Where-Object -FilterScript {$_.Distro -eq "Ubuntu"}).Alias
 # $Distros | ConvertTo-Json
-#$Distros | ForEach-Object -Process {(wsl --list --quiet) -contains $_.Alias}
+#
+# $Distros | ForEach-Object -Process {(wsl --list --quiet) -contains $_.Alias}
 
 # Save PSCustomObject to a variable
 $ActiveDirectoryList = @()
@@ -939,8 +936,20 @@ catch [System.ComponentModel.Win32Exception] {}
 # Remove string in file by its' number
 $Number = 5
 Get-Item -Path "D:\1.txt" | ForEach-Object -Process {
-	(Get-Content -Path $_ -Encoding UTF8) | Where-Object -FilterScript {$_.ReadCount -notmatch $Number} | Set-Content -Path $_ -Encoding UTF8 -Force
+	(Get-Content -Path $_ -Encoding UTF8) | Where-Object -FilterScript {$_.ReadCount -ne $Number} | Set-Content -Path $_ -Encoding UTF8 -Force
 }
+
+# Replace string in file by its' number or othe criteria
+Get-Content -Path "D:\1.txt" -Encoding UTF8 | ForEach-Object -Process {
+	if ($_.StartsWith("UpdateDefender")) # $_.ReadCount -ne X
+	{
+		$_ -replace "text1","text2"
+	}
+	else
+	{
+		$_
+	}
+} | Set-Content -Path "D:\1.txt" -Encoding UTF8 -Force
 
 # Remove first X strings in file
 $File = Get-Content -Path D:\1.txt -Encoding UTF8
@@ -973,8 +982,8 @@ Get-ItemPropertyValue -Path HKCU:\Environment -Name TEMP
 # Extract strings from mui files using Resource Hacker
 # http://www.angusj.com/resourcehacker
 Get-ChildItem -Path D:\Downloads\LanguagePack -Recurse -Force -Filter *.mui -File | ForEach-Object -Process {
-    Write-Verbose -Message $_.FullName -Verbose
-    Start-Process -FilePath "D:\ResourceHacker.exe" -ArgumentList @("-open", $_.FullName, "-save", "D:\extract\$_.Name.rc", "-action extract", "-mask MESSAGETABLE") -Wait
+	Write-Verbose -Message $_.FullName -Verbose
+	Start-Process -FilePath "D:\ResourceHacker.exe" -ArgumentList @("-open", $_.FullName, "-save", "D:\extract\$_.Name.rc", "-action extract", "-mask MESSAGETABLE") -Wait
 }
 
 # Extract strings from pri files using makepri.exe from "Windows SDK for UWP Managed Apps"
