@@ -745,6 +745,7 @@ usoclient StartScan
 (New-Object -ComObject Microsoft.Update.Session).CreateUpdateSearcher().Search("IsHidden = 0").Updates | Where-Object -FilterScript {$_.KBArticleIDs -eq "5005463"} | ForEach-Object -Process {$_.IsHidden = $true}
 
 # Download and install all Store related UWP packages. Even for LTSC
+# Reboot required about execution
 wsreset -i
 
 # Save file in the UTF-8 without BOM encoding
