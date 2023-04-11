@@ -107,9 +107,7 @@ function Set-Association
 
 	if (-not (Test-Path -Path $ProgramPath))
 	{
-		Write-Verbose -Message $Localization.Skipped -Verbose
-		Write-Error -Message $Localization.NoInternetConnection -ErrorAction SilentlyContinue
-		Write-Error -Message ($Localization.RestartFunction -f $MyInvocation.Line) -ErrorAction SilentlyContinue
+		Write-Error -Message "Restart Function"
 
 		return
 	}
