@@ -1065,3 +1065,18 @@ Set-Content -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\shortcut.l
 $Files = @("D:\file1.txt", "D:\file2.txt", "D:\file3.txt")
 if (-not (($Files | Test-Path) -contains $true))
 {}
+
+# Add dot at every string end in JSON file
+$json = Get-Content -Path D:\File.json -Encoding UTF8 | ConvertFrom-Json
+$json.Arg.Zero | ForEach-Object -Process {
+	# Check if $_.ToolTip exists for each level before proceeding
+	# We need to call the value we want to change 9=($_.ToolTip). We cannot just call $_
+	if ($null -ne $_.ToolTip)
+	{
+		if (($_.ToolTip[-1] -ne ".") -and ($_.ToolTip -ne ""))
+		{
+			$_.ToolTip = $_.ToolTip | ForEach-Object -Process {$_.Substring(0, $_.Length) + "."}
+		}
+	}
+}
+$json | ConvertTo-Json | Set-Content D:\File.json -Encoding UTF8 -Force
