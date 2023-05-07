@@ -1070,8 +1070,8 @@ if (-not (($Files | Test-Path) -contains $true))
 $json = Get-Content -Path D:\File.json -Encoding UTF8 | ConvertFrom-Json
 $json.Arg.Zero | ForEach-Object -Process {
 	# Check if $_.ToolTip exists for each level before proceeding
-	# We need to call the value we want to change 9=($_.ToolTip). We cannot just call $_
-	if ($null -ne $_.ToolTip)
+	# We need to call the value we want to change ($_.ToolTip). We cannot just call $_
+	if ($_.ToolTip)
 	{
 		if (($_.ToolTip[-1] -ne ".") -and ($_.ToolTip -ne ""))
 		{
@@ -1079,4 +1079,4 @@ $json.Arg.Zero | ForEach-Object -Process {
 		}
 	}
 }
-$json | ConvertTo-Json | Set-Content D:\File.json -Encoding UTF8 -Force
+$json | ConvertTo-Json -Depth 32 | Set-Content D:\File.json -Encoding UTF8 -Force
