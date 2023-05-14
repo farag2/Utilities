@@ -1073,7 +1073,7 @@ $json.Arg.Zero | ForEach-Object -Process {
 	# We need to call the value we want to change ($_.ToolTip). We cannot just call $_
 	if ($_.ToolTip)
 	{
-		if (($_.ToolTip[-1] -ne ".") -and ($_.ToolTip -ne ""))
+		if ((-not $_.ToolTip.EndsWith(".")) -and ($_.ToolTip -ne ""))
 		{
 			$_.ToolTip = $_.ToolTip | ForEach-Object -Process {$_.Substring(0, $_.Length) + "."}
 		}
