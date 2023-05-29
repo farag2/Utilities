@@ -1080,3 +1080,16 @@ $json.Arg.Zero | ForEach-Object -Process {
 	}
 }
 $json | ConvertTo-Json -Depth 32 | Set-Content D:\File.json -Encoding UTF8 -Force
+
+# Get KB update status
+$KBids = @("KB5026446") 
+$Events = Get-WinEvent -ErrorAction 0 -FilterHashTable @{
+    LogName      = "Setup"
+    ProviderName = "Microsoft-Windows-Servicing"
+}
+foreach ($KBid in $KBids)
+{
+    $Events | Where-Object -FilterScript {$_.Message -like "*$KBid*"} | Format-Table -Wrap
+}
+#
+Get-WindowsPackage -Online -PackageName Package_for_RollupFix* | Sort-Object -Descending | Format-Table PackageName, InstallTime, PackageState, SupportInformation
