@@ -1,5 +1,5 @@
 # https://github.com/complexorganizations/wireguard-manager
-apt update && apt upgrade -y
+apt update -y && apt upgrade -y
 apt autoremove -y
 
 # Upgrade
