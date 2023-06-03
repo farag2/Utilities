@@ -1092,3 +1092,6 @@ foreach ($KBid in @("KB5026446"))
 }
 #
 Get-WindowsPackage -Online -PackageName Package_for_RollupFix* | Sort-Object -Descending | Format-Table PackageName, InstallTime, PackageState, SupportInformation
+
+# Count occurrences of specific character in a string 
+("//sp13/sites/1/2/3".ToCharArray() | Where-Object -FilterScript {$_ -eq "1"} | Measure-Object).Count
