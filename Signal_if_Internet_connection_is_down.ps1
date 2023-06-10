@@ -16,7 +16,7 @@ while ($true)
 	}
 	catch [System.Net.WebException]
 	{
-    # Play beep
+		# Play beep
 		[console]::beep(500,300)
 	}
 }
