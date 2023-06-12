@@ -940,7 +940,7 @@ Get-Item -Path "D:\1.txt" | ForEach-Object -Process {
 	(Get-Content -Path $_ -Encoding UTF8) | Where-Object -FilterScript {$_.ReadCount -ne $Number} | Set-Content -Path $_ -Encoding UTF8 -Force
 }
 
-# Replace string in file by its' number or othe criteria
+# Replace string in file by its' number or other criteria
 Get-Content -Path "D:\1.txt" -Encoding UTF8 | ForEach-Object -Process {
 	if ($_.StartsWith("UpdateDefender")) # $_.ReadCount -ne X
 	{
@@ -959,6 +959,36 @@ $x[($LineNumber-1)..($File.Count)] | Set-Content -Path D:\1.txt -Encoding UTF8 -
 
 # Remove string in file by text in it
 (Get-Content -Path "D:\1.txt") | Where-Object -FilterScript {$_ -notmatch "text"} | Set-Content -Path "D:\1.txt" -Force
+
+# Add dot at every string end in JSON file
+$json = Get-Content -Path D:\File.json -Encoding UTF8 | ConvertFrom-Json
+$json.Arg.Zero | ForEach-Object -Process {
+	# Check if $_.ToolTip exists for each level before proceeding
+	# We need to call the value we want to change ($_.ToolTip). We cannot just call $_
+	if ($_.ToolTip)
+	{
+		if ((-not $_.ToolTip.EndsWith(".")) -and ($_.ToolTip -ne ""))
+		{
+			$_.ToolTip = $_.ToolTip | ForEach-Object -Process {$_.Substring(0, $_.Length) + "."}
+		}
+	}
+}
+$json | ConvertTo-Json -Depth 32 | Set-Content D:\File.json -Encoding UTF8 -Force
+
+# Add dot at every string end in txt file
+Get-Content -Path D:\file.txt -Encoding Default | ForEach-Object -Process {
+	if (($_ -ne "") -and ($_ -notmatch "ConvertFrom-StringData") -and ($_ -ne "'@"))
+	{
+		if ($_.EndsWith("?") -or $_.EndsWith("."))
+		{
+			$_
+		}
+		else
+		{
+			$_ | ForEach-Object -Process {$_.Substring(0, $_.Length) + "."}
+		}
+	}
+} | Set-Content -Path D:\file.txt -Encoding Default -Force
 
 # Get sub keys' value kind recursively
 (Get-Item -Path "HKCU:\Control Panel\Cursors").Property.Split([System.Environment]::NewLine) | ForEach-Object -Process {
@@ -1066,21 +1096,6 @@ Set-Content -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\shortcut.l
 $Files = @("D:\file1.txt", "D:\file2.txt", "D:\file3.txt")
 if (-not (($Files | Test-Path) -contains $true))
 {}
-
-# Add dot at every string end in JSON file
-$json = Get-Content -Path D:\File.json -Encoding UTF8 | ConvertFrom-Json
-$json.Arg.Zero | ForEach-Object -Process {
-	# Check if $_.ToolTip exists for each level before proceeding
-	# We need to call the value we want to change ($_.ToolTip). We cannot just call $_
-	if ($_.ToolTip)
-	{
-		if ((-not $_.ToolTip.EndsWith(".")) -and ($_.ToolTip -ne ""))
-		{
-			$_.ToolTip = $_.ToolTip | ForEach-Object -Process {$_.Substring(0, $_.Length) + "."}
-		}
-	}
-}
-$json | ConvertTo-Json -Depth 32 | Set-Content D:\File.json -Encoding UTF8 -Force
 
 # Get KB update status
 $Setup = @{
