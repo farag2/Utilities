@@ -1,8 +1,17 @@
+if (-not (Test-Path -Path "$env:ProgramFiles\WireGuard\wireguard.exe"))
+{
+    Write-Verbose -Message "Wireguard not installed"
+    return
+}
+
+# We need to copy executable file to call arguments from it
+Copy-item -Path "$env:ProgramFiles\WireGuard\wireguard.exe" -Destination "$env:SystemDrive\wireguard.exe"
+
 # https://git.zx2c4.com/wireguard-windows/about/docs/enterprise.md
 Get-Process -Name wireguard -ErrorAction Ignore | Stop-Process -Force
 
 # Driver Removal
-& "$PSScriptRoot\wireguard.exe" /removedriver
+& "$env:SystemDrive\wireguard.exe" /removedriver
 
 if (Get-Service -Name WireGuardTunnel* -ErrorAction Ignore)
 {
@@ -11,26 +20,23 @@ if (Get-Service -Name WireGuardTunnel* -ErrorAction Ignore)
 	{
 		# Uninstall Tunnel service
 		Write-Verbose -Message $conf -Verbose
-		Start-Process -FilePath "$PSScriptRoot\wireguard.exe" -ArgumentList "/uninstalltunnelservice $conf" -Wait
+		Start-Process -FilePath "$env:SystemDrive\wireguard.exe" -ArgumentList "/uninstalltunnelservice $conf" -Wait
 	}
 
 	# Uninstall services
-	Start-Process -FilePath "$PSScriptRoot\wireguard.exe" -ArgumentList "/uninstallmanagerservice" -Wait
+	Start-Process -FilePath "$env:SystemDrive\wireguard.exe" -ArgumentList "/uninstallmanagerservice" -Wait
 }
 
-if (Test-Path -Path "$env:ProgramFiles\WireGuard")
+# --%
+& takeown /F "$env:ProgramFiles\WireGuard" /R
+
+$UserFiles = Get-ChildItem -Path "$env:ProgramFiles\WireGuard" -File -Recurse -Force
+foreach ($Folder in $UserFiles)
 {
-	# --%
-	& takeown /F "$env:ProgramFiles\WireGuard" /R
-
-	$UserFiles = Get-ChildItem -Path "$env:ProgramFiles\WireGuard" -File -Recurse -Force
-	foreach ($Folder in $UserFiles)
-	{
-		& icacls "$($Folder.FullName)" /grant:r "$($env:USERNAME):F" /T
-	}
-
-	Remove-Item -Path $env:ProgramFiles\WireGuard -Recurse -Force
+	& icacls "$($Folder.FullName)" /grant:r "$($env:USERNAME):F" /T
 }
+
+Remove-Item -Path "$env:ProgramFiles\WireGuard", "$env:SystemDrive\wireguard.exe" -Recurse -Force
 
 # Helps if the app cannot be installed
 # https://support.microsoft.com/en-us/topic/fix-problems-that-block-programs-from-being-installed-or-removed-cca7d1b6-65a9-3d98-426b-e9f927e1eb4d
