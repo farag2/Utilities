@@ -38,6 +38,26 @@ foreach ($Folder in $UserFiles)
 
 Remove-Item -Path "$env:ProgramFiles\WireGuard", "$env:SystemDrive\wireguard.exe" -Recurse -Force
 
+# Uninstall MSI leftover installer
+$Folder = (New-Object -ComObject Shell.Application).NameSpace("$env:SystemRoot\Installer")
+$Files = [hashtable]::new()
+$Folder.Items() | Where-Object -FilterScript {$_.Path.EndsWith(".msi")} | ForEach-Object -Process {$Files.Add($_.Name, $_)} | Out-Null
+
+# Find the necessary .msi with the Subject property equal to "Windows PC Health Check"
+foreach ($MSI in @(Get-ChildItem -Path "$env:SystemRoot\Installer" -Filter *.msi -File -Force))
+{
+	$Name = $Files.Keys | Where-Object -FilterScript {$_ -eq $MSI.BaseName}
+	$File = $Files[$Name]
+
+	# https://learn.microsoft.com/en-us/previous-versions/tn-archive/ee176615(v=technet.10)
+	# "22" is the "Subject" file property
+	if ($Folder.GetDetailsOf($File, 22) -match "WireGuard")
+	{
+		Start-Process -FilePath msiexec.exe -ArgumentList "/uninstall $($MSI.FullName) /quiet /norestart" -Wait
+		break
+	}
+}
+
 # Helps if the app cannot be installed
 # https://support.microsoft.com/en-us/topic/fix-problems-that-block-programs-from-being-installed-or-removed-cca7d1b6-65a9-3d98-426b-e9f927e1eb4d
 
