@@ -46,7 +46,7 @@ $Folder.Items() | Where-Object -FilterScript {$_.Path.EndsWith(".msi")} | ForEac
 # Find the necessary .msi with the Subject property equal to "Windows PC Health Check"
 foreach ($MSI in @(Get-ChildItem -Path "$env:SystemRoot\Installer" -Filter *.msi -File -Force))
 {
-	$Name = $Files.Keys | Where-Object -FilterScript {$_ -eq $MSI.BaseName}
+	$Name = $Files.Keys | Where-Object -FilterScript {$_ -eq $MSI.Name}
 	$File = $Files[$Name]
 
 	# https://learn.microsoft.com/en-us/previous-versions/tn-archive/ee176615(v=technet.10)
