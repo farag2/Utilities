@@ -1111,3 +1111,27 @@ Get-WindowsPackage -Online -PackageName Package_for_RollupFix* | Sort-Object -De
 
 # Count occurrences of specific character in a string 
 ("//sp13/sites/1/2/3".ToCharArray() | Where-Object -FilterScript {$_ -eq "1"} | Measure-Object).Count
+
+# Job
+Get-Job | Remove-Job -Force
+$using:job = Start-Job -ScriptBlock {Get-Item 1} | Wait-Job
+try
+{
+	Receive-Job -Job $job -ErrorAction SilentlyContinue
+}
+catch {}
+$Error.Exception.Message
+
+# Runspace
+$RunspacePool = [runspacefactory]::CreateRunspacePool(1, 5)
+$PowerShell = [powershell]::Create()
+$PowerShell.RunspacePool = $RunspacePool
+$RunspacePool.Open()
+$PowerShell.AddScript({get-item 1})
+# $PowerShell.AddScript({param ($Text) Write-Output $Text})
+# $PowerShell.AddArgument("Hello world!")
+$Job = $PowerShell.BeginInvoke()
+$PowerShell.EndInvoke($Job)
+$RunspacePool.Close()
+$RunspacePool.Dispose()
+$RunspacePool.powershell.Streams.Error
