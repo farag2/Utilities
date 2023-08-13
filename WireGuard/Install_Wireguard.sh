@@ -13,6 +13,7 @@ passwd
 
 # /etc/wireguard/clients
 # /var/backups
+# /var/logs
 
 # Disable ICMP ping response
 /etc/sysctl.conf: net.ipv4.icmp_echo_ignore_all = 1
