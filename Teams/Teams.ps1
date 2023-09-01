@@ -1,36 +1,35 @@
-Get-Process -Name Teams -ErrorAction Ignore | Stop-Process -Force
+if (-not (Get-AppxPackage -Name MSTeams))
+{
+	Write-Warning -Message Teams is not installed
+	return
+}
+
+Get-Process -Name ms-teams -ErrorAction Ignore | Stop-Process -Force
 
 try
 {
-	$config = Get-Content -Path $env:APPDATA\Microsoft\Teams\desktop-config.json -Force | ConvertFrom-Json
+	$config = Get-Content -Path $env:LOCALAPPDATA\Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams\app_settings.json -Force | ConvertFrom-Json
 }
 catch [System.Exception]
 {
 	Write-Verbose "JSON is not valid!" -Verbose
 
-	Invoke-Item -Path $env:APPDATA\Microsoft\Teams
+	Invoke-Item -Path $env:LOCALAPPDATA\Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams
 
 	break
 }
 
-# Enable dark theme
+# Theme like in Windows
 if ($config.theme)
 {
-	$config.theme = "darkV2"
+	$config.theme = 3
 }
 else
 {
-	$config | Add-Member -Name theme -MemberType NoteProperty -Value "darkV2" -Force
+	$config | Add-Member -Name theme -MemberType NoteProperty -Value 3 -Force
 }
 
 # Auto-start application
-if ($config.appPreferenceSettings.openAtLogin)
-{
-	$config.appPreferenceSettings.openAtLogin = $false
-}
-else
-{
-	$config.appPreferenceSettings | Add-Member -Name openAtLogin -MemberType NoteProperty -Value $false -Force
-}
+New-ItemProperty -Path "HKCU:\Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\SystemAppData\MSTeams_8wekyb3d8bbwe\TeamsTfwStartupTask" -Name State -PropertyType DWord -Value 0 -Force
 
-ConvertTo-Json -InputObject $config -Depth 4 | Set-Content -Path $env:APPDATA\Microsoft\Teams\desktop-config.json -Force
+ConvertTo-Json -InputObject $config -Depth 4 | Set-Content -Path $env:LOCALAPPDATA\Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams\app_settings.json -Force
