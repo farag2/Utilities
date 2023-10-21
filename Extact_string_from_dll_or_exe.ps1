@@ -26,13 +26,13 @@ public static string GetIndirectString(string indirectString)
 		else
 		{
 			return null;
-			//return "SHLoadIndirectString Failure: " + returnValue;
+			// return "SHLoadIndirectString Failure: " + returnValue;
 		}
 	}
-	catch (Exception ex)
+	catch // (Exception ex)
 	{
 		return null;
-		//return "Exception Message: " + ex.Message;
+		// return "Exception Message: " + ex.Message;
 	}
 }
 "@
