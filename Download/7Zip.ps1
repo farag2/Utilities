@@ -2,6 +2,13 @@
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
+if ($Host.Version.Major -eq 5)
+{
+	# Progress bar can significantly impact cmdlet performance
+	# https://github.com/PowerShell/PowerShell/issues/2138
+	$Script:ProgressPreference = "SilentlyContinue"
+}
+
 # Get the latest 7-Zip download URL
 $Parameters = @{
 	Uri             = "https://sourceforge.net/projects/sevenzip/best_release.json"
