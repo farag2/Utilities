@@ -1,6 +1,13 @@
 # Download Microsoft Edge Stable x64
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
+if ($Host.Version.Major -eq 5)
+{
+	# Progress bar can significantly impact cmdlet performance
+	# https://github.com/PowerShell/PowerShell/issues/2138
+	$Script:ProgressPreference = "SilentlyContinue"
+}
+
 $Parameters = @{
 	Uri             = "https://edgeupdates.microsoft.com/api/products"
 	UseBasicParsing = $true
