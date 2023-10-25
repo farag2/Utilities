@@ -55,12 +55,7 @@ $Parameters = @{
 }
 Invoke-WebRequest @Parameters
 
-# Extracting Firefox.msi to the "Firefox Setup xx" folder
 # https://support.mozilla.org/kb/deploy-firefox-msi-installers
-Start-Process -FilePath "$DownloadsFolder\Firefox Setup $LatestStableVersion.msi" -ArgumentList "EXTRACT_DIR=`"$DownloadsFolder\Firefox Setup $LatestStableVersion`"" -Wait
-
-Remove-Item -Path "$DownloadsFolder\Firefox Setup $LatestStableVersion\postSigningData" -Force
-
 $Arguments = @(
 	"DESKTOP_SHORTCUT=false",
 	"START_MENU_SHORTCUT=true",
@@ -70,6 +65,6 @@ $Arguments = @(
 	# Since 103
 	"TASKBAR_SHORTCUT=true"	
 )
-Start-Process -FilePath "$env:SystemRoot\System32\msiexec.exe" -ArgumentList /i "$DownloadsFolder\Firefox Setup $LatestStableVersion.msi" $Arguments -Wait
+Start-Process -FilePath "$env:SystemRoot\System32\msiexec.exe" -ArgumentList "/i `"$DownloadsFolder\Firefox Setup $LatestStableVersion.msi`" $Arguments" -Wait
 
 Remove-Item -Path "$DownloadsFolder\Firefox Setup $LatestStableVersion.msi" -Force
