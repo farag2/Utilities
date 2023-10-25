@@ -63,7 +63,6 @@ $Arguments = @(
 	# Since 103
 	"TASKBAR_SHORTCUT=true"	
 )
-
 Start-Process -FilePath "$DownloadsFolder\Firefox Setup $LatestStableVersion.msi" -ArgumentList $Arguments -Wait
 
 Remove-Item -Path "$DownloadsFolder\Firefox Setup $LatestStableVersion.msi" -Force
