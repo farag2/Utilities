@@ -460,7 +460,7 @@ if (Test-Path -Path "$env:ProgramFiles\WinRAR")
 	Remove-Item -Path $Remove -Recurse -Force -ErrorAction Ignore
 
 	$Parameters = @{
-		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/WinRAR/WinRAR/WinRAR.ini"
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/WinRAR/WinRAR.ini"
 		OutFile         = "$env:ProgramFiles\WinRAR\WinRAR.ini"
 		UseBasicParsing = $true
 		Verbose         = $true
