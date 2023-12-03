@@ -67,38 +67,6 @@ if (Test-Path -Path $env:ProgramFiles\AIMP)
 	$Defaultini | Set-Content -Path "$env:APPDATA\AIMP\Skins\Default.ini" -Encoding Default -Force
 }
 
-# CCleaner
-if (Test-Path -Path "$env:ProgramFiles\CCleaner")
-{
-	Stop-Process -Name CCleaner64 -Force -ErrorAction Ignore
-
-	if (-not (Test-Path -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\CCleaner.lnk"))
-	{
-		Copy-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\CCleaner\CCleaner.lnk" -Destination "$env:ProgramData\Microsoft\Windows\Start Menu\Programs" -Force
-	}
-
-	$Remove = @(
-		"$env:ProgramData\Microsoft\Windows\Start Menu\Programs\CCleaner",
-		"$env:ProgramFiles\CCleaner\CCleaner.exe",
-		"$env:ProgramFiles\CCleaner\CCUpdate.exe",
-		"$env:PUBLIC\Desktop\CCleaner.lnk",
-		"$env:ProgramFiles\CCleaner\Setup",
-		"Registry::HKEY_CLASSES_ROOT\CLSID\{645FF040-5081-101B-9F08-00AA002F954E}\shell\*CCleaner*"
-	)
-	Remove-Item -Path $Remove -Recurse -Force -ErrorAction Ignore
-
-	Unregister-ScheduledTask -TaskName *CCleaner* -Confirm:$false
-	Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "CCleaner Smart Cleaning" -Force -ErrorAction Ignore
-
-	$Parameters = @{
-		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/CCleaner/ccleaner.ini"
-		OutFile         = "$env:ProgramFiles\CCleaner\ccleaner.ini"
-		UseBasicParsing = $true
-		Verbose         = $true
-	}
-	Invoke-WebRequest @Parameters
-}
-
 # CUE Splitter
 if (Test-Path -Path "${env:ProgramFiles(x86)}\Medieval Software\Medieval CUE Splitter")
 {
