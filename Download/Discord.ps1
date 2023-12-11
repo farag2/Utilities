@@ -22,13 +22,14 @@ Invoke-Webrequest @Parameters
 Start-Process -FilePath "$DownloadsFolder\BetterDiscord-Windows.exe" -Wait
 Remove-Item -Path "$DownloadsFolder\BetterDiscord-Windows.exe" -Force
 
-# https://github.com/TakosThings/Fluent-Discord
+# https://github.com/DiscordStyles/Fluent
 $Parameters = @{
-	Uri             = "https://api.github.com/repos/TakosThings/Fluent-Discord/releases/latest"
+	Uri             = "https://raw.githubusercontent.com/DiscordStyles/Fluent/deploy/Fluent.theme.css"
+	OutFile         = "$env:APPDATA\BetterDiscord\themes\Fluent.theme.css"
 	UseBasicParsing = $true
 	Verbose         = $true
 }
-$FluentDiscordTag = (Invoke-RestMethod @Parameters).tag_name
+Invoke-RestMethod @Parameters
 
 $Plugins = @(
 	# https://github.com/mwittrien/BetterDiscordAddons/blob/master/Library/0BDFDB.plugin.js
@@ -38,25 +39,11 @@ $Plugins = @(
 	# https://github.com/mwittrien/BetterDiscordAddons/blob/master/Plugins/ReadAllNotificationsButton/ReadAllNotificationsButton.plugin.js
 	"https://raw.githubusercontent.com/mwittrien/BetterDiscordAddons/master/Plugins/ReadAllNotificationsButton/ReadAllNotificationsButton.plugin.js",
 
-	# https://github.com/TakosThings/Fluent-Discord
-	"https://github.com/TakosThings/Fluent-Discord/releases/download/$FluentDiscordTag/Fluent-Discord.theme.css",
-
 	# https://github.com/oSumAtrIX/BetterDiscordPlugins/blob/master/NitroEmoteAndScreenShareBypass.plugin.js
 	"https://raw.githubusercontent.com/oSumAtrIX/BetterDiscordPlugins/master/NitroEmoteAndScreenShareBypass.plugin.js"
 )
 foreach ($Plugin in $Plugins)
 {
-	if ($(Split-Path -Path $Plugin -Leaf) -eq "Fluent-Discord.theme.css")
-	{
-		$Parameters = @{
-			Uri             = $Plugin
-			OutFile         = "$env:APPDATA\BetterDiscord\themes\$(Split-Path -Path $Plugin -Leaf)"
-			UseBasicParsing = $true
-			Verbose         = $true
-		}
-		Invoke-Webrequest @Parameters
-	}
-
 	$Parameters = @{
 		Uri             = $Plugin
 		OutFile         = "$env:APPDATA\BetterDiscord\plugins\$(Split-Path -Path $Plugin -Leaf)"
