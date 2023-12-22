@@ -26,6 +26,7 @@ function yt-dlp
 		$URLs
 	)
 
+
 	# Get the latest youtube-dl build tag
 	$Parameters = @{
 		Uri              = "https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest"
