@@ -1135,3 +1135,14 @@ $PowerShell.EndInvoke($Job)
 $RunspacePool.Close()
 $RunspacePool.Dispose()
 $RunspacePool.powershell.Streams.Error
+
+# https://www.outsidethebox.ms/22149/
+Install-Language -Language ru-RU
+Set-WinUILanguageOverride -Language ru-RU
+$List = Get-WinUserLanguageList
+$List.Add("ru-RU")
+Set-WinUserLanguageList -LanguageList $($list[1], $list[0]) -Force
+Set-WinHomeLocation -GeoId 203 # https://go.microsoft.com/fwlink/?LinkID=242308
+Set-WinSystemLocale -SystemLocale ru-RU
+Copy-UserInternationalSettingsToSystem -WelcomeScreen $true -NewUser $true
+# Set-WinDefaultInputMethodOverride -InputTip "0409:00000409"
