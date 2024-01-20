@@ -91,7 +91,7 @@ function yt-dlp
 	{
 		# Getting URL's IDs
 		# https://www.reddit.com/r/youtubedl/comments/fzv58p/comment/fn6hass/?context=3
-		& "$DownloadsFolder\yt-dlp.exe" --list-formats $URLs
+		& "$DownloadsFolder\yt-dlp.exe" --list-formats $URL
 		$VideoID = Read-Host -Prompt "`nType prefered video ID"
 		$AudioID = Read-Host -Prompt "`nType prefered audio ID"
 
