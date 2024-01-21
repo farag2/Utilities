@@ -1,5 +1,4 @@
 # https://rkeithhill.wordpress.com/2014/04/28/how-to-determine-if-a-process-is-32-or-64-bit/
-
 function ProcessBitness
 {
 	param
@@ -14,11 +13,8 @@ function ProcessBitness
 		Name      = "Bitness"
 		Language  = "CSharp"
 		MemberDefinition = @"
-[DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
-[return: MarshalAs(UnmanagedType.Bool)]
-public static extern bool IsWow64Process(
-	[In] System.IntPtr hProcess,
-	[Out, MarshalAs(UnmanagedType.Bool)] out bool wow64Process);
+[DllImport("kernel32.dll")]
+public static extern bool IsWow64Process(System.IntPtr hProcess, [Out] out bool wow64Process);
 "@
 	}
 	if (-not ("Kernel32.Bitness" -as [type]))
@@ -41,3 +37,4 @@ public static extern bool IsWow64Process(
 		}
 	}
 }
+ProcessBitness -ProcessName pwsh
