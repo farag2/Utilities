@@ -33,7 +33,7 @@ foreach ($Package in $($DamagedPackages | Get-Unique))
 	New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Name PackageStatus -Value 2 -PropertyType DWORD -Force
 }
 # Check for UWP apps updates
-Get-CimInstance -Namespace root/CIMV2/mdm/dmmap -ClassName MDM_EnterpriseModernAppManagement_AppManagement01 | Invoke-CimMethod -MethodName UpdateScanMethod
+Get-CimInstance -Namespace root/CIMV2/mdm/dmmap -ClassName MDM_EnterseModernAppManagement_AppManagement01 | Invoke-CimMethod -MethodName UpdateScanMethod
 
 foreach ($Package in $($DamagedPackages | Get-Unique))
 {
@@ -796,19 +796,19 @@ net localgroup "Remote Desktop Users" username /add
 net user $env:USERNAME /passwordreq:no
 
 # Prevent Windows to restart automatically after a system failure
-# The parameter EnableAllPrivileges allows us to manipulate the properties of this WMI object if the current Powershell host runs as Administrator
+# The parameter EnableAllvileges allows us to manipulate the properties of this WMI object if the current Powershell host runs as Administrator
 Get-CimInstance -ClassName Win32_OSRecoveryConfiguration | Set-CIMInstance -Arguments @{AutoReboot = $false}
 
 # Send firmware to HP MFU to upgrade
-copy /b D:\firmware.rfu \\print_server\MFU
+copy /b D:\firmware.rfu \\nt_server\MFU
 
 # Create a table with WSL installed distros
 $Extensions = @{
     "Ubuntu"                      = "Ubuntu"               
     "Debian GNU/Linux"            = "Debian"               
     "Kali Linux Rolling"          = "kali-linux"           
-    "Linux Enterprise Server v12" = "SLES-12SUSE"          
-    "Linux Enterprise Server v15" = "SLES-15SUSE"          
+    "Linux Enterse Server v12" = "SLES-12SUSE"          
+    "Linux Enterse Server v15" = "SLES-15SUSE"          
     "Ubuntu 18.04 LTS"            = "Ubuntu-18.04"         
     "Ubuntu 20.04 LTS"            = "Ubuntu-20.04"         
     "Ubuntu 22.04 LTS "           = "Ubuntu-22.04"         
@@ -888,7 +888,7 @@ Start-Process -FilePath ($DriveLetter + ":\" + "WinSDKSetup.exe") @("/features",
 Dismount-DiskImage -ImagePath "$PSScriptRoot\WindowsSDK.iso"
 
 # Auto elevate script
-$IsAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator")
+$IsAdmin = ([Security.ncipal.Windowsncipal][Security.ncipal.WindowsIdentity]::GetCurrent()).IsInRole([Security.ncipal.WindowsBuiltInRole]"Administrator")
 if (-not $IsAdmin)
 {
 	Start-Process -FilePath powershell.exe -ArgumentList "-ExecutionPolicy Bypass -NoProfile -NoLogo -File `"$PSCommandPath`"" -Verb Runas
@@ -1013,7 +1013,7 @@ Get-ChildItem -Path D:\Downloads\LanguagePack -Recurse -Force -Filter *.mui -Fil
 # https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/
 Get-ChildItem -Path D:\Downloads\LanguagePack -Recurse -Force -Filter *.pri -File | ForEach-Object -Process {
 	Write-Verbose -Message $_.FullName -Verbose
-	& "${env:ProgramFiles(x86)}\Windows Kits\10\bin\10.0.22621.0\x64\makepri.exe" dump /if $_.FullName /of (-join ($_.Directory, "\", $_.Name))
+	& "${env:ProgramFiles(x86)}\Windows Kits\10\bin\10.0.22621.0\x64\makepri.exe" dump /if $_.FullName /of "$($_.Directory)\$($_.Name)"
 }
 
 # Create a table with UWP apps installed with their local native logo paths
