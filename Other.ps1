@@ -1005,7 +1005,7 @@ Get-ItemPropertyValue -Path HKCU:\Environment -Name TEMP
 Get-ChildItem -Path D:\Downloads\LanguagePack -Recurse -Force -Filter *.mui -File | ForEach-Object -Process {
 	Write-Verbose -Message $_.FullName -Verbose
 	$Name = $_.Name.Replace("$($_.Extension)", "")
-	Start-Process -FilePath "D:\ResourceHacker.exe" -ArgumentList @("-open", $_.FullName, "-save", "D:\extract\$Name.rc", "-action extract", "-mask MESSAGETABLE") -Wait
+	Start-Process -FilePath "D:\ResourceHacker.exe" -ArgumentList @("-open", $_.FullName, "-save", "D:\extract\$Name.rc", "-action extract", "-mask MESSAGETABLE", "-mask STRINGTABLE") -Wait
 }
 
 # Extract strings from pri files using makepri.exe from "Windows SDK for UWP Managed Apps"
