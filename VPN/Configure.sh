@@ -18,3 +18,7 @@ passwd
 # Disable ICMP ping response
 /etc/sysctl.conf: net.ipv4.icmp_echo_ignore_all = 1
 sysctl -p
+
+https://github.com/XTLS/Xray-core
+https://github.com/MHSanaei/3x-ui
+bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
