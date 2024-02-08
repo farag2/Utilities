@@ -738,8 +738,7 @@ $Array | Where-Object -FiletScript {-not ($_ -as [Double]) -and ($_ -as [IPAddre
 # Trigger Windows Update for detecting new updates
 # https://michlstechblog.info/blog/windows-10-trigger-detecting-updates-from-command-line
 # https://omgdebugging.com/2017/10/09/command-line-equivalent-of-wuauclt-in-windows-10-windows-server-2016/
-(New-Object -ComObject Microsoft.Update.AutoUpdate).DetectNow()
-usoclient StartScan
+Start-Process -FilePath "$env:SystemRoot\System32\UsoClient.exe" -ArgumentList StartInteractiveScan
 
 # Exclude KB update from installing
 (New-Object -ComObject Microsoft.Update.Session).CreateUpdateSearcher().Search("IsHidden = 0").Updates | Where-Object -FilterScript {$_.KBArticleIDs -eq "5005463"} | ForEach-Object -Process {$_.IsHidden = $true}
@@ -795,15 +794,6 @@ net localgroup Administrators username /add
 # "Пользователи удаленного рабочего стола"
 net localgroup "Remote Desktop Users" username /add
 net user $env:USERNAME /passwordreq:no
-
-# Download the latest russia-blacklist.txt version
-# https://github.com/ValdikSS/GoodbyeDPI
-$Parameters = @{
-	Uri              = "https://antizapret.prostovpn.org/domains-export.txt"
-	UseBasicParsing  = $true
-}
-Invoke-RestMethod @Parameters | Set-Content -Encoding UTF8 -Path "$PSScriptRoot\russia-blacklist.txt" -Force
-Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path "$PSScriptRoot\russia-blacklist.txt" -Raw)) -Encoding Byte -Path "$PSScriptRoot\russia-blacklist.txt" -Force
 
 # Prevent Windows to restart automatically after a system failure
 # The parameter EnableAllPrivileges allows us to manipulate the properties of this WMI object if the current Powershell host runs as Administrator
