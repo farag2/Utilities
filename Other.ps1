@@ -1011,7 +1011,10 @@ Get-ChildItem -Path D:\Downloads\LanguagePack -Recurse -Force -Filter *.mui -Fil
 # Extract strings from pri files using makepri.exe from "Windows SDK for UWP Managed Apps"
 # https://learn.microsoft.com/en-us/windows/uwp/app-resources/makepri-exe-command-options
 # https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/
-& "${env:ProgramFiles(x86)}\Windows Kits\10\bin\10.0.22621.0\x64\makepri.exe" dump /if D:\Windows.UI.SettingsAppThreshold.en-US.pri /of D:\resources.pri.xml
+Get-ChildItem -Path D:\Downloads\LanguagePack -Recurse -Force -Filter *.pri -File | ForEach-Object -Process {
+	Write-Verbose -Message $_.FullName -Verbose
+	& "${env:ProgramFiles(x86)}\Windows Kits\10\bin\10.0.22621.0\x64\makepri.exe" dump /if $_.FullName /of (-join ($_.Directory, "\", $_.Name))
+}
 
 # Create a table with UWP apps installed with their local native logo paths
 $AppxPackages = @(Get-AppxPackage -PackageTypeFilter Bundle -AllUsers)
