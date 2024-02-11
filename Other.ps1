@@ -620,9 +620,6 @@ function Convert-Error ([int]$ErrorCode)
 }
 Convert-Error -2147287037
 
-# Get error description
-certutil -error 0xc0000409
-
 # Remove lines starting with "//" and blank spaces
 Get-Content -Path $settings | Where-Object -FilterScript {$_ -notmatch "//"} | Where-Object -FilterScript {$_.Trim(" `t")} | Set-Content -Path $settings -Force
 
@@ -803,17 +800,39 @@ Get-CimInstance -ClassName Win32_OSRecoveryConfiguration | Set-CIMInstance -Argu
 copy /b D:\firmware.rfu \\nt_server\MFU
 
 # Create a table with WSL installed distros
+[System.Console]::OutputEncoding = [System.Text.Encoding]::Unicode
+
+# https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json
+# wsl --list --online relies on Internet connection too, so it's much convenient to parse DistributionInfo.json, rather than parse a cmd output
+$Parameters = @{
+	Uri             = "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json"
+	UseBasicParsing = $true
+	Verbose         = $true
+}
+(Invoke-RestMethod @Parameters).Distributions | ForEach-Object -Process {
+	[PSCustomObject]@{
+		"Distro" = $_.FriendlyName
+		"Alias"  = $_.Name
+	}
+}
+
+($Distros | Where-Object -FilterScript {$_.Distro -eq "Ubuntu"}).Alias
+# $Distros | ConvertTo-Json
+#
+# $Distros | ForEach-Object -Process {(wsl --list --quiet) -contains $_.Alias}
+
+<#
 $Extensions = @{
-    "Ubuntu"                      = "Ubuntu"               
-    "Debian GNU/Linux"            = "Debian"               
-    "Kali Linux Rolling"          = "kali-linux"           
-    "Linux Enterse Server v12" = "SLES-12SUSE"          
-    "Linux Enterse Server v15" = "SLES-15SUSE"          
-    "Ubuntu 18.04 LTS"            = "Ubuntu-18.04"         
-    "Ubuntu 20.04 LTS"            = "Ubuntu-20.04"         
-    "Ubuntu 22.04 LTS "           = "Ubuntu-22.04"         
-    "Linux 8.5"                   = "OracleLinux_8_5Oracle"
-    "Linux 7.9"                   = "OracleLinux_7_9Oracle"
+	"Ubuntu"                   = "Ubuntu"
+	"Debian GNU/Linux"         = "Debian"
+	"Kali Linux Rolling"       = "kali-linux"
+	"Linux Enterse Server v12" = "SLES-12SUSE"
+	"Linux Enterse Server v15" = "SLES-15SUSE"
+	"Ubuntu 18.04 LTS"         = "Ubuntu-18.04"
+	"Ubuntu 20.04 LTS"         = "Ubuntu-20.04"
+	"Ubuntu 22.04 LTS "        = "Ubuntu-22.04"
+	"Linux 8.5"                = "OracleLinux_8_5Oracle"
+	"Linux 7.9"                = "OracleLinux_7_9Oracle"
 }
 $Extensions.Keys | ForEach-Object -Process {(wsl --list --quiet) -contains $_}
 #
@@ -828,10 +847,7 @@ $Distros = ($wsl).Replace("  ", "").Replace("* ", "")[($LineNumber)..(($wsl).Cou
 		"Alias"  = ($_ -split " ", 2 | Select-Object -First 1).Trim()
 	}
 }
-($Distros | Where-Object -FilterScript {$_.Distro -eq "Ubuntu"}).Alias
-# $Distros | ConvertTo-Json
-#
-# $Distros | ForEach-Object -Process {(wsl --list --quiet) -contains $_.Alias}
+#>
 
 # Save PSCustomObject to a variable
 $ActiveDirectoryList = @()
