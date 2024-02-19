@@ -6,6 +6,7 @@ Get-ChildItem -Path "HKLM:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Wi
 } | Where-Object -FilterScript {$_.Path -match "Program Files"} | Where-Object -FilterScript {$_.PSChildName -notin $Bundles} | Where-Object -FilterScript {$_.Path -match "x64"} | ForEach-Object -Process {
 	"$($_.Path)\AppxManifest.xml"
 } | Add-AppxPackage -Register -ForceApplicationShutdown -ForceUpdateFromAnyVersion -DisableDevelopmentMode -Verbose
+
 # Check for UWP apps updates
 Get-CimInstance -Namespace root/CIMV2/mdm/dmmap -ClassName MDM_EnterpriseModernAppManagement_AppManagement01 | Invoke-CimMethod -MethodName UpdateScanMethod
 #
