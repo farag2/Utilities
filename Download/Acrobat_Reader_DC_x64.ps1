@@ -58,6 +58,12 @@ $Arguments = @(
 )
 Start-Process -FilePath "$DownloadsFolder\AcroRdrDCx64$($Version)_$($IetfLanguageTag).exe" -ArgumentList $Arguments -Wait
 
+$Items = @(
+	"$DownloadsFolder\AcroRdrDCx64\WindowsInstaller-KB893803-v2-x86.exe",
+	"$DownloadsFolder\AcroRdrDCx64\VCRT_x64"
+)
+Remove-Item -Path $Items -Recurse -Force -ErrorAction Ignore
+
 # Get the latest Adobe Acrobat Pro DC patch version (lang=mui)
 $Parameters = @{
 	Uri = "https://rdc.adobe.io/reader/products?lang=mui&site=enterprise&os=Windows%2011&api_key=dc-get-adobereader-cdn"
