@@ -20,17 +20,6 @@ Invoke-WebRequest @Parameters
 # Extract archive
 & tar.exe -x -f "$DownloadsFolder\Acrobat_DC_Web_x64_WWMUI.zip" -C $DownloadsFolder --exclude "WindowsInstaller-KB893803-v2-x86.exe" --exclude "VCRT_x64" -v
 
-# Extract AcroPro.msi to the "AcroPro.msi extracted" folder
-$Arguments = @(
-	"/a `"$DownloadsFolder\Adobe Acrobat\AcroPro.msi`""
-	"TARGETDIR=`"$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted`""
-	"/qb"
-)
-Start-Process "msiexec" -ArgumentList $Arguments -Wait
-
-Get-ChildItem -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\Adobe Acrobat" -Force
-Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Force
-
 # Get the latest Adobe Acrobat Pro DC patch version (lang=mui)
 $Parameters = @{
 	Uri = "https://rdc.adobe.io/reader/products?lang=mui&site=enterprise&os=Windows%2011&api_key=dc-get-adobereader-cdn"
