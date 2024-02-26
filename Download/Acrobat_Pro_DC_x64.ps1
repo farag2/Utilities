@@ -1,4 +1,8 @@
 # Download the latest Adobe Acrobat Pro DC x64
+
+# HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Installer\Products\68AB67CA3301FFFF7706CB5110E47A00\SourceList\Net
+# C:\Program Files\Common Files\Adobe\Acrobat\Setup Files\{AC76BA86-1033-FFFF-7760-BC15014EA700}
+
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 if ($Host.Version.Major -eq 5)
