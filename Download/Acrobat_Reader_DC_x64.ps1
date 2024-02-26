@@ -58,24 +58,6 @@ $Arguments = @(
 )
 Start-Process -FilePath "$DownloadsFolder\AcroRdrDCx64$($Version)_$($IetfLanguageTag).exe" -ArgumentList $Arguments -Wait
 
-# Extract AcroPro.msi to the "AcroPro.msi extracted" folder
-$Arguments = @(
-	"/a `"$DownloadsFolder\AcroRdrDCx64\AcroPro.msi`""
-	"TARGETDIR=`"$DownloadsFolder\AcroRdrDCx64\AcroPro.msi extracted`""
-	"/qb"
-)
-Start-Process "msiexec" -ArgumentList $Arguments -Wait
-
-$Items = @(
-	"$DownloadsFolder\AcroRdrDCx64\Core.cab",
-	"$DownloadsFolder\AcroRdrDCx64\Languages.cab",
-	"$DownloadsFolder\AcroRdrDCx64\WindowsInstaller-KB893803-v2-x86.exe",
-	"$DownloadsFolder\AcroRdrDCx64\VCRT_x64"
-)
-Remove-Item -Path $Items -Recurse -Force -ErrorAction Ignore
-Get-ChildItem -Path "$DownloadsFolder\AcroRdrDCx64\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\AcroRdrDCx64" -Force
-Remove-Item -Path "$DownloadsFolder\AcroRdrDCx64\AcroPro.msi extracted" -Recurse -Force
-
 # Get the latest Adobe Acrobat Pro DC patch version (lang=mui)
 $Parameters = @{
 	Uri = "https://rdc.adobe.io/reader/products?lang=mui&site=enterprise&os=Windows%2011&api_key=dc-get-adobereader-cdn"
