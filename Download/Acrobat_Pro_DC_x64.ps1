@@ -28,16 +28,6 @@ $Arguments = @(
 )
 Start-Process "msiexec" -ArgumentList $Arguments -Wait
 
-$CABs = @(
-	"$DownloadsFolder\Adobe Acrobat\AlfSdPack.cab",
-	"$DownloadsFolder\Adobe Acrobat\Core.cab",
-	"$DownloadsFolder\Adobe Acrobat\Extras.cab",
-	"$DownloadsFolder\Adobe Acrobat\Intermediate.cab",
-	"$DownloadsFolder\Adobe Acrobat\Languages.cab",
-	"$DownloadsFolder\Adobe Acrobat\Optional.cab"
-)
-Remove-Item -Path $CABs -Force
-
 Get-ChildItem -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Recurse -Force | Move-Item -Destination "$DownloadsFolder\Adobe Acrobat" -Force
 Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcroPro.msi extracted" -Force
 
