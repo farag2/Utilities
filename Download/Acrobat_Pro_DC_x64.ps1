@@ -22,7 +22,7 @@ $Parameters = @{
 Invoke-WebRequest @Parameters
 
 # Extract archive
-& tar.exe -x -f "$DownloadsFolder\Acrobat_DC_Web_x64_WWMUI.zip" -C $DownloadsFolder --exclude "WindowsInstaller-KB893803-v2-x86.exe" --exclude "VCRT_x64" -v
+Start-Process -FilePath "$env:SystemRoot\System32\tar.exe" -ArgumentList "-x -f `"$DownloadsFolder\Acrobat_DC_Web_x64_WWMUI.zip`" -C $DownloadsFolder --exclude `"WindowsInstaller-KB893803-v2-x86.exe`" --exclude `"VCRT_x64`" -v"
 
 # Get the latest Adobe Acrobat Pro DC patch version (lang=mui)
 $Parameters = @{
