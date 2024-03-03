@@ -1156,3 +1156,6 @@ Set-WinHomeLocation -GeoId 203 # https://go.microsoft.com/fwlink/?LinkID=242308
 Set-WinSystemLocale -SystemLocale ru-RU
 Copy-UserInternationalSettingsToSystem -WelcomeScreen $true -NewUser $true
 # Set-WinDefaultInputMethodOverride -InputTip "0409:00000409"
+
+# Extract strings from a library (.dll) via ResourcesExtract.exe
+& "D:\ResourcesExtract.exe" /Source "C:\Windows\System32\shell32.dll" /DestFolder "C:\Users\Sanctuary\Desktop\1" /ExtractIcons 0 /ExtractCursors 0 /ExtractBitmaps 0 /ExtractHTML 0 /ExtractManifests 0 /ExtractAnimatedIcons 0 /ExtractAnimatedCursors 0 /ExtractAVI 0 /ExtractTypeLib 0 /ExtractBinary 0 /ScanSubFolders 0 /FileExistMode 2 /OpenDestFolder 0
