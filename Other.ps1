@@ -1162,3 +1162,6 @@ Copy-UserInternationalSettingsToSystem -WelcomeScreen $true -NewUser $true
 
 # Check if a variable assigned with "Set-StrictMode -Version Latest" set
 Test-Path -Path variable:MyVariable
+
+# Lockscreen wallpaper location
+%LOCALAPPDATA%\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\LocalState\Assets
