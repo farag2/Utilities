@@ -1165,3 +1165,13 @@ Test-Path -Path variable:MyVariable
 
 # Lockscreen wallpaper location
 %LOCALAPPDATA%\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\LocalState\Assets
+
+# Extract archive
+Start-Process -FilePath "$env:SystemRoot\System32\tar.exe" -ArgumentList "-x -f `"$DownloadsFolder\Acrobat_DC_Web_x64_WWMUI.zip`" -C $DownloadsFolder --exclude `"WindowsInstaller-KB893803-v2-x86.exe`" --exclude `"VCRT_x64`" -v"
+#
+Add-Type -Assembly System.IO.Compression.FileSystem
+$ZIP = [IO.Compression.ZipFile]::OpenRead("D:\folder\archive.zip")
+$ZIP.Entries | Where-Object -FilterScript {$_.FullName -like "dark/*.*"} | ForEach-Object -Process {
+	[IO.Compression.ZipFileExtensions]::ExtractToFile($_, "D:\Folder2\$($_.Name)", $true)
+}
+$ZIP.Dispose()
