@@ -62,7 +62,6 @@ $Arguments = @(
 	"INSTALL_MAINTENANCE_SERVICE=true",
 	"PREVENT_REBOOT_REQUIRED=false",
 	"OPTIONAL_EXTENSIONS=true",
-	# Since 103
 	"TASKBAR_SHORTCUT=true"	
 )
 Start-Process -FilePath "$env:SystemRoot\System32\msiexec.exe" -ArgumentList "/i `"$DownloadsFolder\Firefox Setup $LatestStableVersion.msi`" $Arguments" -Wait
