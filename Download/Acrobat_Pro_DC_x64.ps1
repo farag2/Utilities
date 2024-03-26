@@ -35,6 +35,7 @@ $Version = ((Invoke-RestMethod @Parameters).products.reader | Where-Object -Filt
 # If latest version is greater than one from archive
 if ((Get-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd*.msp").FullName -notmatch $Version)
 {
+	Start-Sleep -Seconds 3
 	Remove-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd*.msp" -Force
 
 	$Parameters = @{
