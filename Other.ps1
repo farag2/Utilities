@@ -1175,3 +1175,6 @@ $ZIP.Entries | Where-Object -FilterScript {$_.FullName -like "dark/*.*"} | ForEa
 	[IO.Compression.ZipFileExtensions]::ExtractToFile($_, "D:\Folder2\$($_.Name)", $true)
 }
 $ZIP.Dispose()
+
+# Check Microsoft 365 for updates
+& "$env:CommonProgramFiles\microsoft shared\ClickToRun\OfficeC2RClient.exe" /update user
