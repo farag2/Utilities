@@ -575,7 +575,7 @@ slmgr.vbs /ato
 
 # Get exception name
 $Error.Exception.GetType().FullName
-(Get-Error).Exception.InnerException.Message
+(Get-Error).Exception.Type
 
 # Close all windows without killing the File Explorer process
 (New-Object -ComObject Shell.Application).Windows() | Where-Object {$null -ne $_.FullName} | Where-Object {$_.FullName.EndsWith("\explorer.exe") } | ForEach-Object -Process {$_.Quit()}
