@@ -1178,3 +1178,8 @@ $ZIP.Dispose()
 
 # Check Microsoft 365 for updates
 & "$env:CommonProgramFiles\microsoft shared\ClickToRun\OfficeC2RClient.exe" /update user
+
+# Convert to hex data
+$Hex = Get-Content -Path path\to\file.exe -Encoding Byte -Raw
+[System.BitConverter]::ToString($tHex)
+ 
