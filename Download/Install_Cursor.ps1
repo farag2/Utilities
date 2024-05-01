@@ -12,8 +12,8 @@ if ($Host.Version.Major -eq 5)
 
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
-	Uri             = "https://github.com/farag2/Sophia-Script-for-Windows/raw/master/Misc/Cursors.zip"
-	OutFile         = "$DownloadsFolder\Cursors.zip"
+	Uri             = "https://github.com/farag2/Sophia-Script-for-Windows/raw/master/Misc/dark.zip"
+	OutFile         = "$DownloadsFolder\dark.zip"
 	UseBasicParsing = $true
 	Verbose         = $true
 }
@@ -24,14 +24,15 @@ if (-not (Test-Path -Path "$env:SystemRoot\Cursors\W11_dark_v2.2"))
 	New-Item -Path "$env:SystemRoot\Cursors\W11_dark_v2.2" -ItemType Directory -Force
 }
 
+# Extract archive. We cannot call tar.exe due to it fails to extract files if username has cyrillic first letter in lowercase
+# Start-Process -FilePath "$env:SystemRoot\System32\tar.exe" -ArgumentList "-xf `"$DownloadsFolder\dark.zip`" -C `"$env:SystemRoot\Cursors\W11_dark_v2.2`" -v"
+# https://github.com/PowerShell/PowerShell/issues/21070
 Add-Type -Assembly System.IO.Compression.FileSystem
-$ZIP = [IO.Compression.ZipFile]::OpenRead("$DownloadsFolder\Cursors.zip")
-$ZIP.Entries | Where-Object -FilterScript {$_.FullName -like "dark/*.*"} | ForEach-Object -Process {
+$ZIP = [IO.Compression.ZipFile]::OpenRead("$DownloadsFolder\dark.zip")
+$ZIP.Entries | ForEach-Object -Process {
 	[IO.Compression.ZipFileExtensions]::ExtractToFile($_, "$env:SystemRoot\Cursors\W11_dark_v2.2\$($_.Name)", $true)
 }
 $ZIP.Dispose()
-
-Remove-Item -Path "$DownloadsFolder\Cursors.zip" -Force
 
 New-ItemProperty -Path "HKCU:\Control Panel\Cursors" -Name "(default)" -PropertyType String -Value "W11 Cursors Dark Free v2.2 by Jepri Creations" -Force
 New-ItemProperty -Path "HKCU:\Control Panel\Cursors" -Name AppStarting -PropertyType ExpandString -Value "%SystemRoot%\Cursors\W11_dark_v2.2\working.ani" -Force
@@ -84,6 +85,10 @@ if (-not (Test-Path -Path "HKCU:\Control Panel\Cursors\Schemes"))
 ) -join ","
 New-ItemProperty -Path "HKCU:\Control Panel\Cursors\Schemes" -Name "W11 Cursors Dark Free v2.2 by Jepri Creations" -PropertyType String -Value $Schemes -Force
 
+Start-Sleep -Seconds 1
+
+Remove-Item -Path "$DownloadsFolder\dark.zip" -Force
+
 # Reload cursor on-the-fly
 $Signature = @{
 	Namespace        = "WinAPI"
@@ -93,10 +98,10 @@ $Signature = @{
 [DllImport("user32.dll", EntryPoint = "SystemParametersInfo")]
 public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, uint pvParam, uint fWinIni);
 "@
+	}
+	if (-not ("WinAPI.Cursor" -as [type]))
+	{
+		Add-Type @Signature
+	}
+	[WinAPI.Cursor]::SystemParametersInfo(0x0057, 0, $null, 0)
 }
-if (-not ("WinAPI.Cursor" -as [type]))
-{
-	Add-Type @Signature
-}
-[WinAPI.Cursor]::SystemParametersInfo(0x0057, 0, $null, 0)
-
