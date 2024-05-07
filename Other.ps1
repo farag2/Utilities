@@ -1182,4 +1182,21 @@ $ZIP.Dispose()
 # Convert to hex data
 $Hex = Get-Content -Path path\to\file.exe -Encoding Byte -Raw
 [System.BitConverter]::ToString($tHex)
- 
+
+# Parse gitlab.com
+# https://gitlab.com/gitlab-org/gitlab
+# Replace "/" with "%2F"
+$Parameters = @{
+	Uri             = "https://gitlab.com/api/v4/projects/gitlab-org%2Fgitlab"
+	UseBasicParsing = $true
+	Verbose         = $true
+}
+$id = (Invoke-RestMethod @Parameters).id
+
+# Get latest GitLab release version
+$Parameters = @{
+	Uri             = "https://gitlab.com/api/v4/projects/$id/releases/permalink/latest"
+	UseBasicParsing = $true
+	Verbose         = $true
+}
+Invoke-RestMethod @Parameters
