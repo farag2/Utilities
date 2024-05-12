@@ -256,7 +256,7 @@ if (Test-Path -Path "$env:ProgramFiles\paint.net")
 
 		$Parameters = @{
 			Uri     = https://raw.githubusercontent.com/farag2/Utilities/master/Convert_web_request_response_to_a_string.ps1
-			OutFile = "$env:APPDATA\qBittorrent\defaulticons-fluent-dark-no-mica.qbtheme"
+   			UseBasicParsing = $true
 			Verbose = $true
 		}
 		Invoke-WebRequest @Parameters | Invoke-Expression
