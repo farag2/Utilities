@@ -254,6 +254,7 @@ if (Test-Path -Path "$env:ProgramFiles\paint.net")
 	{
 		New-Item -Path Registry::HKEY_CLASSES_ROOT\*\shell\Paint.NET -Force
 
+		# https://github.com/farag2/Utilities/blob/master/Convert_web_request_response_to_a_string.ps1
 		$Parameters = @{
 			Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Convert_web_request_response_to_a_string.ps1"
    			UseBasicParsing = $true
