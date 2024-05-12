@@ -20,5 +20,12 @@ $Extensions = @(
 )
 foreach ($Extension in $Extensions)
 {
-	 & "$env:ProgramFiles\Microsoft VS Code\bin\code.cmd" --install-extension $Extension
+	if (Test-Path -Path "$env:ProgramFiles\Microsoft VS Code\bin\code.cmd")
+	{
+		& "$env:ProgramFiles\Microsoft VS Code\bin\code.cmd" --install-extension $Extension
+	}
+	elseif (Test-Path -Path "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code.cmd")
+	{
+		& "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code.cmd" --install-extension $Extension
+	}
 }
