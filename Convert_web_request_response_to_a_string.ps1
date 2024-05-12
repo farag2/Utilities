@@ -35,9 +35,9 @@ function ConvertTo-BodyWithEncoding
 }
 
 # We cannot invoke an expression with non-latin words to avoid "??????"
-# New-ItemProperty -Path "Registry::HKEY_CLASSES_ROOT\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings" -Name Title -PropertyType String -Value "Открыть с помощью &Notepad++" -Force
+# New-ItemProperty -LiteralPath Registry::HKEY_CLASSES_ROOT\*\shell\Paint.NET -Name "(Default)" -PropertyType String -Value "Открыть с помощью Paint.NET" -Force
 $Parameters = @{
-	Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Notepad%2B%2B_context_menu.ps1"
+	Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Paint.NET_context_menu.ps1"
 	UseBasicParsing = $true
 	Verbose         = $true
 }
