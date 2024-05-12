@@ -253,7 +253,13 @@ if (Test-Path -Path "$env:ProgramFiles\paint.net")
 	if (-not (Test-Path -LiteralPath Registry::HKEY_CLASSES_ROOT\*\shell\Paint.NET))
 	{
 		New-Item -Path Registry::HKEY_CLASSES_ROOT\*\shell\Paint.NET -Force
-		https://raw.githubusercontent.com/farag2/Utilities/master/Convert_web_request_response_to_a_string.ps1 | Invoke-Expression
+
+		$Parameters = @{
+			Uri     = https://raw.githubusercontent.com/farag2/Utilities/master/Convert_web_request_response_to_a_string.ps1
+			OutFile = "$env:APPDATA\qBittorrent\defaulticons-fluent-dark-no-mica.qbtheme"
+			Verbose = $true
+		}
+		Invoke-WebRequest @Parameters | Invoke-Expression
 
 		$Value = "$env:ProgramFiles\Paint.NET\PaintDotNet.exe"
 		New-ItemProperty -LiteralPath Registry::HKEY_CLASSES_ROOT\*\shell\Paint.NET -Name Icon -PropertyType String -Value "$Value,0" -Force
