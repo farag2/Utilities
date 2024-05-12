@@ -255,9 +255,9 @@ if (Test-Path -Path "$env:ProgramFiles\paint.net")
 		New-Item -Path Registry::HKEY_CLASSES_ROOT\*\shell\Paint.NET -Force
 
 		$Parameters = @{
-			Uri     = https://raw.githubusercontent.com/farag2/Utilities/master/Convert_web_request_response_to_a_string.ps1
+			Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Convert_web_request_response_to_a_string.ps1"
    			UseBasicParsing = $true
-			Verbose = $true
+			Verbose         = $true
 		}
 		Invoke-WebRequest @Parameters | Invoke-Expression
 
