@@ -61,7 +61,7 @@ function yt-dlp
 		Uri              = "https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/latest"
 		UseBasicParsing  = $true
 	}
-	$LatestFFmpegURL = ((Invoke-RestMethod @Parameters).assets | Where-Object -FilterScript {$_.name -match "ffmpeg-n5.1-latest-win64-gpl-5.1.zip"}).browser_download_url
+	$LatestFFmpegURL = ((Invoke-RestMethod @Parameters).assets | Where-Object -FilterScript {$_.name -eq "ffmpeg-master-latest-win64-lgpl.zip"}).browser_download_url
 
 	if (-not (Test-Path -Path "$DownloadsFolder\ffmpeg.exe"))
 	{
