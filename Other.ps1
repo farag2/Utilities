@@ -1200,3 +1200,18 @@ $Parameters = @{
 	Verbose         = $true
 }
 Invoke-RestMethod @Parameters
+
+# Get Windows updates installed
+Get-CimInstance -ClassName Win32_ReliabilityRecords
+Get-CimInstance -ClassName Win32_QuickFixEngineering
+Get-HotFix
+Get-Package -ProviderName msu
+#
+$Session = New-Object -ComObject "Microsoft.Update.Session"
+# [Activator]::CreateInstance([type]::GetTypeFromProgID("Microsoft.Update.Session"))
+$Searcher = $Session.CreateUpdateSearcher()
+$HistoryCount = $Searcher.GetTotalHistoryCount()
+if ($HistoryCount -gt 0)
+{
+	$Searcher.QueryHistory(0,$HistoryCount)
+}
