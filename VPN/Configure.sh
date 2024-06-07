@@ -1,6 +1,8 @@
 # https://github.com/complexorganizations/wireguard-manager
 apt update -y && apt upgrade -y
 apt autoremove -y
+apt --fix-broken install
+apt --fix-missing install
 
 # Upgrade
 do-release-upgrade
