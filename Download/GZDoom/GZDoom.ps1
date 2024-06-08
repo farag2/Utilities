@@ -64,7 +64,7 @@ Invoke-WebRequest @Parameters
 # https://www.moddb.com/mods/brutal-doom/downloads/brutal-doom-v22-beta-test-3
 # Expand archive manualy
 $Parameters = @{
-	Uri             = "https://www.moddb.com/downloads/start/95667"
+	Uri             = "https://www.moddb.com/downloads/start/265147"
 	UseBasicParsing = $false # Disabled
 	Verbose         = $true
 }
