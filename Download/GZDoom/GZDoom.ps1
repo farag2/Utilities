@@ -34,19 +34,8 @@ Expand-Archive @Parameters
 
 # https://github.com/farag2/Utilities/tree/master/Download/GZDoom
 $Parameters = @{
-	Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Download/GZDoom/gzdoom.ini"
+	Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Download/GZDoom/gzdoom_portable.ini"
 	OutFile         = "$DownloadsFolder\GZDoom\gzdoom.ini"
-	UseBasicParsing = $true
-	Verbose         = $true
-}
-Invoke-WebRequest @Parameters
-
-Get-Item -Path "$DownloadsFolder\GZDoom\gzdoom.ini" -Force | Rename-Item -NewName "gzdoom-$env:USERNAME.ini" -Force
-
-# https://github.com/farag2/Utilities/tree/master/Download/GZDoom
-$Parameters = @{
-	Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Download/GZDoom/_pb.cmd"
-	OutFile         = "$DownloadsFolder\GZDoom\_pb.cmd"
 	UseBasicParsing = $true
 	Verbose         = $true
 }
