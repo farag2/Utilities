@@ -810,7 +810,7 @@ $Parameters = @{
 	UseBasicParsing = $true
 	Verbose         = $true
 }
-(Invoke-RestMethod @Parameters).Distributions | ForEach-Object -Process {
+$Distros = (Invoke-RestMethod @Parameters).Distributions | ForEach-Object -Process {
 	[PSCustomObject]@{
 		"Distro" = $_.FriendlyName
 		"Alias"  = $_.Name
