@@ -16,31 +16,6 @@ foreach ($AppxPackage in $AppxPackages)
 	"$($AppxPackage.InstallLocation)\AppxManifest.xml" | Add-AppxPackage -Register -ForceApplicationShutdown -ForceUpdateFromAnyVersion -DisableDevelopmentMode -Verbose
 }
 
-# Restore all UWP apps
-$DamagedPackages = @()
-$DamagedFiles = (Get-ChildItem -Path "$env:ProgramFiles\WindowsApps\" -Recurse | Where-Object -FilterScript {$_.Length -eq 0}).FullName
-
-foreach ($DamagedFile in $DamagedFiles)
-{
-	if ($DamagedFile -like "*8wekyb3d8bbwe*")
-	{
-		$DamagedPackages += ((Split-Path -Path $DamagedFile).Replace("$env:ProgramFiles\WindowsApps\","") -Split ("8wekyb3d8bbwe"))[0] + "8wekyb3d8bbwe"
-	}
-}
-
-foreach ($Package in $($DamagedPackages | Get-Unique))
-{
-	New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Force
-	New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Name PackageStatus -Value 2 -PropertyType DWORD -Force
-}
-# Check for UWP apps updates
-Get-CimInstance -Namespace root/CIMV2/mdm/dmmap -ClassName MDM_EnterseModernAppManagement_AppManagement01 | Invoke-CimMethod -MethodName UpdateScanMethod
-
-foreach ($Package in $($DamagedPackages | Get-Unique))
-{
-	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateChange\PackageList\$Package" -Force
-}
-
 # Allow to connect to a single label domain
 New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters -Name AllowSingleLabelDnsDomain -Value 1 -Force
 
