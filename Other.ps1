@@ -298,7 +298,7 @@ Get-ChildItem -Path $Path -Filter *.$Extension | Rename-Item -NewName {(Get-Cult
 $String = "аа аа аа"
 (Get-Culture).TextInfo.ToTitleCase($String.ToLower())
 
-#  chars in a string
+# Count chars in a string
 ("string" | Measure-Object -Character).Characters
 
 # Replace a word in a file name in a folder
@@ -363,7 +363,7 @@ $parent.DeleteSubKey('UserChoice', $true)
 $parent.Close()
 
 # Drives properties
-Get-PhysicalDisk | Get-StorageReliabilityer | Select-Object -Property *
+Get-PhysicalDisk | Get-StorageReliabilityCounter | Select-Object -Property *
 
 # Show all autostarts. Even drivers
 Get-EventLog -LogName System -InstanceId 1073748869 | ForEach-Object {
@@ -465,7 +465,7 @@ $OFS = "|"
 $AppxPackages = (Get-AppxPackage -PackageTypeFilter Bundle -AllUsers).Name | Select-String $ExcludedAppxPackages -NotMatch
 foreach ($AppxPackage in $AppxPackages)
 {
-	Write-Progress -Activity "Uninstalling UWP apps" -Status "Removing $AppxPackage" -PercentComplete ($AppxPackages.IndexOf($AppxPackage)/$AppxPackages. * 100)
+	Write-Progress -Activity "Uninstalling UWP apps" -Status "Removing $AppxPackage" -PercentComplete ($AppxPackages.IndexOf($AppxPackage)/$AppxPackages.Count * 100)
 	Get-AppxPackage -PackageTypeFilter Bundle -AllUsers | Where-Object -FilterScript {$_.Name -cmatch $AppxPackage} | Remove-AppxPackage -AllUsers
 }
 Write-Progress -Activity "Uninstalling UWP apps" -Completed
@@ -585,13 +585,13 @@ Get-ChildItem -Path "D:\folder" -Depth 0 -Exclude *.dll, *.winmd, *.ps1 -File -R
 		$i += $_
 	}
 }
-Write-Verbose -Message "Total number of lines is: $i" -Verbose
+Write-Verbose -Message "Total number of lines: $i" -Verbose
 #
 $a = 0
 Get-ChildItem -Path D:\Sophia-Script-for-Windows\src -File -Recurse | ForEach-Object -Process {
     $a += ((Get-Content -Path $_.FullName -Raw).Count | Measure-Object -Sum).Sum
 }
-Write-Verbose -Message "Total number of lines $a: $i" -Verbose
+Write-Verbose -Message "Total number of lines: $i" -Verbose
 
 # Error description
 function Convert-Error ([int]$ErrorCode)
