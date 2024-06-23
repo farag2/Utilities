@@ -1221,3 +1221,10 @@ if ($HistoryCount -gt 0)
 {
 	$Searcher.QueryHistory(0,$HistoryCount)
 }
+
+# Check if integer is even or odd
+function IsEven($number)
+{
+    ($number % 2) -eq 0
+}
+IsEven 5
