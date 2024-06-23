@@ -589,7 +589,7 @@ Write-Verbose -Message "Total number of lines: $i" -Verbose
 #
 $a = 0
 Get-ChildItem -Path D:\Sophia-Script-for-Windows\src -File -Recurse | ForEach-Object -Process {
-    $a += ((Get-Content -Path $_.FullName -Raw).Count | Measure-Object -Sum).Sum
+    $a += ((Get-Content -Path $_.FullName).Count | Measure-Object -Sum).Sum
 }
 Write-Verbose -Message "Total number of lines: $i" -Verbose
 
