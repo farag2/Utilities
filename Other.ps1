@@ -1203,3 +1203,6 @@ function IsEven($number)
     ($number % 2) -eq 0
 }
 IsEven 5
+
+# Microsoft Edge local settings file (JSON)
+"$env:LOCALAPPDATA\Microsoft\Edge\User Data\Local State"
