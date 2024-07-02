@@ -155,7 +155,7 @@ if (Test-Path -Path "$env:ProgramFiles\Icaros")
 }
 
 # MPC-BE
-if (Test-Path -Path "$env:ProgramFiles\MPC-BE x64")
+if (Test-Path -Path "$env:ProgramFiles\MPC-BE")
 {
 	$DesktopFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name Desktop
 	Remove-Item -Path "$DesktopFolder\MPC-BE x64.lnk" -Force -ErrorAction Ignore
