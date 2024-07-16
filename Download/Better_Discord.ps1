@@ -22,7 +22,7 @@ Invoke-Webrequest @Parameters
 Start-Process -FilePath "$DownloadsFolder\BetterDiscord-Windows.exe" -Wait
 Remove-Item -Path "$DownloadsFolder\BetterDiscord-Windows.exe" -Force
 
-# https://github.com/DiscordStyles/Fluent
+# https://github.com/DiscordStyles/Fluent/blob/deploy/Fluent.theme.css
 $Parameters = @{
 	Uri             = "https://raw.githubusercontent.com/DiscordStyles/Fluent/deploy/Fluent.theme.css"
 	OutFile         = "$env:APPDATA\BetterDiscord\themes\Fluent.theme.css"
