@@ -224,12 +224,12 @@ function WindowState
 	}
 
 	$Win32ShowWindowAsync = @{
-		Namespace = "Win32Functions"
-		Name = "Win32ShowWindowAsync"
-		Language = "CSharp"
+		Namespace        = "Win32Functions"
+		Name             = "Win32ShowWindowAsync"
+		Language         = "CSharp"
 		MemberDefinition = @"
-			[DllImport("user32.dll")]
-			public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+[DllImport("user32.dll")]
+public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 "@
 	}
 
@@ -783,7 +783,6 @@ copy /b D:\firmware.rfu \\nt_server\MFU
 
 # Create a table with WSL installed distros
 [System.Console]::OutputEncoding = [System.Text.Encoding]::Unicode
-
 # https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json
 # wsl --list --online relies on Internet connection too, so it's much convenient to parse DistributionInfo.json, rather than parse a cmd output
 $Parameters = @{
@@ -800,7 +799,6 @@ $Distros = (Invoke-RestMethod @Parameters).Distributions | ForEach-Object -Proce
 
 ($Distros | Where-Object -FilterScript {$_.Distro -eq "Ubuntu"}).Alias
 # $Distros | ConvertTo-Json
-#
 # $Distros | ForEach-Object -Process {(wsl --list --quiet) -contains $_.Alias}
 
 <#
@@ -910,10 +908,10 @@ Get-PhysicalDisk | Get-Disk | ForEach-Object -Process {
 try
 {
 	$Parameters = @{
-		Name             = "dns.msftncsi.com"
-		Server           = "1.1.1.1"
-		DnsOnly          = $true
-		ErrorAction      = "Stop"
+		Name        = "dns.msftncsi.com"
+		Server      = "1.1.1.1"
+		DnsOnly     = $true
+		ErrorAction = "Stop"
 	}
 	if ((Resolve-DnsName @Parameters).IPAddress -notcontains "131.107.255.255")
 	{
@@ -1150,12 +1148,45 @@ Test-Path -Path variable:MyVariable
 # Extract archive
 Start-Process -FilePath "$env:SystemRoot\System32\tar.exe" -ArgumentList "-xf `"$DownloadsFolder\Acrobat_DC_Web_x64_WWMUI.zip`" -C $DownloadsFolder --exclude `"WindowsInstaller-KB893803-v2-x86.exe`" --exclude `"VCRT_x64`" -v"
 #
-Add-Type -Assembly System.IO.Compression.FileSystem
-$ZIP = [IO.Compression.ZipFile]::OpenRead("D:\folder\archive.zip")
-$ZIP.Entries | Where-Object -FilterScript {$_.FullName -like "dark/*.*"} | ForEach-Object -Process {
-	[IO.Compression.ZipFileExtensions]::ExtractToFile($_, "D:\Folder2\$($_.Name)", $true)
+function ExtractZIPFolder
+{
+	[CmdletBinding()]
+	param
+	(
+		[string]
+		$Source,
+
+		[string]
+		$Destination,
+
+		[string[]]
+		$Files
+	)
+
+	Add-Type -Assembly System.IO.Compression.FileSystem
+
+	$ZIP = [IO.Compression.ZipFile]::OpenRead($Source)
+	$ZIP.Entries | Where-Object -FilterScript {$Files -contains $_.FullName} | ForEach-Object -Process {
+		$File = Join-Path -Path $Destination -ChildPath $_.FullName
+		$Parent = Split-Path -Path $File -Parent
+
+		if (-not (Test-Path -Path $Parent))
+		{
+			New-Item -Path $Parent -Type Directory -Force
+		}
+
+		[IO.Compression.ZipFileExtensions]::ExtractToFile($_, $File, $true)
+	}
+
+	$ZIP.Dispose()
 }
-$ZIP.Dispose()
+
+$Parameters = @{
+	Source      = "D:\1.zip"
+	Destination = "D:\1"
+	Files       = @("file.txt", "file2.txt")
+}
+ExtractZIPFolder @Parameters
 
 # Check Microsoft 365 for updates
 & "$env:CommonProgramFiles\microsoft shared\ClickToRun\OfficeC2RClient.exe" /update user
