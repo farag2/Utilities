@@ -35,6 +35,7 @@ function yt-dlp
 		$Script:ProgressPreference = "SilentlyContinue"
 	}
 
+	# https://github.com/yt-dlp/yt-dlp
 	# Get the latest youtube-dl build tag
 	$Parameters = @{
 		Uri              = "https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest"
@@ -55,6 +56,7 @@ function yt-dlp
 	}
 
 	# Get the latest FFmpeg URL
+ 	# https://github.com/BtbN/FFmpeg-Builds
 	# "ffmpeg-*-win64-lgpl-[0-9].[0-9].zip"
 	# gpl includes all dependencies, even those that require full GPL instead of just LGPL
 	$Parameters = @{
