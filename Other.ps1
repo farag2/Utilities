@@ -712,7 +712,7 @@ $ParentFolder = Split-Path -Path $Paths.FullName -Parent
 
 # Isolate IP addresses only
 $Array = @('Handshake', 'Success', 'Status', 200, '192.30.253.113', 'OK', 0xF, "2001:4860:4860::8888")
-$Array | Where-Object -FiletScript {-not ($_ -as [Double]) -and ($_ -as [IPAddress])}
+$Array | Where-Object -FilterScript {-not ($_ -as [Double]) -and ($_ -as [IPAddress])}
 
 # Trigger Windows Update for detecting new updates
 # https://michlstechblog.info/blog/windows-10-trigger-detecting-updates-from-command-line
