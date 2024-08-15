@@ -143,14 +143,11 @@ function Get-StringHash
 		[Parameter(Mandatory = $true)]
 		[ValidateSet("MACTripleDES", "MD5", "RIPEMD160", "SHA1", "SHA256", "SHA384", "SHA512")]
 		[string]
-		$HashName
+		$Hash
 	)
 
-	$StringBuilder = New-Object -TypeName System.Text.StringBuilder
-	[System.Security.Cryptography.HashAlgorithm]::Create($HashName).ComputeHash([System.Text.Encoding]::UTF8.GetBytes($String))| ForEach-Object -Process {
-		[Void]$StringBuilder.Append($_.ToString("x2"))
-	}
-	$StringBuilder.ToString()
+	$hash = [System.Security.Cryptography.HashAlgorithm]::Create("$Hash").ComputeHash([System.Text.Encoding]::UTF8.GetBytes($String))
+	[System.BitConverter]::ToString($hash).Replace('-', '')
 }
 Get-StringHash -String 2 -HashName SHA1
 
