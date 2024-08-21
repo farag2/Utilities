@@ -1023,7 +1023,7 @@ foreach ($AppxPackage in $AppxPackages)
 
 	[PSCustomObject]@{
 		DisplayName = $PackageId.DisplayName
-		Logo        = $PackageId.Logo -replace "file:///", ""
+		Logo        = $PackageId.Logo.OriginalString # | Where-Object -FilterScript {Test-Path -Path $_}
 	}
 }
 
