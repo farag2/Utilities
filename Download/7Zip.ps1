@@ -20,7 +20,7 @@ $bestRelease = (Invoke-RestMethod @Parameters).platform_releases.windows.filenam
 # Download the latest 7-Zip x64
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
-	Uri             = "https://nchc.dl.sourceforge.net/project/sevenzip$($bestRelease)"
+	Uri             = "https://unlimited.dl.sourceforge.net/project/sevenzip$($bestRelease)?viasf=1"
 	OutFile         = "$DownloadsFolder\7-Zip.msi"
 	UseBasicParsing = $true
 	Verbose         = $true
