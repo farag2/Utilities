@@ -136,26 +136,28 @@ function Get-StringHash
 	[CmdletBinding()]
 	param
 	(
-		[Parameter(Mandatory = $true)]
 		[string]
 		$String,
 
-		[Parameter(Mandatory = $true)]
 		[ValidateSet("MACTripleDES", "MD5", "RIPEMD160", "SHA1", "SHA256", "SHA384", "SHA512")]
 		[string]
 		$Hash
 	)
 
-	$hash = [System.Security.Cryptography.HashAlgorithm]::Create("$Hash").ComputeHash([System.Text.Encoding]::UTF8.GetBytes($String))
-	[System.BitConverter]::ToString($hash).Replace('-', '')
+	$HashResalt = [System.Security.Cryptography.HashAlgorithm]::Create($Hash).ComputeHash([System.Text.Encoding]::UTF8.GetBytes($String))
+	[System.BitConverter]::ToString($HashResalt).Replace('-', '')
 }
 Get-StringHash -String 2 -HashName SHA1
 
+# Encode using Base64 and vice versa
+[Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("SecretMessage"))
+[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("U2VjcmV0TWVzc2FnZQ=="))
+
 # Expand the window with "Task manager" title but others to minimize
 $Win32ShowWindowAsync = @{
-	Namespace = "WinAPI"
-	Name = "Win32ShowWindowAsync"
-	Language = "CSharp"
+	Namespace        = "WinAPI"
+	Name             = "Win32ShowWindowAsync"
+	Language         = "CSharp"
 	MemberDefinition = @"
 [DllImport("user32.dll")]
 public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
@@ -349,10 +351,6 @@ $hash = @{
 	Status = "Online"
 }
 New-Object -TypeName PSObject -Property $hash
-
-# Encode using Base64 and vice versa
-[Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("SecretMessage"))
-[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("U2VjcmV0TWVzc2FnZQ=="))
 
 # Remove unremovable registry key
 $parent = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ps1', $true)
@@ -1234,3 +1232,6 @@ IsEven 5
 
 # Microsoft Edge local settings file (JSON)
 "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Local State"
+
+# Bitlocker. Get-CimInstance has less properties
+Get-WmiObject -namespace Root\cimv2\security\MicrosoftVolumeEncryption -ClassName Win32_Encryptablevolume
