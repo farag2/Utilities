@@ -173,7 +173,7 @@ if (Test-Path -Path "$env:ProgramFiles\MPC-BE")
 
 	$Parameters = @{
 		Uri     = "https://raw.githubusercontent.com/farag2/Utilities/master/MPC-BE/mpc-be64.ini"
-		OutFile = "$env:ProgramFiles\MPC-BE x64\mpc-be64.ini"
+		OutFile = "$env:ProgramFiles\MPC-BE\mpc-be64.ini"
 		Verbose = $true
 	}
 	Invoke-WebRequest @Parameters
