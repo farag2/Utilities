@@ -1235,3 +1235,20 @@ IsEven 5
 
 # Bitlocker. Get-CimInstance has less properties
 Get-WmiObject -namespace Root\cimv2\security\MicrosoftVolumeEncryption -ClassName Win32_Encryptablevolume
+
+# Get real Windows version
+# https://dennisbabkin.com/blog/?t=how-to-tell-the-real-version-of-windows-your-app-is-running-on
+$Signature = @{
+	Namespace        = "WinAPI"
+	Name             = "Winbrand"
+	Language         = "CSharp"
+	MemberDefinition = @"
+[DllImport("Winbrand.dll", CharSet = CharSet.Unicode)]
+public extern static string BrandingFormatString(string sFormat);
+"@
+}
+if (-not ("WinAPI.Winbrand" -as [type]))
+{
+	Add-Type @Signature
+}
+[WinAPI.Winbrand]::BrandingFormatString("%WINDOWS_LONG%")
