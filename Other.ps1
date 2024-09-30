@@ -1252,3 +1252,7 @@ if (-not ("WinAPI.Winbrand" -as [type]))
 	Add-Type @Signature
 }
 [WinAPI.Winbrand]::BrandingFormatString("%WINDOWS_LONG%")
+
+# Invoke argument explicitly
+$EscapeParser = "--%"
+& "$env:SystemRoot\system32\reg.exe" $EscapeParser ADD HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /v TaskbarDa  /t REG_DWORD /d 0 /f
