@@ -38,7 +38,7 @@ foreach ($email in $Array)
 			$Parameters = @{
 				SmtpServer = $NameExchange
 				Port       = 25
-				From       = "test@test.com"
+				From       = $check_email
 				To         = $email
 				Subject    = "Test"
 				Body       = "Test"
@@ -98,7 +98,7 @@ foreach ($email in $Array)
 		# https://datatracker.ietf.org/doc/html/rfc1869#section-4
 		try
 		{
-			$streamWriter.WriteLine("HELO pierre-fabre.com")
+			$streamWriter.WriteLine("HELO $check_email")
 		}
 		catch
 		{
@@ -127,7 +127,7 @@ foreach ($email in $Array)
 			# Write-Verbose -Message $ehloResponse -Verbose
 		}
 
-		$streamWriter.WriteLine("MAIL FROM:<test@test.com>")
+		$streamWriter.WriteLine("MAIL FROM:<$check_email>")
 		$FromResponse = $streamReader.ReadLine()
 		if (-not ($FromResponse.StartsWith("250")))
 		{
