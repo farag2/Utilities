@@ -1256,3 +1256,20 @@ if (-not ("WinAPI.Winbrand" -as [type]))
 # Invoke argument explicitly
 $EscapeParser = "--%"
 & "$env:SystemRoot\system32\reg.exe" $EscapeParser ADD HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /v TaskbarDa  /t REG_DWORD /d 0 /f
+
+# Verify that IP address is IPv4 or IPv6
+$Parameters = @{
+	Uri             = "https://api64.ipify.org?format=json"
+	UseBasicParsing = $true
+	Verbose         = $true
+}
+$IPAddress = (Invoke-RestMethod @Parameters).ip
+
+if (([ipaddress]$IPAddress).Address)
+{
+	"IPv4"
+}
+else
+{
+	"IPv6"
+}
