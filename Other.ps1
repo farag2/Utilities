@@ -1264,7 +1264,6 @@ $Parameters = @{
 	Verbose         = $true
 }
 $IPAddress = (Invoke-RestMethod @Parameters).ip
-
 if (([ipaddress]$IPAddress).Address)
 {
 	"IPv4"
@@ -1273,3 +1272,6 @@ else
 {
 	"IPv6"
 }
+
+# Check if string is a GUID
+[System.Guid]::Parse("2c9eefa9-825a-4a27-bd2a-ad575a2b3d71") -is [guid]
