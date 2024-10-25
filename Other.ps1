@@ -1234,7 +1234,7 @@ IsEven 5
 "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Local State"
 
 # Bitlocker. Get-CimInstance has less properties
-Get-WmiObject -namespace Root\cimv2\security\MicrosoftVolumeEncryption -ClassName Win32_Encryptablevolume
+Get-WmiObject -Namespace Root\cimv2\security\MicrosoftVolumeEncryption -ClassName Win32_Encryptablevolume
 
 # Get real Windows version
 # https://dennisbabkin.com/blog/?t=how-to-tell-the-real-version-of-windows-your-app-is-running-on
@@ -1275,3 +1275,10 @@ else
 
 # Check if string is a GUID
 [System.Guid]::Parse("2c9eefa9-825a-4a27-bd2a-ad575a2b3d71") -is [guid]
+
+# Remove string in file
+$hosts = Get-Content -Path D:\1.txt -Encoding UTF8 -Force
+$hosts | ForEach-Object -Process {
+	$hosts = $hosts | Where-Object -FilterScript {$_ -notmatch "text_to_remove"}
+}
+$hosts | Set-Content -Path D:\1.txt -Encoding UTF8 -Force
