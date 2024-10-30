@@ -1273,7 +1273,7 @@ else
 	"IPv6"
 }
 
-# Check if string is a GUID
+# Check if a string is a GUID
 [System.Guid]::Parse("2c9eefa9-825a-4a27-bd2a-ad575a2b3d71") -is [guid]
 
 # Remove string in file
@@ -1282,3 +1282,10 @@ $hosts | ForEach-Object -Process {
 	$hosts = $hosts | Where-Object -FilterScript {$_ -notmatch "text_to_remove"}
 }
 $hosts | Set-Content -Path D:\1.txt -Encoding UTF8 -Force
+
+# Add a string to a file in particular line
+$Line = 27
+$String = "text"
+$file = (Get-Content -Path D:\1.txt -Encoding UTF8 -Force) -as [Collections.ArrayList]
+$file.Insert($Line, $String)
+$file | Set-Content -Path D:\1.txt -Encoding UTF8 -Force
