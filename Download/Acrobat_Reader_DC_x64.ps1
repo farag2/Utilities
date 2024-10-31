@@ -30,7 +30,7 @@ $saveName = (Invoke-RestMethod @Parameters).saveName
 if ($downloadURL -match "reader")
 {
 	$Parameters = @{
-		Uri = "https://rdc.adobe.io/reader/products?lang=en&site=enterprise&os=Windows 11&api_key=dc-get-adobereader-cdn"
+		Uri = "https://rdc.adobe.io/reader/products?lang=en&site=enterprise&os=Windows%2011&api_key=dc-get-adobereader-cdn"
 		UseBasicParsing = $true
 	}
 	$Version = (Invoke-RestMethod @Parameters).products.reader.version.Replace(".", "")
