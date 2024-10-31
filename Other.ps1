@@ -938,6 +938,20 @@ $File = Get-Content -Path D:\1.txt -Encoding UTF8
 $LineNumber = ($File | Select-String -Pattern "Pattern").LineNumber
 $x[($LineNumber-1)..($File.Count)] | Set-Content -Path D:\1.txt -Encoding UTF8 -Force
 
+# Remove string in file
+$hosts = Get-Content -Path D:\1.txt -Encoding UTF8 -Force
+$hosts | ForEach-Object -Process {
+	$hosts = $hosts | Where-Object -FilterScript {$_ -notmatch "text_to_remove"}
+}
+$hosts | Set-Content -Path D:\1.txt -Encoding UTF8 -Force
+
+# Add a string to a file in particular line
+$Line = 27
+$String = "text"
+$file = (Get-Content -Path D:\1.txt -Encoding UTF8 -Force) -as [Collections.ArrayList]
+$file.Insert($Line, $String)
+$file | Set-Content -Path D:\1.txt -Encoding UTF8 -Force
+
 # Remove string in file by text in it
 (Get-Content -Path "D:\1.txt") | Where-Object -FilterScript {$_ -notmatch "text"} | Set-Content -Path "D:\1.txt" -Force
 
@@ -1275,17 +1289,3 @@ else
 
 # Check if a string is a GUID
 [System.Guid]::Parse("2c9eefa9-825a-4a27-bd2a-ad575a2b3d71") -is [guid]
-
-# Remove string in file
-$hosts = Get-Content -Path D:\1.txt -Encoding UTF8 -Force
-$hosts | ForEach-Object -Process {
-	$hosts = $hosts | Where-Object -FilterScript {$_ -notmatch "text_to_remove"}
-}
-$hosts | Set-Content -Path D:\1.txt -Encoding UTF8 -Force
-
-# Add a string to a file in particular line
-$Line = 27
-$String = "text"
-$file = (Get-Content -Path D:\1.txt -Encoding UTF8 -Force) -as [Collections.ArrayList]
-$file.Insert($Line, $String)
-$file | Set-Content -Path D:\1.txt -Encoding UTF8 -Force
