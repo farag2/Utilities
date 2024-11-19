@@ -1153,6 +1153,7 @@ Test-Path -Path variable:MyVariable
 
 # Lockscreen wallpaper location
 %LOCALAPPDATA%\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\LocalState\Assets
+%APPDATA%\Microsoft\Windows\Themes\CachedFiles
 
 # Extract archive
 Start-Process -FilePath "$env:SystemRoot\System32\tar.exe" -ArgumentList "-xf `"$DownloadsFolder\Acrobat_DC_Web_x64_WWMUI.zip`" -C $DownloadsFolder --exclude `"WindowsInstaller-KB893803-v2-x86.exe`" --exclude `"VCRT_x64`" -v"
