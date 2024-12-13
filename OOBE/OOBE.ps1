@@ -24,7 +24,7 @@ if ($IsOOBEComplete)
 }
 
 $Parameters = @{
-	Uri             = "https://pastebin.com/raw/r2fwLARM"
+	Uri             = "https://raw.githubusercontent.com/farag2/Utilities/refs/heads/master/OOBE/OOBE.xml"
 	OutFile         = "$env:TEMP\UnattendOOBE.xml"
 	Verbose         = $true
 	UseBasicParsing = $true
