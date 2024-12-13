@@ -1,4 +1,4 @@
-# powershell -c "iwr https://raw.githubusercontent.com/farag2/Utilities/refs/heads/master/OOBE/OOBE.ps1 | iex"
+# powershell -c "iwr https://raw.githubusercontent.com/farag2/Utilities/refs/heads/master/OOBE/OOBE.ps1 -useb | iex"
 # https://schneegans.de/windows/unattend-generator/
 $Signature = @{
 	Namespace          = "WinAPI"
@@ -23,13 +23,21 @@ if ($IsOOBEComplete)
 	exit
 }
 
-$Parameters = @{
-	Uri             = "https://raw.githubusercontent.com/farag2/Utilities/refs/heads/master/OOBE/OOBE.xml"
-	OutFile         = "$env:TEMP\UnattendOOBE.xml"
-	Verbose         = $true
-	UseBasicParsing = $true
+try
+{
+	$Parameters = @{
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/refs/heads/master/OOBE/OOBE.xml"
+		OutFile         = "$env:TEMP\UnattendOOBE.xml"
+		Verbose         = $true
+		UseBasicParsing = $true
+	}
+	Invoke-RestMethod @Parameters
 }
-Invoke-RestMethod @Parameters
+catch [System.Net.WebException]
+{
+	Write-Warning -Message "Cannot establish Internet connection."
+	exit
+}
 
 foreach ($Letter in (Get-Volume).DriveLetter)
 {
