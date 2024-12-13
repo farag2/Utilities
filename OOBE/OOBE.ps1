@@ -23,7 +23,6 @@ if ($IsOOBEComplete)
 	exit
 }
 
-# https://github.com/farag2/Sophia-Script-for-Windows/blob/master/sophia_script_versions.json
 $Parameters = @{
 	Uri             = "https://pastebin.com/raw/r2fwLARM"
 	OutFile         = "$env:TEMP\UnattendOOBE.xml"
