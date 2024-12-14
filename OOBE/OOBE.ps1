@@ -23,21 +23,13 @@ if ($IsOOBEComplete)
 	exit
 }
 
-try
-{
-	$Parameters = @{
-		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/refs/heads/master/OOBE/OOBE.xml"
-		OutFile         = "$env:TEMP\UnattendOOBE.xml"
-		Verbose         = $true
-		UseBasicParsing = $true
-	}
-	Invoke-RestMethod @Parameters
+$Parameters = @{
+	Uri             = "https://raw.githubusercontent.com/farag2/Utilities/refs/heads/master/OOBE/OOBE.xml"
+	OutFile         = "$env:TEMP\UnattendOOBE.xml"
+	Verbose         = $true
+	UseBasicParsing = $true
 }
-catch [System.Net.WebException]
-{
-	Write-Warning -Message "Cannot establish Internet connection."
-	exit
-}
+Invoke-RestMethod @Parameters
 
 foreach ($Letter in (Get-Volume).DriveLetter)
 {
