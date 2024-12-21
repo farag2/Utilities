@@ -1,4 +1,3 @@
-exit
 # Re-register all UWP apps
 $Bundles = (Get-AppXPackage -PackageTypeFilter Framework -AllUsers).PackageFullName
 Get-ChildItem -Path "HKLM:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\PackageRepository\Packages" | ForEach-Object -Process {
@@ -6,9 +5,6 @@ Get-ChildItem -Path "HKLM:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Wi
 } | Where-Object -FilterScript {$_.Path -match "Program Files"} | Where-Object -FilterScript {$_.PSChildName -notin $Bundles} | Where-Object -FilterScript {$_.Path -match "x64"} | ForEach-Object -Process {
 	"$($_.Path)\AppxManifest.xml"
 } | Add-AppxPackage -Register -ForceApplicationShutdown -ForceUpdateFromAnyVersion -DisableDevelopmentMode -Verbose
-
-# Check for UWP apps updates
-Get-CimInstance -Namespace root/CIMV2/mdm/dmmap -ClassName MDM_EnterpriseModernAppManagement_AppManagement01 | Invoke-CimMethod -MethodName UpdateScanMethod
 #
 $PackagesIds = [Windows.Management.Deployment.PackageManager, Windows.Web, ContentType = WindowsRuntime]::new().FindPackages() | Select-Object -Property DisplayName -ExpandProperty Id | Select-Object -Property Name, DisplayName
 foreach ($AppxPackage in $AppxPackages)
@@ -16,15 +12,11 @@ foreach ($AppxPackage in $AppxPackages)
 	"$($AppxPackage.InstallLocation)\AppxManifest.xml" | Add-AppxPackage -Register -ForceApplicationShutdown -ForceUpdateFromAnyVersion -DisableDevelopmentMode -Verbose
 }
 
-# Allow to connect to a single label domain
-New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters -Name AllowSingleLabelDnsDomain -Value 1 -Force
+# Check for UWP apps updates
+Get-CimInstance -Namespace root/CIMV2/mdm/dmmap -ClassName MDM_EnterpriseModernAppManagement_AppManagement01 | Invoke-CimMethod -MethodName UpdateScanMethod
 
 # Find all non-USB & non-boot drives except nulled letter drives (external USB drives are excluded)
-(Get-Disk | Where-Object -FilterScript {$_.BusType -ne "USB" -and $_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object -Process {Join-Path ($_ + ":") $Path}
-# Find non-boot drives except nulled letter drives (external USB drives are not excluded)
-(Get-Disk | Where-Object -FilterScript {$_.IsBoot -eq $false} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object -Process {Join-Path ($_ + ":") $Path}
-# Find the first USB drive except nulled letter drives
-(Get-Disk | Where-Object -FilterScript {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter | ForEach-Object -Process {Join-Path ($_ + ":") $Path} | Select-Object -First 1
+(Get-Disk | Where-Object -FilterScript {($_.BusType -ne "USB") -and (-not $_.IsBoot)} | Get-Partition | Get-Volume | Where-Object -FilterScript {$_.DriveLetter}).DriveLetter
 
 # Add domains to hosts
 $hosts = "$env:SystemRoot\System32\drivers\etc\hosts"
@@ -43,6 +35,8 @@ Split-Path -Path file.ext -Leaf
 Split-Path -Path file.ext -Parent
 # Split the last folder name from the path
 Get-Item -Path file.ext | Split-Path -Parent | Split-Path -Parent | Split-Path -Leaf
+# Split the drive letter
+Split-Path -Path "D:\file.mp3" -Qualifier
 
 # Events categories
 enum Level
@@ -75,8 +69,6 @@ $WindowsPowerShell = @{
 Get-WinEvent -FilterHashtable $WindowsPowerShell | Where-Object -FilterScript {$_.Level -eq "3" -or $_.Level -eq "4"}
 #
 Get-WinEvent -LogName "Windows PowerShell" | Where-Object -FilterScript {$_.Message -match "HostApplication=(?<a>.*)"} | Format-List -Property *
-# Deprecated
-Get-EventLog -LogName "Windows PowerShell" -InstanceId 10 | Where-Object -FilterScript {$_.Message -match "powershell.exe"}
 #
 $Security = @{
 	LogName = "Security"
@@ -126,9 +118,6 @@ $Log = Get-LogProperties -Name Application
 $Log.Enabled = $true
 Set-LogProperties -LogDetails $logsource
 # & wevtutil.exe set-log Application /e
-
-# Split the drive letter
-Split-Path -Path "D:\file.mp3" -Qualifier
 
 # Get string hash
 function Get-StringHash
@@ -241,26 +230,6 @@ public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 $MainWindowHandle = (Get-Process -Name notepad | Where-Object -FilterScript {$_.MainWindowHandle -ne 0}).MainWindowHandle
 $MainWindowHandle | WindowState -State HIDE
 
-# Find drive letter when we know where file is but a drive letter is unknown
-# Suitable for situations when file is located on a USB drive
-function Get-ResolvedPath
-{
-	[CmdletBinding()]
-	param
-	(
-		[Parameter(
-			Mandatory = $true,
-			ValueFromPipeline = $true
-		)]
-		[string]
-		$Path
-	)
-
-	$DriveLetter = (Get-Disk | Where-Object -FilterScript {$_.BusType -eq "USB"} | Get-Partition | Get-Volume | Where-Object -FilterScript {$null -ne $_.DriveLetter}).DriveLetter
-	$DriveLetter | ForEach-Object -Process {[string]$_ + ":\" + $Path}
-}
-Get-ResolvedPath -Path "Folder\folder" | Copy-Item -Destination $env:SystemRoot\Cursors -Force
-
 # Become a file owner
 takeown /F D:\file.exe
 icacls D:\file.exe /grant:r %username%:F
@@ -318,14 +287,65 @@ $bytes = [System.BitConverter]::GetBytes($int)
 $int = [System.BitConverter]::ToInt32($bytes, 0)
 '0x{0:x}' -f $int
 
-# Disable net protocols
-Disable-NetAdapterBinding -Name Ethernet -ComponentID @("ms_tcpip6", "ms_pacer")
-
 # Find all uninstalled updates
 $UpdateSession = New-Object -ComObject Microsoft.Update.Session
 $UpdateSearcher = $UpdateSession.CreateupdateSearcher()
 $Updates = @($UpdateSearcher.Search("IsHidden=0 and IsInstalled=0").Updates)
 $Updates | Select-Object -ExpandProperty Title
+
+# Trigger Windows Update for detecting new updates
+# https://michlstechblog.info/blog/windows-10-trigger-detecting-updates-from-command-line
+# https://omgdebugging.com/2017/10/09/command-line-equivalent-of-wuauclt-in-windows-10-windows-server-2016/
+Start-Process -FilePath "$env:SystemRoot\System32\UsoClient.exe" -ArgumentList StartInteractiveScan
+
+# Exclude KB update from installing
+(New-Object -ComObject Microsoft.Update.Session).CreateUpdateSearcher().Search("IsHidden = 0").Updates | Where-Object -FilterScript {$_.KBArticleIDs -eq "5005463"} | ForEach-Object -Process {$_.IsHidden = $true}
+
+# Check for a Windows Update pending reboot
+$Parameters = @{
+	Namespace  = "root\CIMv2"
+	ClassName  = "StdRegProv"
+	MethodName = "EnumKey"
+}
+
+$Parameters.Arguments = @{
+	hDefKey     = [UInt32]2147483650
+	sSubKeyName = "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
+}
+(Invoke-CimMethod @Parameters).sNames -contains "RebootPending"
+
+$Parameters.Arguments = @{
+	hDefKey     = [UInt32]2147483650
+	sSubKeyName = "SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update"
+}
+(Invoke-CimMethod @Parameters).sNames -contains "RebootRequired"
+
+# Get KB update status
+$Setup = @{
+	LogName      = "Setup"
+	ProviderName = "Microsoft-Windows-Servicing"
+}
+foreach ($KBid in @("KB5026446"))
+{
+	Get-WinEvent -FilterHashTable $Setup | Where-Object -FilterScript {$_.Message -like "*$KBid*"} | Format-Table -Wrap
+}
+#
+Get-WindowsPackage -Online -PackageName Package_for_RollupFix* | Sort-Object -Descending | Format-Table PackageName, InstallTime, PackageState, SupportInformation
+
+# Get Windows updates installed
+Get-CimInstance -ClassName Win32_ReliabilityRecords
+Get-CimInstance -ClassName Win32_QuickFixEngineering
+Get-HotFix
+Get-Package -ProviderName msu
+#
+$Session = New-Object -ComObject "Microsoft.Update.Session"
+# [Activator]::CreateInstance([type]::GetTypeFromProgID("Microsoft.Update.Session"))
+$Searcher = $Session.CreateUpdateSearcher()
+$HistoryCount = $Searcher.GetTotalHistoryCount()
+if ($HistoryCount -gt 0)
+{
+	$Searcher.QueryHistory(0,$HistoryCount)
+}
 
 # Closed the specific File Explorer window
 $FolderName = "D:\folder"
@@ -359,6 +379,17 @@ $parent.Close()
 
 # Drives properties
 Get-PhysicalDisk | Get-StorageReliabilityCounter | Select-Object -Property *
+
+# Get NVidia videocard temperature
+nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader
+
+# Get disks temperature
+Get-PhysicalDisk | Get-Disk | ForEach-Object -Process {
+	[PSCustomObject]@{
+		Disk        = $_.FriendlyName
+		Temperature = (Get-PhysicalDisk -DeviceNumber $_.DiskNumber | Get-StorageReliabilityCounter).Temperature
+	}
+}
 
 # Show all autostarts. Even drivers
 Get-EventLog -LogName System -InstanceId 1073748869 | ForEach-Object {
@@ -442,14 +473,10 @@ sfc /scannow /offbootdir=C:\ /offwindir=C:\Windows
 DISM /Online /Cleanup-Image /StartComponentCleanup /ResetBase
 
 # Check if a file is saved in UTF-8 with BOM encoding
-if ($PSCommandPath)
+$bytes = Get-Content -Path $file -Encoding Byte -Raw
+if (($bytes[0] -ne 239) -and ($bytes[1] -ne 187) -and ($bytes[2] -ne 191))
 {
-	$bytes = Get-Content -Path $PSCommandPath -Encoding Byte -Raw
-	if ($bytes[0] -ne 239 -and $bytes[1] -ne 187 -and $bytes[2] -ne 191)
-	{
-		Write-Warning -Message "The script wasn't saved in `"UTF-8 with BOM`" encoding"
-		break
-	}
+	Write-Warning -Message "The script wasn't saved in `"UTF-8 with BOM`" encoding"
 }
 
 # Write-Progress
@@ -584,7 +611,7 @@ Write-Verbose -Message "Total number of lines: $i" -Verbose
 #
 $a = 0
 Get-ChildItem -Path D:\Sophia-Script-for-Windows\src -File -Recurse | ForEach-Object -Process {
-    $a += ((Get-Content -Path $_.FullName).Count | Measure-Object -Sum).Sum
+	$a += ((Get-Content -Path $_.FullName).Count | Measure-Object -Sum).Sum
 }
 Write-Verbose -Message "Total number of lines: $i" -Verbose
 
@@ -709,39 +736,9 @@ $ParentFolder = Split-Path -Path $Paths.FullName -Parent
 $Array = @('Handshake', 'Success', 'Status', 200, '192.30.253.113', 'OK', 0xF, "2001:4860:4860::8888")
 $Array | Where-Object -FilterScript {-not ($_ -as [Double]) -and ($_ -as [IPAddress])}
 
-# Trigger Windows Update for detecting new updates
-# https://michlstechblog.info/blog/windows-10-trigger-detecting-updates-from-command-line
-# https://omgdebugging.com/2017/10/09/command-line-equivalent-of-wuauclt-in-windows-10-windows-server-2016/
-Start-Process -FilePath "$env:SystemRoot\System32\UsoClient.exe" -ArgumentList StartInteractiveScan
-
-# Exclude KB update from installing
-(New-Object -ComObject Microsoft.Update.Session).CreateUpdateSearcher().Search("IsHidden = 0").Updates | Where-Object -FilterScript {$_.KBArticleIDs -eq "5005463"} | ForEach-Object -Process {$_.IsHidden = $true}
-
 # Download and install all Store related UWP packages. Even for LTSC
 # Reboot required about execution
 wsreset -i
-
-# Save file in the UTF-8 without BOM encoding
-Set-Content -Value (New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false).GetBytes($(Get-Content -Path d:\file.txt -Raw)) -Encoding Byte -Path d:\file.txt -Force
-
-# Check for a Windows Update pending reboot
-$Parameters = @{
-	Namespace  = "root\CIMv2"
-	ClassName  = "StdRegProv"
-	MethodName = "EnumKey"
-}
-
-$Parameters.Arguments = @{
-	hDefKey     = [UInt32]2147483650
-	sSubKeyName = "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
-}
-(Invoke-CimMethod @Parameters).sNames -contains "RebootPending"
-
-$Parameters.Arguments = @{
-	hDefKey     = [UInt32]2147483650
-	sSubKeyName = "SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update"
-}
-(Invoke-CimMethod @Parameters).sNames -contains "RebootRequired"
 
 # Since Windows 22H2 22557 build
 # https://oofhours.com/2022/04/27/language-pack-handling-in-windows-11-continues-to-evolve/
@@ -886,17 +883,6 @@ if (-not $IsAdmin)
 	exit
 }
 & "$PSScriptRoot\File.ps1"
-
-# Get NVidia videocard temperature
-nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader
-
-# Get disks temperature
-Get-PhysicalDisk | Get-Disk | ForEach-Object -Process {
-	[PSCustomObject]@{
-		Disk        = $_.FriendlyName
-		Temperature = (Get-PhysicalDisk -DeviceNumber $_.DiskNumber | Get-StorageReliabilityCounter).Temperature
-	}
-}
 
 # Check Internet connection. Works even if ICMP echo is disabled
 # https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol
@@ -1096,18 +1082,6 @@ $Files = @("D:\file1.txt", "D:\file2.txt", "D:\file3.txt")
 if (-not (($Files | Test-Path) -contains $true))
 {}
 
-# Get KB update status
-$Setup = @{
-	LogName      = "Setup"
-	ProviderName = "Microsoft-Windows-Servicing"
-}
-foreach ($KBid in @("KB5026446"))
-{
-	Get-WinEvent -FilterHashTable $Setup | Where-Object -FilterScript {$_.Message -like "*$KBid*"} | Format-Table -Wrap
-}
-#
-Get-WindowsPackage -Online -PackageName Package_for_RollupFix* | Sort-Object -Descending | Format-Table PackageName, InstallTime, PackageState, SupportInformation
-
 # Count occurrences of specific character in a string 
 ("//sp13/sites/1/2/3".ToCharArray() | Where-Object -FilterScript {$_ -eq "1"} | Measure-Object).Count
 
@@ -1157,7 +1131,7 @@ Test-Path -Path variable:MyVariable
 %APPDATA%\Microsoft\Windows\Themes\CachedFiles
 
 # Extract archive
-Start-Process -FilePath "$env:SystemRoot\System32\tar.exe" -ArgumentList "-xf `"$DownloadsFolder\Acrobat_DC_Web_x64_WWMUI.zip`" -C $DownloadsFolder --exclude `"WindowsInstaller-KB893803-v2-x86.exe`" --exclude `"VCRT_x64`" -v"
+& "$env:SystemRoot\System32\tar.exe" -xvf "$DownloadsFolder\Acrobat_DC_Web_x64_WWMUI.zip" -C $DownloadsFolder --exclude "WindowsInstaller-KB893803-v2-x86.exe" --exclude "VCRT_x64"
 #
 function ExtractZIPFolder
 {
@@ -1224,25 +1198,10 @@ $Parameters = @{
 }
 Invoke-RestMethod @Parameters
 
-# Get Windows updates installed
-Get-CimInstance -ClassName Win32_ReliabilityRecords
-Get-CimInstance -ClassName Win32_QuickFixEngineering
-Get-HotFix
-Get-Package -ProviderName msu
-#
-$Session = New-Object -ComObject "Microsoft.Update.Session"
-# [Activator]::CreateInstance([type]::GetTypeFromProgID("Microsoft.Update.Session"))
-$Searcher = $Session.CreateUpdateSearcher()
-$HistoryCount = $Searcher.GetTotalHistoryCount()
-if ($HistoryCount -gt 0)
-{
-	$Searcher.QueryHistory(0,$HistoryCount)
-}
-
 # Check if integer is even or odd
 function IsEven($number)
 {
-    ($number % 2) -eq 0
+	($number % 2) -eq 0
 }
 IsEven 5
 
