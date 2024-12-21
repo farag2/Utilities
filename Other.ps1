@@ -876,7 +876,7 @@ Start-Process -FilePath ($DriveLetter + ":\" + "WinSDKSetup.exe") @("/features",
 Dismount-DiskImage -ImagePath "$PSScriptRoot\WindowsSDK.iso"
 
 # Auto elevate script
-$IsAdmin = ([Security.ncipal.Windowsncipal][Security.ncipal.WindowsIdentity]::GetCurrent()).IsInRole([Security.ncipal.WindowsBuiltInRole]"Administrator")
+$IsAdmin = ((New-Object -TypeName System.Security.Principal.WindowsPrincipal([System.Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))
 if (-not $IsAdmin)
 {
 	Start-Process -FilePath powershell.exe -ArgumentList "-ExecutionPolicy Bypass -NoProfile -NoLogo -File `"$PSCommandPath`"" -Verb Runas
