@@ -1257,3 +1257,12 @@ $CurrentUserName = (Get-Process -Id $PID -IncludeUserName).UserName | Split-Path
 # (Get-Process -Name explorer -IncludeUserName | Where-Object -FilterScript {$_.SessionId -eq $CurrentSessionId}).UserName | Select-Object -First 1 | Split-Path -Leaf
 $LoginUserName = (Get-CimInstance -ClassName Win32_Process -Filter "name='explorer.exe'" | Invoke-CimMethod -MethodName GetOwner | Select-Object -First 1).User
 # (New-Object -TypeName System.Security.Principal.WindowsPrincipal([System.Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)
+
+# Helps find internals of functions, arguments, values, etc
+$PSBoundParameters
+$MyInvocation.BoundParameters
+Get-PSCallStack
+$MyInvocation
+Get-Variable -Name MyInvocation -Scope Script
+$ExecutionContext
+$PSCmdlet
