@@ -1266,3 +1266,6 @@ $MyInvocation
 Get-Variable -Name MyInvocation -Scope Script
 $ExecutionContext
 $PSCmdlet
+
+# Show all icons in notification area. Applicable for only Windows 11
+New-ItemProperty -Path "HKCU:\Control Panel\NotifyIconSettings\*" -Name IsPromoted2 -PropertyType DWord -Value 1 -Force
