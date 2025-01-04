@@ -25,11 +25,12 @@ net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
 # Change SSH port
 # /etc/ssh/ssd_config
+# Should not be used in other cases
 Port=port_number
-# disable roo account. Needed another user with sudo access level
+# disable root account. Needed another user with sudo access level
 PermitRootLogin=no
 systemctl restart ssh
 
-https://github.com/XTLS/Xray-core
-https://github.com/MHSanaei/3x-ui
+# https://github.com/XTLS/Xray-core
+# https://github.com/MHSanaei/3x-ui
 bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
