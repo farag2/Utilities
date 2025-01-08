@@ -24,7 +24,7 @@ net.ipv4.icmp_echo_ignore_all = 1
 net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
 # Change SSH port
-# /etc/ssh/ssd_config
+# /etc/ssh/sshd_config
 # Should not be used in other cases
 Port=port_number
 # disable root account. Needed another user with sudo access level
