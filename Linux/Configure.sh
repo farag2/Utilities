@@ -20,16 +20,22 @@ passwd
 # Disable ICMP ping response
 # /etc/sysctl.conf
 net.ipv4.icmp_echo_ignore_all = 1
+
 # Enable BBR
 net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
+
 # Change SSH port
 # /etc/ssh/sshd_config
 # Should not be used in other cases
 Port=port_number
+
 # disable root account. Needed another user with sudo access level
 PermitRootLogin=no
 systemctl restart ssh
+
+# Check Internet speed connection
+wget -qO- bench.sh | bash
 
 # https://github.com/XTLS/Xray-core
 # https://github.com/MHSanaei/3x-ui
