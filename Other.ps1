@@ -435,12 +435,14 @@ $HT = @{
 Test-FileCatalog @HT
 
 # Reset local user password via WinPE
-# In the WinPE
+# In WinPE
 MOVE C:\Windows\system32\utilman.exe C:\Windows\system32\utilman.exe.bak
 RENAME C:\Windows\system32\utilman.exe utilman.exe.bak
 COPY C:\Windows\system32\cmd.exe C:\Windows\system32\utilman.exe
 wpeutil reboot
-#
+# in Windows
+control userpasswords2
+# or
 $user = (Get-LocalUser | Where-Object -FilterScript {$_.Enabled}).Name
 $user
 $Password = Read-Host -Prompt "Enter the new password" -AsSecureString
