@@ -1,5 +1,6 @@
 # Download file from SFTP server via WinSCP
 # https://winscp.net/eng/docs/library#classes
+# C:\Windows\Microsoft.NET\Framework64\v4.0.30319\RegAsm.exe WinSCPnet.dll /codebase /tlb:WinSCPnet64.tlb 
 
 Add-Type -Path "D:\WinSCPnet.dll"
 
