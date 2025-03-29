@@ -755,6 +755,10 @@ Uninstall-Language
 # Bypass the Internet account creation in Windows 11
 # Shift+F10
 OOBE\BYPASSNRO
+# 26200.5516, 26120.3653
+New-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE -Name BypassNRO -PropertyType REG_DWORD -Value 1 -Force
+# Reboot
+wpeutil reboot
 # Windows 11 Insider Preview 25120+
 # This method requires to invoke the following commands if user doesn't use password
 # Otherwise even if password is blank OS will ask to prolong it and block access
