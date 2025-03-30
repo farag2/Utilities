@@ -757,6 +757,7 @@ Uninstall-Language
 OOBE\BYPASSNRO
 # 26200.5516, 26120.3653
 New-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE -Name BypassNRO -PropertyType REG_DWORD -Value 1 -Force
+start ms-cxh:localonly
 # Reboot
 wpeutil reboot
 # Windows 11 Insider Preview 25120+
