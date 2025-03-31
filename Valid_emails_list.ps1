@@ -4,7 +4,7 @@ $check_email = "test@domain.com"
 $SaveFile = "D:\1.txt"
 $Domain = ([mailaddress]$check_email).Host
 
-$Array = @("noreply_pfrussia@pierre-fabre.com")
+$Array = @()
 foreach ($email in $Array)
 {
 	# Initial check
