@@ -2,7 +2,7 @@
 # https://github.com/gscales/Powershell-Scripts/blob/master/TLS-SMTPMod.ps1
 $check_email = "test@domain.com"
 $SaveFile = "D:\1.txt"
-$Domain = "domain.com"
+$Domain = ([mailaddress]$check_email).Host
 
 $Array = @("noreply_pfrussia@pierre-fabre.com")
 foreach ($email in $Array)
