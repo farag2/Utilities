@@ -1,29 +1,33 @@
 # Validate emails by sending commands to an SMTP server 
 # https://github.com/gscales/Powershell-Scripts/blob/master/TLS-SMTPMod.ps1
-$check_email = test@test.com
-$Array = @()
+$check_email = "test@domain.com"
+$SaveFile = "D:\1.txt"
+$Domain = "domain.com"
+
+$Array = @("noreply_pfrussia@pierre-fabre.com")
 foreach ($email in $Array)
 {
-  # Initial check
+	# Initial check
 	try
 	{
 		$Parameters = @{
 			Name = ([mailaddress]$email).Host
 			Type = "MX"
 		}
+
 		try
 		{
 			$Resolve = Resolve-DnsName @Parameters -ErrorAction Stop
 		}
 		catch
 		{
-			Add-Content -Path D:\1.txt -Value "$email. Initial check failed" -Force
+			Add-Content -Path $SaveFile -Value "$email. Initial check failed" -Force
 			continue
 		}
 	}
 	catch
 	{
-		Add-Content -Path D:\1.txt -Value "$email. Initial check failed" -Force
+		Add-Content -Path $SaveFile -Value "$email. Initial check failed" -Force
 		continue
 	}
 
@@ -34,7 +38,6 @@ foreach ($email in $Array)
 		<#
 		if ($Resolve)
 		{
-			
 			$Parameters = @{
 				SmtpServer = $NameExchange
 				Port       = 25
@@ -56,7 +59,7 @@ foreach ($email in $Array)
 		catch
 		{
 			Write-Warning -Message "$email. Connection was forcibly closed by the remote host"
-			Add-Content -Path D:\1.txt -Value "$email. Connection was forcibly closed by the remote host" -Force
+			Add-Content -Path $SaveFile -Value "$email. Connection was forcibly closed by the remote host" -Force
 
 			continue
 		}
@@ -70,7 +73,7 @@ foreach ($email in $Array)
 		catch
 		{
 			Write-Warning -Message "$email. Cannot access a disposed object"
-			Add-Content -Path D:\1.txt -Value "$email. Cannot access a disposed object" -Force
+			Add-Content -Path $SaveFile -Value "$email. Cannot access a disposed object" -Force
 
 			$stream.Close()
 
@@ -83,7 +86,7 @@ foreach ($email in $Array)
 		if (-not ($ConnectResponse.StartsWith("220")))
 		{
 			Write-Warning -Message $ConnectResponse
-			Add-Content -Path D:\1.txt -Value "$email. $ConnectResponse" -Force
+			Add-Content -Path $SaveFile -Value "$email. $ConnectResponse" -Force
 
 			$streamWriter.WriteLine("QUIT")
 			$stream.Close()
@@ -98,12 +101,12 @@ foreach ($email in $Array)
 		# https://datatracker.ietf.org/doc/html/rfc1869#section-4
 		try
 		{
-			$streamWriter.WriteLine("HELO $check_email")
+			$streamWriter.WriteLine("HELO $Domain")
 		}
 		catch
 		{
 			Write-Warning -Message "$email. Cannot access a disposed object"
-			Add-Content -Path D:\1.txt -Value "$email. Cannot access a disposed object" -Force
+			Add-Content -Path $SaveFile -Value "$email. Cannot access a disposed object" -Force
 
 			$streamWriter.WriteLine("QUIT")
 			$stream.Close()
@@ -115,7 +118,7 @@ foreach ($email in $Array)
 		if (-not ($ehloResponse.StartsWith("250")))
 		{
 			Write-Warning -Message $ehloResponse
-			Add-Content -Path D:\1.txt -Value "$email. $ehloResponse" -Force
+			Add-Content -Path $SaveFile -Value "$email. $ehloResponse" -Force
 
 			$streamWriter.WriteLine("QUIT")
 			$stream.Close()
@@ -132,7 +135,7 @@ foreach ($email in $Array)
 		if (-not ($FromResponse.StartsWith("250")))
 		{
 			Write-Warning -Message $FromResponse
-			Add-Content -Path D:\1.txt -Value "$email. $FromResponse" -Force
+			Add-Content -Path $SaveFile -Value "$email. $FromResponse" -Force
 
 			$streamWriter.WriteLine("QUIT")
 			$stream.Close()
@@ -150,7 +153,7 @@ foreach ($email in $Array)
 		if (-not ($Quit.StartsWith("221")))
 		{
 			Write-Warning -Message $ToResponse
-			Add-Content -Path D:\1.txt -Value "$email. $Quit" -Force
+			Add-Content -Path $SaveFile -Value "$email. $Quit" -Force
 
 			$streamWriter.WriteLine("QUIT")
 			$stream.Close()
