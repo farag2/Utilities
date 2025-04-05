@@ -1276,3 +1276,10 @@ $PSCmdlet
 
 # Show all icons in notification area. Applicable for only Windows 11
 New-ItemProperty -Path "HKCU:\Control Panel\NotifyIconSettings\*" -Name IsPromoted2 -PropertyType DWord -Value 1 -Force
+
+# Publish a chocolatey package
+cd D:\folder_where_package_will_be_created
+choco new <package_name>
+choco pack D:\folder_where_package_will_be_created\<package_name>\sophia.nuspec
+choco install <package_name> --source D:\folder_where_package_will_be_created --force -y
+choco uninstall <package_name> -y
