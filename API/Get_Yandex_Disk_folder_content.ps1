@@ -1,5 +1,5 @@
 # https://oauth.yandex.ru
-# Open https://oauth.yandex.ru/authorize?response_type=token&client_id=<Your_ClientID> and your Token
+# Open https://oauth.yandex.ru/authorize?response_type=token&client_id=<Your_ClientID> and obtain your Token
 # https://yandex.ru/dev/disk-api/doc/ru/concepts/quickstart
 
 # Rights needed
