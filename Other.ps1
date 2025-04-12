@@ -1286,3 +1286,15 @@ choco uninstall <package_name> -y
 
 # Get hashsum of a remote file
 Get-FileHash -InputStream (Invoke-WebRequest -Uri $URL -UseBasicParsing).RawContentStream
+
+# Publish a new package to PowerShell Gallery
+# https://github.com/PowerShell/PSResourceGet
+Install-Module -Name Microsoft.PowerShell.PSResourceGet -Force
+# Manifest and module files must be in the root folder, unless nupkg file won't contain all project files
+$Parameters = @{
+	ApiKey     = "your_token" # https://www.powershellgallery.com/account/apikeys
+	Repository = "PSGallery"
+	Path       = "D:\path_to_manifest_folder"
+	Verbose    = $true
+}
+Publish-PSResource @Parameters
