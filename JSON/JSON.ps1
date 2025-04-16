@@ -96,3 +96,13 @@ Remove-TypeData -TypeName System.Array
 $Ids = (Get-Content -Path "D:\Downloads\1.js" -Encoding UTF8 -Raw | ConvertFrom-Json).Id
 $UniqueIds = $Ids | Select-Object -Unique
 (Compare-Object -ReferenceObject $UniqueIds -DifferenceObject $Ids).InputObject
+
+# Find value in JSON file by name
+<#
+{
+  "1": "2",
+  "3": "4"
+}
+#>
+$SHA256SUM = Get-Content -Path "D:\Desktop\1.json" | ConvertFrom-Json
+$SHA256SUM.PSObject.Properties | Where-Object -FilterScript {$_.Name -eq "3"}
