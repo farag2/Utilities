@@ -1298,3 +1298,13 @@ $Parameters = @{
 	Verbose    = $true
 }
 Publish-PSResource @Parameters
+
+# Hide Windows update by title
+$ServiceManager = New-Object -ComObject Microsoft.Update.ServiceManager
+$ServiceID = ($ServiceManager.Services | Where-Object -FilterScript {$_.Name -eq "Microsoft Update"}).ServiceID
+$Session = New-Object -ComObject "Microsoft.Update.Session"
+$Searcher = $Session.CreateUpdateSearcher()
+$Searcher.ServerSelection = 3
+$Searcher.ServiceID = $ServiceID
+$Results = $Searcher.Search("IsHidden = 0")
+($Results.Updates | Where-Object -FilterScript {$_.Title -match "HP - USB"}).IsHidden = "1"
