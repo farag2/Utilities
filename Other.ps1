@@ -262,6 +262,15 @@ $Path = "D:\folder"
 $Extension = "flac"
 Get-ChildItem -Path $Path -Filter *.$Extension | Rename-Item -NewName {(Get-Culture).TextInfo.ToTitleCase($_.BaseName) + $_.Extension}
 
+# Rename files in folder by pattern
+# Black_1, Black_2, etc.
+$PartNumber = "Black"
+$i = 1
+Get-ChildItem -Path D:\folder | ForEach-Object -Process {
+	Rename-Item -Path $_.FullName -NewName "$($PartNumber)_$i$($_.Extension)" -Force
+	$i++
+}
+
 # Capitalize the first letters
 $String = "аа аа аа"
 (Get-Culture).TextInfo.ToTitleCase($String.ToLower())
