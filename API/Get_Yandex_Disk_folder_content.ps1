@@ -1,14 +1,30 @@
-# https://oauth.yandex.ru
-# Open https://oauth.yandex.ru/authorize?response_type=token&client_id=<Your_ClientID> and obtain your Token
-# https://yandex.ru/dev/disk-api/doc/ru/concepts/quickstart
+<#
+	.PARAMETER Path
+	Path to Yandex Disk folder to rename files
 
-# Rights needed
-# cloud_api:disk.app_folder
-# cloud_api:disk.read
-# cloud_api:disk.info
-# cloud_api:disk.write
-# yadisk:disk
+	.PARAMETER Token
+	Yandex Disk token
 
+	.EXAMPLE
+	Get-YandexDiskContent -Path disk:/folder -Token your_token
+
+	.ACCESS LEVEL
+	cloud_api:disk.app_folder
+	cloud_api:disk.read
+	cloud_api:disk.info
+	cloud_api:disk.write
+	yadisk:disk
+
+	.NOTES
+	disk:/folder
+
+	.LINK
+	https://oauth.yandex.ru
+	https://oauth.yandex.ru/verification_code
+	https://oauth.yandex.ru/authorize?response_type=token&client_id=<clientid>
+	https://oauth.yandex.ru/client/new/
+	https://yandex.ru/dev/disk-api/doc/ru/concepts/quickstart
+#>
 function Get-YandexDiskContent
 {
 	param
@@ -38,27 +54,20 @@ function Get-YandexDiskContent
 	}
 	$Response = Invoke-RestMethod @Parameters
 
-	$items = $response._embedded.items | ForEach-Object -Process {
-		$Type = if ($_.type -eq "dir")
-		{
-			"Folder"
-		}
-		else
-		{
-			"File"
-		}
+	$Response._embedded.items | ForEach-Object -Process {
+		$Type = if ($_.type -eq "dir") {"Folder"} else {"File"}
 
 		[PSCustomObject]@{
-			Name  = $_.name
-			Type  = $Type
-			Path  = $_.path
+			Name = $_.name
+			Type = $Type
+			Path = $_.path
 		}
 	}
-
-	return $items
 }
 
-# Your token from https://oauth.yandex.ru/authorize?response_type=token&client_id=<Your_ClientID> page
-$Token = ""
-# disk:/folder
-Get-YandexDiskContent -Path "disk:/folder" -Token $Token | Format-Table -AutoSize
+$Parameters = @{
+	Path  = "disk:/folder"
+ 	# Your token from https://oauth.yandex.ru/authorize?response_type=token&client_id=<Your_ClientID> page
+	Token = ""
+}
+Get-YandexDiskContent @Parameters | Format-Table -AutoSize
