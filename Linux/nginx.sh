@@ -1,3 +1,6 @@
+# https://freedirector.io/dashboard
+# https://forwarddomain.net
+
 # Enable permanent redirection
 sudo nano /etc/nginx/sites-available/<subdomain>
 
