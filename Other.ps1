@@ -1317,3 +1317,8 @@ $Searcher.ServerSelection = 3
 $Searcher.ServiceID = $ServiceID
 $Results = $Searcher.Search("IsHidden = 0")
 ($Results.Updates | Where-Object -FilterScript {$_.Title -match "HP - USB"}).IsHidden = "1"
+
+# WinGet
+winget validate --manifest D:\Downloads\<version>
+winget install --manifest D:\Downloads\<version>
+winget uninstall --manifest D:\Downloads\<version>
