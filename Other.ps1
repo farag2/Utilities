@@ -1284,7 +1284,7 @@ $ExecutionContext
 $PSCmdlet
 
 # Show all icons in notification area. Applicable for only Windows 11
-New-ItemProperty -Path "HKCU:\Control Panel\NotifyIconSettings\*" -Name IsPromoted2 -PropertyType DWord -Value 1 -Force
+New-ItemProperty -Path "HKCU:\Control Panel\NotifyIconSettings" -Name IsPromoted2 -PropertyType DWord -Value 1 -Force
 
 # Publish a chocolatey package
 cd D:\folder_where_package_will_be_created
@@ -1322,3 +1322,18 @@ $Results = $Searcher.Search("IsHidden = 0")
 winget validate --manifest D:\Downloads\<version>
 winget install --manifest D:\Downloads\<version>
 winget uninstall --manifest D:\Downloads\<version>
+
+# Open dialog
+Add-Type -AssemblyName System.Windows.Forms
+$OpenFileDialog = New-Object -TypeName System.Windows.Forms.OpenFileDialog
+$OpenFileDialog.Filter = "*.exe|*.exe|{0} (*.*)|*.*" -f $Localization.AllFilesFilter
+# This PC
+$OpenFileDialog.InitialDirectory = "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
+$OpenFileDialog.Multiselect = $false
+
+# Force move the open file dialog to the foreground
+$Focus = New-Object -TypeName System.Windows.Forms.Form -Property @{TopMost = $true}
+$OpenFileDialog.ShowDialog($Focus)
+
+if ($OpenFileDialog.FileName)
+{}
