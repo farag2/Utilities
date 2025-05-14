@@ -113,6 +113,46 @@ $ParentProcess = @{
 }
 Get-WinEvent -LogName Security | Where-Object -FilterScript {$_.Id -eq "4688"} | Where-Object -FilterScript {$_.Properties[5].Value -match 'conhost'} | Select-Object TimeCreated, $ParentProcess | Select-Object -First 10
 
+# Audit for registry key
+# secpol.msc — Advanced audit policy configuration — System audit policies — Object access — Audit registry
+# Enable auditing for a path in the Windows registry
+$Security = @{
+	LogName      = "Security"
+	ProviderName = "Microsoft-Windows-Security-Auditing"
+	Id           = 4657
+	# For the past 5 days
+	#StartTime   = (Get-Date).AddHours(-120)
+}
+$Path = @{
+	Name       = "Path"
+	Expression = {$_.Properties[4].Value}
+}
+$Time = @{
+	Name       = "Time"
+	Expression = {$_.TimeCreated}
+}
+$User = @{
+	Name       = "User"
+	Expression = {$_.Properties[1].Value}
+}
+$Process = @{
+	Name       = "Process"
+	Expression = {$_.Properties[13].Value}
+}
+$ObjectValueName = @{
+	Name       = "ObjectValueName"
+	Expression = {$_.Properties[5].Value}
+}
+$OldValue = @{
+	Name       = "Old Value"
+	Expression = {$_.Properties[9].Value}
+}
+$NewValue = @{
+	Name       = "New Value"
+	Expression = {$_.Properties[11].Value}
+}
+Get-WinEvent -FilterHashtable $Security | Select-Object $Path, $Time, $User, $Process, $ObjectValueName, $OldValue, $NewValue | Format-List
+
 # Enable Event Log
 $Log = Get-LogProperties -Name Application
 $Log.Enabled = $true
