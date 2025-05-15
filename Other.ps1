@@ -1370,10 +1370,11 @@ $OpenFileDialog.Filter = "*.exe|*.exe|{0} (*.*)|*.*" -f $Localization.AllFilesFi
 # This PC
 $OpenFileDialog.InitialDirectory = "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
 $OpenFileDialog.Multiselect = $false
-
 # Force move the open file dialog to the foreground
 $Focus = New-Object -TypeName System.Windows.Forms.Form -Property @{TopMost = $true}
 $OpenFileDialog.ShowDialog($Focus)
-
 if ($OpenFileDialog.FileName)
 {}
+
+# Check if item is a number/digit
+($_ -as [version]) -or ($_ -is [int])
