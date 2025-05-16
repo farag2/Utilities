@@ -22,7 +22,7 @@ else
 	exit
 }
 
-	$Updates | ForEach-Object -Process {$_.AcceptEula()}
+$Updates | ForEach-Object -Process {$_.AcceptEula()}
 
 Write-Verbose -Message "Downloading Drivers..." -Verbose
 
