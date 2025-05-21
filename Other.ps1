@@ -1378,3 +1378,7 @@ if ($OpenFileDialog.FileName)
 
 # Check if item is a number/digit
 ($_ -as [version]) -or ($_ -is [int])
+
+# Start Company Portal sync
+Start-Process -FilePath "intunemanagementextension://syncapp" -Wait
+
