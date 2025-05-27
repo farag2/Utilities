@@ -42,12 +42,12 @@ wget -qO- bench.sh | bash
 bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
 
 # cron
-# System jobs
-/var/spool/cron/crontabs
-
 # List cron jobs
 sudo crontab -u root -l
 
 # Reboots every Sunday at 00 am
-# /etc/cron.d
+# crontab -e
 0 0 * * 7 /sbin/reboot >> /home/user/cron.log
+
+# System jobs
+/var/spool/cron/crontabs
