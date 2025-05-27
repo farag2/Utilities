@@ -45,9 +45,11 @@ bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.
 # List cron jobs
 sudo crontab -u root -l
 
+# Edit crons
+crontab -e
 # Reboots every Sunday at 00 am
-# crontab -e
-0 0 * * 7 /sbin/reboot >> /home/user/cron.log
+# Run the echo "Failed" command only if script fails
+0 0 * * 7 /sbin/reboot && echo "$(date): Success" >> /home/cron.log || echo "$(date): Failed" >> /home/cron/cron_fail.log
 
 # System jobs
 /var/spool/cron/crontabs
