@@ -24,7 +24,7 @@ Remove-Item -Path "$DownloadsFolder\BetterDiscord-Windows.exe" -Force
 
 # https://github.com/DiscordStyles/Fluent/blob/deploy/Fluent.theme.css
 $Parameters = @{
-	Uri             = "https://raw.githubusercontent.com/DiscordStyles/Fluent/deploy/Fluent.theme.css"
+	Uri             = "https://raw.githubusercontent.com/DiscordStyles/Fluent/refs/heads/deploy/Fluent.theme.css"
 	OutFile         = "$env:APPDATA\BetterDiscord\themes\Fluent.theme.css"
 	UseBasicParsing = $true
 	Verbose         = $true
