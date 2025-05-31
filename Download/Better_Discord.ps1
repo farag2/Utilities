@@ -23,9 +23,10 @@ Start-Process -FilePath "$DownloadsFolder\BetterDiscord-Windows.exe" -Wait
 Remove-Item -Path "$DownloadsFolder\BetterDiscord-Windows.exe" -Force
 
 # https://github.com/DiscordStyles/Fluent/blob/deploy/Fluent.theme.css
+# https://github.com/TakosThings/Fluent-Discord
 $Parameters = @{
-	Uri             = "https://raw.githubusercontent.com/DiscordStyles/Fluent/refs/heads/deploy/Fluent.theme.css"
-	OutFile         = "$env:APPDATA\BetterDiscord\themes\Fluent.theme.css"
+	Uri             = "https://takosthings.github.io/Fluent-Discord/Fluent-Discord.theme.css"
+	OutFile         = "$env:APPDATA\BetterDiscord\themes\Fluent-Discord.theme.css"
 	UseBasicParsing = $true
 	Verbose         = $true
 }
