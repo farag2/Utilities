@@ -63,7 +63,6 @@ Write-Verbose -Message "Registered apps" -Verbose
 
 #region Updates
 $HotFixID = @{
-$Session = New-Object -ComObject Microsoft.Update.Session
 	Name = "KB ID"
 	Expression = {$_.HotFixID}
 }
