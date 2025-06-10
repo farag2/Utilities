@@ -28,7 +28,7 @@ $Threads = @{
 }
 (Get-CimInstance -ClassName CIM_Processor | Select-Object -Property Name, $Cores, $L3CacheSize, $Threads | Format-Table | Out-String).Trim()
 
-Write-Verbose -MessageRAM -Verbose
+Write-Verbose -Message RAM -Verbose
 $Speed = @{
 	Name       = "Speed, MHz"
 	Expression = {$_.ConfiguredClockSpeed}
