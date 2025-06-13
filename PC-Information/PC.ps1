@@ -7,7 +7,7 @@ $Version = @{
 }
 (Get-CimInstance -ClassName CIM_BIOSElement | Select-Object -Property Manufacturer, $Version | Format-Table | Out-String).Trim()
 
-Write-Verbose -Message Motherboard"
+Write-Verbose -Message Motherboard
 (Get-CimInstance -ClassName Win32_BaseBoard | Select-Object -Property Manufacturer, Product | Format-Table | Out-String).Trim()
 
 Write-Verbose -Message "Serial number" -Verbose
