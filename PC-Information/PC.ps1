@@ -59,7 +59,7 @@ $BusType = @{
 (Get-PhysicalDisk | Select-Object -Property $Model, $MediaType, $BusType, $Size | Format-Table | Out-String).Trim()
 
 # Integrated graphics
-if ((Get-CimInstance -ClassName CIM_VideoController | Where-Object -FilterScript {$_.AdapterDACType -eq "Internal"}))
+if ((Get-CimInstance -ClassName CIM_VideoController | Where-Object -FilterScript {$_.AdapterDACType -match "Internal"}))
 {
 	$Caption = @{
 		Name       = "Model"
@@ -69,22 +69,25 @@ if ((Get-CimInstance -ClassName CIM_VideoController | Where-Object -FilterScript
 		Name       = "VRAM, MB"
 		Expression = {[math]::round($_.AdapterRAM/1MB)}
 	}
-	Get-CimInstance -ClassName CIM_VideoController | Where-Object -FilterScript {$_.AdapterDACType -eq "Internal"} | Select-Object -Property $Caption, $VRAM
+	Get-CimInstance -ClassName CIM_VideoController | Where-Object -FilterScript {$_.AdapterDACType -match "Internal"} | Select-Object -Property $Caption, $VRAM
 }
 
 # Dedicated graphics
-if ((Get-CimInstance -ClassName CIM_VideoController | Where-Object -FilterScript {$_.AdapterDACType -ne "Internal"}))
+if ((Get-CimInstance -ClassName CIM_VideoController | Where-Object -FilterScript {($_.AdapterDACType -notmatch "Internal") -and ($_.AdapterDACType -match "Integrated")}))
 {
-	$qwMemorySize = (Get-ItemProperty -Path "HKLM:\SYSTEM\ControlSet001\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0*" -Name HardwareInformation.qwMemorySize -ErrorAction SilentlyContinue)."HardwareInformation.qwMemorySize"
-	foreach ($VRAM in $qwMemorySize)
+	foreach ($VRAM in @(Get-ItemProperty -Path "HKLM:\SYSTEM\ControlSet001\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0*"))
 	{
-		Get-CimInstance -ClassName CIM_VideoController | Where-Object -FilterScript {$_.AdapterDACType -ne "Internal"} | ForEach-Object -Process {
-			[PSCustomObject] @{
-				Model      = $_.Caption
-				"VRAM, MB" = [math]::round($VRAM/1MB)
+		# We can't differentiate using "Get-ItemProperty GetType().Name -is [string]". Instead we would have to use the .NET method RegistryKey.GetValueKind()
+		if ((Get-Item -Path $VRAM.PSPath -ErrorAction Ignore).GetValueKind("HardwareInformation.AdapterString") -eq "String")
+		{
+			$qwMemorySize = (Get-ItemProperty -Path $VRAM.PSPath -Name HardwareInformation.qwMemorySize -ErrorAction Ignore)."HardwareInformation.qwMemorySize"
+			Get-CimInstance -ClassName CIM_VideoController | Where-Object -FilterScript {($_.AdapterDACType -notmatch "Internal") -and ($_.AdapterDACType -match "Integrated")} | ForEach-Object -Process {
+				[PSCustomObject] @{
+					Model      = $_.Caption
+					"VRAM, MB" = [math]::round($qwMemorySize/1MB) | select
+				}
+				continue
 			}
-
-			continue
 		}
 	}
 }
