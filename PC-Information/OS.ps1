@@ -19,7 +19,7 @@ $UserName = @{
 Write-Verbose -Message "Local Users" -Verbose
 (Get-LocalUser | Out-String).Trim()
 
-Write-Output "`nGroup Membership"
+Write-Verbose -Message "Group Membership"
 if ((Get-CimInstance -ClassName CIM_ComputerSystem).PartOfDomain -eq $true)
 {
 	Get-ADPrincipalGroupMembership $env:USERNAME | Select-Object -Property Name
@@ -72,7 +72,7 @@ $InstalledOn = @{
 }
 (Get-HotFix | Select-Object -Property $HotFixID, $InstalledOn -Unique | Format-Table | Out-String).Trim()
 
-Write-Output "Installed updates supplied by CBS" -Verbose
+Write-Verbose -Message "Installed updates supplied by CBS" -Verbose
 $Session = New-Object -ComObject Microsoft.Update.Session
 $Searcher = $Session.CreateUpdateSearcher()
 $historyCount = $Searcher.GetTotalHistoryCount()
@@ -122,7 +122,7 @@ Write-Verbose -Message "Mapped disks" -Verbose
 #endregion Mapped disks
 
 #region Printers
-Write-Verbose -Message Printers" -Verbose
+Write-Verbose -Message Printers -Verbose
 Get-CimInstance -ClassName CIM_Printer | Select-Object -Property Name, Default, PortName, DriverName, ShareName | Format-Table
 #endregion Printers
 
