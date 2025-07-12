@@ -1382,3 +1382,7 @@ if ($OpenFileDialog.FileName)
 # Start Company Portal sync
 Start-Process -FilePath "intunemanagementextension://syncapp" -Wait
 
+# Markdown variables
+[discord-news-badge]: https://discordapp.com/api/guilds/1006179075263561779/widget.png?style=shield
+[discord-link]: https://discord.gg/sSryhaEv79
+[![Discord][discord-news-badge]][discord-link]
