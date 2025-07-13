@@ -96,3 +96,7 @@
 # Windows Inbox Apps ISO
   
 * <https://learn.microsoft.com/en-us/azure/virtual-desktop/windows-11-language-packs#requirements>
+
+# AI
+
+* <https://docs.google.com/spreadsheets/d/1akzr5psN0Qa2EvAwzwTW5aF0TX63ftVwN9F7lLA6QiI>
