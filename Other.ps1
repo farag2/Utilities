@@ -1386,3 +1386,29 @@ Start-Process -FilePath "intunemanagementextension://syncapp" -Wait
 [discord-news-badge]: https://discordapp.com/api/guilds/1006179075263561779/widget.png?style=shield
 [discord-link]: https://discord.gg/sSryhaEv79
 [![Discord][discord-news-badge]][discord-link]
+
+# https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-movefileexa
+# Pending file delete after reboot
+$Script:Signature = @{
+	Namespace        = "WinAPI"
+	Name             = "DeleteFiles"
+	Language         = "CSharp"
+	MemberDefinition = @"
+public enum MoveFileFlags
+{
+	MOVEFILE_DELAY_UNTIL_REBOOT = 0x00000004
+}
+[DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+static extern bool MoveFileEx(string lpExistingFileName, string lpNewFileName, MoveFileFlags dwFlags);
+public static bool MarkFileDelete (string sourcefile)
+{
+	return MoveFileEx(sourcefile, null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
+}
+"@
+}
+
+if (-not ("WinAPI.DeleteFiles" -as [type]))
+{
+	Add-Type @Signature
+}
+[WinAPI.DeleteFiles]::MarkFileDelete("D:\1.txt")
