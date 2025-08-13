@@ -1,4 +1,3 @@
-# https://github.com/complexorganizations/wireguard-manager
 apt update -y && apt full-upgrade -y && apt autoremove -y && apt autoclean -y
 apt --fix-broken install
 apt --fix-missing install
@@ -12,7 +11,6 @@ apt install curl -y
 # Change pasword
 passwd
 
-# /etc/wireguard/clients
 # /var/backups
 # /var/logs
 
