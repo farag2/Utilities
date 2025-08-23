@@ -27,8 +27,21 @@ net.ipv4.tcp_congestion_control=bbr
 # Should not be used in other cases
 Port=port_number
 
-# disable root account. Needed another user with sudo access level
+# Disable root account. Needed another user with sudo access level
+# Create a new account
+sudo adduser <username>
+# Add the user to the sudo group 
+sudo usermod -aG sudo <username>
+# Switch to new account
+su <username>
+sudo whoami  # Should output "root"
+exit
+# Lock the root password
+sudo passwd -l root
+# Disable Root SSH Login
+sudo nano /etc/ssh/sshd_config
 PermitRootLogin=no
+# Restart
 systemctl restart ssh
 
 # Check Internet speed connection
