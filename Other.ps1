@@ -530,19 +530,6 @@ if (($bytes[0] -ne 239) -and ($bytes[1] -ne 187) -and ($bytes[2] -ne 191))
 	Write-Warning -Message "The script wasn't saved in `"UTF-8 with BOM`" encoding"
 }
 
-# Write-Progress
-$ExcludedAppxPackages = @(
-	"NVIDIACorp.NVIDIAControlPanel"
-)
-$OFS = "|"
-$AppxPackages = (Get-AppxPackage -PackageTypeFilter Bundle -AllUsers).Name | Select-String $ExcludedAppxPackages -NotMatch
-foreach ($AppxPackage in $AppxPackages)
-{
-	Write-Progress -Activity "Uninstalling UWP apps" -Status "Removing $AppxPackage" -PercentComplete ($AppxPackages.IndexOf($AppxPackage)/$AppxPackages.Count * 100)
-	Get-AppxPackage -PackageTypeFilter Bundle -AllUsers | Where-Object -FilterScript {$_.Name -cmatch $AppxPackage} | Remove-AppxPackage -AllUsers
-}
-Write-Progress -Activity "Uninstalling UWP apps" -Completed
-
 # Waiting for a process
 do
 {
@@ -1412,3 +1399,6 @@ if (-not ("WinAPI.DeleteFiles" -as [type]))
 	Add-Type @Signature
 }
 [WinAPI.DeleteFiles]::MarkFileDelete("D:\1.txt")
+
+# Parse GitHub folder
+Invoke-RestMethod -Uri "https://api.github.com/repos/microsoft/winget-cli/contents/schemas/JSON/manifests"
