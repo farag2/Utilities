@@ -26,6 +26,8 @@ net.ipv4.tcp_congestion_control=bbr
 # /etc/ssh/sshd_config
 # Should not be used in other cases
 Port=port_number
+# Disable port on firewall
+ufw enable && ufw allow <portn_number>/tcp
 
 # Disable root account. Needed another user with sudo access level
 # Create a new account
