@@ -27,10 +27,6 @@ net.ipv4.tcp_congestion_control=bbr
 # Port=port_number
 sudo nano /etc/ssh/sshd_config
 
-# 
-& "$env:SystemRoot\System32\OpenSSH\ssh.exe" user@ip_address -p <port> -v
-Remove-Item -Path "$env:USERPROFILE\.ssh" -Recurse -Force
-
 # Disable port on firewall
 ufw enable && ufw allow <portn_number>/tcp
 
@@ -70,3 +66,7 @@ crontab -e
 
 # System jobs
 /var/spool/cron/crontabs
+
+# Connect via SSH from PowerShell
+& "$env:SystemRoot\System32\OpenSSH\ssh.exe" user@ip_address -p <port> -v
+Remove-Item -Path "$env:USERPROFILE\.ssh" -Recurse -Force
