@@ -70,3 +70,13 @@ crontab -e
 # Connect via SSH from PowerShell
 & "$env:SystemRoot\System32\OpenSSH\ssh.exe" user@ip_address -p <port> -v
 Remove-Item -Path "$env:USERPROFILE\.ssh" -Recurse -Force
+
+# Download file from remote server
+# -P <port> must be the first
+& "$env:SystemRoot\System32\OpenSSH\sftp.exe" -P <port> user@ip_address:/home/file.txt D:\folder
+
+# Upload file to remote server
+& "$env:SystemRoot\System32\OpenSSH\scp.exe" P <port> "D:\folder\1.txt" user@ip_address:/home/<username>
+#
+& "$env:SystemRoot\System32\OpenSSH\sftp.exe" P <port> user@ip_address
+put "D:\folder\1.txt" /home/<username>
