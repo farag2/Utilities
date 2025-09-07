@@ -44,7 +44,7 @@ sudo passwd -l root
 sudo nano /etc/ssh/sshd_config
 PermitRootLogin=no
 # Restart
-systemctl restart ssh
+sudo systemctl restart ssh
 
 # Check Internet speed connection
 wget -qO- bench.sh | bash
