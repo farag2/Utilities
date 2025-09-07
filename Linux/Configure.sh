@@ -36,10 +36,10 @@ sudo adduser <username>
 sudo usermod -aG sudo <username>
 # Switch to new account
 su <username>
-sudo whoami  # Should output "root"
-exit
+sudo whoami
 # Lock the root password
 sudo passwd -l root
+
 # Disable Root SSH Login
 sudo nano /etc/ssh/sshd_config
 PermitRootLogin=no
