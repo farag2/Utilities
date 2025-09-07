@@ -23,9 +23,10 @@ net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
 
 # Change SSH port
-# /etc/ssh/sshd_config
-# Should not be used in other cases
-Port=port_number
+# Check if port number is not used in other cases
+# Port=port_number
+sudo nano /etc/ssh/sshd_config
+
 # Disable port on firewall
 ufw enable && ufw allow <portn_number>/tcp
 
