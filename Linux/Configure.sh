@@ -80,3 +80,29 @@ Remove-Item -Path "$env:USERPROFILE\.ssh" -Recurse -Force
 #
 & "$env:SystemRoot\System32\OpenSSH\sftp.exe" P <port> user@ip_address
 put "D:\folder\1.txt" /home/<username>
+
+# Authorize via SSH key
+
+# sudo apt install openssh-server -y
+# apt list --installed | grep openssh
+# Create /home/<user>/.ssh folder
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+
+# Generate an SSH keys and save them to "$env:USERPROFILE\.ssh"
+& "$env:SystemRoot\System32\OpenSSH\ssh-keygen.exe" -t ed25519
+# Copy id_ed25519 to /home/<user>/.ssh folder
+& "$env:SystemRoot\System32\OpenSSH\scp.exe" -P 6601 "$env:USERPROFILE\.ssh\id_ed25519.pub" user@ip_address:~/.ssh/authorized_keys
+
+sudo nano /etc/ssh/sshd_config
+PubkeyAuthentication yes
+# Where SSH key to expect
+AuthorizedKeysFile .ssh/authorized_keys
+systemctl restart sshd
+# Authorize on server
+# id_ed25519 won't be accepted if it is placed in a public folder
+& "$env:SystemRoot\System32\OpenSSH\ssh.exe" user@ip_address -p <port> -i "$env:USERPROFILE\.ssh\id_ed25519" -v
+
+# Disable authorization via password
+sudo nano /etc/ssh/sshd_config
+PasswordAuthentication no
