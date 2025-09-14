@@ -1216,6 +1216,9 @@ $Parameters = @{
 }
 ExtractZIPFolder @Parameters
 
+# Extract specific file from archive
+& "$env:SystemRoot\System32\tar.exe" -xvf "D:\file.zip" --strip-components=1 -C D:\Folder_to_extract "folder1/folder2/file.xml"
+
 # Check Microsoft 365 for updates
 & "$env:CommonProgramFiles\microsoft shared\ClickToRun\OfficeC2RClient.exe" /update user
 
@@ -1402,3 +1405,4 @@ if (-not ("WinAPI.DeleteFiles" -as [type]))
 
 # Parse GitHub folder
 Invoke-RestMethod -Uri "https://api.github.com/repos/microsoft/winget-cli/contents/schemas/JSON/manifests"
+
