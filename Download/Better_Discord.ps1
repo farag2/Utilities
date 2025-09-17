@@ -22,7 +22,6 @@ Invoke-Webrequest @Parameters
 Start-Process -FilePath "$DownloadsFolder\BetterDiscord-Windows.exe" -Wait
 Remove-Item -Path "$DownloadsFolder\BetterDiscord-Windows.exe" -Force
 
-# https://github.com/DiscordStyles/Fluent/blob/deploy/Fluent.theme.css
 # https://github.com/TakosThings/Fluent-Discord
 $Parameters = @{
 	Uri             = "https://takosthings.github.io/Fluent-Discord/Fluent-Discord.theme.css"
@@ -50,3 +49,5 @@ foreach ($Plugin in $Plugins)
 	}
 	Invoke-Webrequest @Parameters
 }
+
+& $env:LOCALAPPDATA\Discord\Update.exe --processStart Discord.exe
