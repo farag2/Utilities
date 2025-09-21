@@ -892,15 +892,43 @@ LGPO.exe /parse /m C:\Temp\LGPO_Backup\DomainSysvol\GPO\Machine\registry.pol >> 
 LGPO.exe /t C:\Temp\lgpo.txt
 
 # TrueForAll
-[array]::TrueForAll(
+$Files = [Array]::TrueForAll(@(
+	"$PSScriptRoot\..\Binaries\LGPO.exe",
+	"$PSScriptRoot\..\Binaries\Microsoft.Windows.SDK.NET.dll",
+	"$PSScriptRoot\..\Binaries\WinRT.Runtime.dll"),
+
+	[Predicate[string]]{
+	param($File)
+
+	Test-Path -Path $File
+})
+if (-not $Files)
+{
+	"Some files missing"
+}
+#
+$Services = [array]::TrueForAll(
 	[string[]](Get-Service -Name WinDefend, SecurityHealthService, wisvc).Status,
 
 	[Predicate[string]]{
 		param ($Status)
 
 		$Status -eq "Running"
-	}
+})
+if (-not $Services)
+{
+	"Some services not running"
+}
+#
+$Files = @(
+	D:\folder\1.txt,
+	D:\folder\2.txt,
+	D:\folder\3.txt
 )
+if (($Files | Test-Path) -contains $false)
+{
+	"Some files missing"
+}
 
 # Download Windows.winmd from Windows 10 SDK
 # https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/
@@ -1405,4 +1433,5 @@ if (-not ("WinAPI.DeleteFiles" -as [type]))
 
 # Parse GitHub folder
 Invoke-RestMethod -Uri "https://api.github.com/repos/microsoft/winget-cli/contents/schemas/JSON/manifests"
+
 
