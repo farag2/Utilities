@@ -41,6 +41,7 @@ function Get-YandexDiskContent
 	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 	# Encode folder path
+ 	# We need to that only if path has HTML encoded characters. If path is clean, $EncodePath should not be used, and "Uri" property has to use $Path string 
 	$EncodePath = [System.Uri]::EscapeDataString($Path)
 
 	$Headers = @{
@@ -66,6 +67,7 @@ function Get-YandexDiskContent
 }
 
 $Parameters = @{
+ 	# Use encoded HTML string if you you $EncodePath. Unless use clean path 
 	Path  = "disk:/folder"
  	# Your token from https://oauth.yandex.ru/authorize?response_type=token&client_id=<Your_ClientID> page
 	Token = ""
