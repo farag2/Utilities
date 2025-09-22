@@ -1,52 +1,5 @@
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Q5Q51QUJC)
 
-# PowerShell
-
-<details>
-  <summary>List</summary>
-  
-* <https://4sysops.com/tag/powershell>
-* <https://arcanecode.com>
-* <https://foxdeploy.com>
-* <https://www.gngrninja.com>
-* <https://www.itprotoday.com>
-* <https://www.madwithpowershell.com>
-* <http://www.outsidethebox.ms>
-* <https://p0w3rsh3ll.wordpress.com>
-* <https://powershellexplained.com>
-* <https://vmblog.ru>
-* <https://windowsnotes.ru>
-* <http://winitpro.ru>
-* <https://kazunposh.wordpress.com>
-* <https://theitbros.com>
-* <https://coolcode.ru/powershell/>
-* <http://blog.dbsnet.fr>
-* <https://jdhitsolutions.com/blog/category/powershell>
-* <https://community.idera.com/database-tools/powershell/powertips/>
-* <https://vacuumbreather.com>
-* <https://blogs.msmvps.com/richardsiddaway/category/powershell>
-* <https://fixmypc.ru/subcategory/powershell/>
-* <https://winintro.ru>
-* <https://www.undocumented-features.com/category/scripting>
-* <https://administra.top/category/powershell/>
-* <https://blog.it-kb.ru/tag/powershell/>
-* <https://michael-casey.com>
-* <https://www.itdroplets.com/category/powershell/>
-* <https://vimalshekar.github.io>
-* <https://smsagent.blog/category/powershell/>
-* <http://www.systanddeploy.com/search?max-results=10&q=+>
-* <https://petri.com/category/powershell>
-* <https://evotec.xyz/category/powershell>
-* <https://sid-500.com/category/powershell/>
-* <https://get-powershellblog.blogspot.com/search/label/PowerShell>
-* <https://info.sapien.com/index.php/scripting/scripting-classes/creating-objects-in-windows-powershell>
-* <https://vexx32.github.io>
-* <https://docs.microsoft.com/ru-ru/powershell/module/microsoft.powershell.core/about/about_functions_advanced_parameters>
-* <https://www.thomasmaurer.ch/tag/powershell/>
-* <https://superwidgets.wordpress.com/>
-* <https://blog.vertigion.com>
-</details>
-
 # CheetSheets
 
 <details>
@@ -91,7 +44,7 @@
   
 # Windows ISOs
 
-* <https://cloud.mail.ru/public/dUNz/Y56hnwnhZ>
+* <https://massgrave.dev/genuine-installation-media>
 
 # Windows Inbox Apps ISO
   
