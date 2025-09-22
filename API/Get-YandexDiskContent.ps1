@@ -41,7 +41,7 @@ function Get-YandexDiskContent
 	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 	# Encode folder path
- 	# We need to that only if path has HTML encoded characters. If path is clean, $EncodePath should not be used, and "Uri" property has to use $Path string 
+	# We need to that only if path has HTML encoded characters. If path is clean, $EncodePath should not be used, and "Uri" property has to use $Path string
 	$EncodePath = [System.Uri]::EscapeDataString($Path)
 
 	$Headers = @{
@@ -55,7 +55,7 @@ function Get-YandexDiskContent
 	}
 	$Response = Invoke-RestMethod @Parameters
 
-	$Response._embedded.items | ForEach-Object -Process {
+	$Response._embedded.items | Where-Object -FilterScript {$_.media_type -eq "image"} | ForEach-Object -Process {
 		$Type = if ($_.type -eq "dir") {"Folder"} else {"File"}
 
 		[PSCustomObject]@{
@@ -67,9 +67,9 @@ function Get-YandexDiskContent
 }
 
 $Parameters = @{
- 	# Use encoded HTML string if you you $EncodePath. Unless use clean path 
+	# Use here clean URL path (without URL encoded characters) by default, unless $EncodePath will fail to decode it, and vice versa
 	Path  = "disk:/folder"
- 	# Your token from https://oauth.yandex.ru/authorize?response_type=token&client_id=<Your_ClientID> page
+	# Your token from https://oauth.yandex.ru/authorize?response_type=token&client_id=<Your_ClientID> page
 	Token = ""
 }
 Get-YandexDiskContent @Parameters | Format-Table -AutoSize
