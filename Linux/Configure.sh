@@ -73,16 +73,16 @@ Remove-Item -Path "$env:USERPROFILE\.ssh" -Recurse -Force
 
 # Download file from remote server
 # -P <port> must be the first
+# get /home/cron.log D:\Downloads\cron.log
 & "$env:SystemRoot\System32\OpenSSH\sftp.exe" -P <port> user@ip_address:/home/file.txt D:\folder
 
 # Upload file to remote server
-& "$env:SystemRoot\System32\OpenSSH\scp.exe" P <port> "D:\folder\1.txt" user@ip_address:/home/<username>
+& "$env:SystemRoot\System32\OpenSSH\scp.exe" -P <port> "D:\folder\1.txt" user@ip_address:/home/<username>
 #
-& "$env:SystemRoot\System32\OpenSSH\sftp.exe" P <port> user@ip_address
+& "$env:SystemRoot\System32\OpenSSH\sftp.exe" -P <port> user@ip_address
 put "D:\folder\1.txt" /home/<username>
 
 # Authorize via SSH key
-
 # sudo apt install openssh-server -y
 # apt list --installed | grep openssh
 # Create /home/<user>/.ssh folder
