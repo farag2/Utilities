@@ -1438,8 +1438,8 @@ Invoke-RestMethod -Uri "https://api.github.com/repos/microsoft/winget-cli/conten
 $Resource = ""
 $Port = ""
 $Login = ""
-$Password ""
-$Request = [System.Net.FtpWebRequest]::Create("ftp://${$Resource}:${$Port}")
+$Password = ""
+$Request = [System.Net.FtpWebRequest]::Create("ftp://${Resource}:${Port}")
 $Request.Credentials = New-Object System.Net.NetworkCredential($Login, $Password)
 $Request.Method = [System.Net.WebRequestMethods+Ftp]::ListDirectory
 # Use $true for FTPS
@@ -1471,3 +1471,4 @@ Remove-Item -Path "$env:USERPROFILE\.ssh" -Recurse -Force
 #
 & "$env:SystemRoot\System32\OpenSSH\sftp.exe" -P <port> user@ip_address
 put "D:\folder\1.txt" /home/<username>
+
