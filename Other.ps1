@@ -1434,4 +1434,40 @@ if (-not ("WinAPI.DeleteFiles" -as [type]))
 # Parse GitHub folder
 Invoke-RestMethod -Uri "https://api.github.com/repos/microsoft/winget-cli/contents/schemas/JSON/manifests"
 
+# List directories via FTP
+$Resource = ""
+$Port = ""
+$Login = ""
+$Password ""
+$Request = [System.Net.FtpWebRequest]::Create("ftp://${$Resource}:${$Port}")
+$Request.Credentials = New-Object System.Net.NetworkCredential($Login, $Password)
+$Request.Method = [System.Net.WebRequestMethods+Ftp]::ListDirectory
+# Use $true for FTPS
+$Request.EnableSsl = $false
+$Response = $Request.GetResponse()
+$responseStream = $Response.GetResponseStream()
+$reader = New-Object System.IO.StreamReader($responseStream)
 
+# List directories and files
+$files = @()
+while (-not $reader.EndOfStream)
+{
+    $files += $reader.ReadLine()
+}
+return $files
+
+# Connect via SSH from PowerShell
+& "$env:SystemRoot\System32\OpenSSH\ssh.exe" user@ip_address -p <port> -v
+Remove-Item -Path "$env:USERPROFILE\.ssh" -Recurse -Force
+
+# Download file from remote server
+# https://github.com/farag2/Utilities/blob/master/Linux/Configure.sh
+# -P <port> must be the first
+# get /home/cron.log D:\Downloads\cron.log
+& "$env:SystemRoot\System32\OpenSSH\sftp.exe" -P <port> user@ip_address:/home/file.txt D:\folder
+
+# Upload file to remote server
+& "$env:SystemRoot\System32\OpenSSH\scp.exe" -P <port> "D:\folder\1.txt" user@ip_address:/home/<username>
+#
+& "$env:SystemRoot\System32\OpenSSH\sftp.exe" -P <port> user@ip_address
+put "D:\folder\1.txt" /home/<username>
