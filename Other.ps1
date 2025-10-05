@@ -791,23 +791,12 @@ Uninstall-Language
 # Bypass the Internet account creation in Windows 11
 # Shift+F10
 OOBE\BYPASSNRO
-# 26200.5516, 26120.3653
-New-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE -Name BypassNRO -PropertyType REG_DWORD -Value 1 -Force
+#
+reg add HKLM\Software\Microsoft\Windows\CurrentVersion\OOBE /v BypassNRO /t REG_DWORD /d 1 /f
+shutdown.exe /r /t 1
+# 
 start ms-cxh:localonly
-# Reboot
-wpeutil reboot
-# Windows 11 Insider Preview 25120+
-# This method requires to invoke the following commands if user doesn't use password
-# Otherwise even if password is blank OS will ask to prolong it and block access
-# Set-LocalUser -Name $env:USERNAME -PasswordNeverExpires $true
-# net user $env:USERNAME /passwordreq:no
-# Add a new user account
-net user username /add
-# Администраторы
-net localgroup Administrators username /add
-# "Пользователи удаленного рабочего стола"
-net localgroup "Remote Desktop Users" username /add
-net user $env:USERNAME /passwordreq:no
+start ms-cxh://setaddlocalonly
 
 # Prevent Windows to restart automatically after a system failure
 # The parameter EnableAllvileges allows us to manipulate the properties of this WMI object if the current Powershell host runs as Administrator
@@ -1471,4 +1460,5 @@ Remove-Item -Path "$env:USERPROFILE\.ssh" -Recurse -Force
 #
 & "$env:SystemRoot\System32\OpenSSH\sftp.exe" -P <port> user@ip_address
 put "D:\folder\1.txt" /home/<username>
+
 
