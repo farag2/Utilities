@@ -1,22 +1,5 @@
-# Re-register all UWP apps
-$Bundles = (Get-AppXPackage -PackageTypeFilter Framework -AllUsers).PackageFullName
-Get-ChildItem -Path "HKLM:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\PackageRepository\Packages" | ForEach-Object -Process {
-	Get-ItemProperty -Path $_.PSPath
-} | Where-Object -FilterScript {$_.Path -match "Program Files"} | Where-Object -FilterScript {$_.PSChildName -notin $Bundles} | Where-Object -FilterScript {$_.Path -match "x64"} | ForEach-Object -Process {
-	"$($_.Path)\AppxManifest.xml"
-} | Add-AppxPackage -Register -ForceApplicationShutdown -ForceUpdateFromAnyVersion -DisableDevelopmentMode -Verbose
-#
-$PackagesIds = [Windows.Management.Deployment.PackageManager, Windows.Web, ContentType = WindowsRuntime]::new().FindPackages() | Select-Object -Property DisplayName -ExpandProperty Id | Select-Object -Property Name, DisplayName
-foreach ($AppxPackage in $AppxPackages)
-{
-	"$($AppxPackage.InstallLocation)\AppxManifest.xml" | Add-AppxPackage -Register -ForceApplicationShutdown -ForceUpdateFromAnyVersion -DisableDevelopmentMode -Verbose
-}
-
 # Check for UWP apps updates
 Get-CimInstance -Namespace root/CIMV2/mdm/dmmap -ClassName MDM_EnterpriseModernAppManagement_AppManagement01 | Invoke-CimMethod -MethodName UpdateScanMethod
-
-# Find all non-USB & non-boot drives except nulled letter drives (external USB drives are excluded)
-(Get-Disk | Where-Object -FilterScript {($_.BusType -ne "USB") -and (-not $_.IsBoot)} | Get-Partition | Get-Volume | Where-Object -FilterScript {$_.DriveLetter}).DriveLetter
 
 # Add domains to hosts
 $hosts = "$env:SystemRoot\System32\drivers\etc\hosts"
@@ -83,29 +66,6 @@ $CommandLine = @{
 	Expression = {$_.Properties[8].Value}
 }
 Get-WinEvent -FilterHashtable $Security | Select-Object TimeCreated, $NewProcessName, $CommandLine | Format-Table -AutoSize -Wrap
-#
-function Get-ProcessAuditEvents ([long]$MaxEvents)
-{
-	function Prettify([string]$Message)
-	{
-		$Message = [regex]::Replace($Message, '\s+Token Elevation Type indicates.+$', '', [System.Text.RegularExpressions.RegexOptions]::Singleline)
-		$Message = [regex]::Replace($Message, '(Token Elevation Type:\s+%%1936)', '$1 (Full token)')
-		$Message = [regex]::Replace($Message, '(Token Elevation Type:\s+%%1937)', '$1 (Elevated token)')
-		$Message = [regex]::Replace($Message, '(Token Elevation Type:\s+%%1938)', '$1 (Limited token)')
-		return $Message
-	}
-	$Security = @{
-		LogName = "Security"
-		Id = 4688
-	}
-	Get-WinEvent -MaxEvents $MaxEvents -FilterHashtable $Security | Sort-Object -Property TimeCreated | ForEach-Object {
-		[pscustomobject] @{
-			TimeCreated = $_.TimeCreated
-			Message     = $_.Message
-		}
-	}
-}
-Get-ProcessAuditEvents -MaxEvents 10 | Format-List
 #
 $ParentProcess = @{
 	Label      = "ParentProcess"
@@ -1068,6 +1028,9 @@ Get-ChildItem -Path D:\Downloads\LanguagePack -Recurse -Force -Filter *.pri -Fil
 	& "${env:ProgramFiles(x86)}\Windows Kits\10\bin\10.0.22621.0\x64\makepri.exe" dump /if $_.FullName /of "$($_.Directory)\$($_.Name)"
 }
 
+# Extract strings from a library (.dll) via ResourcesExtract.exe
+& "D:\ResourcesExtract.exe" /Source "C:\Windows\System32\shell32.dll" /DestFolder "D:\Folder" /ExtractIcons 0 /ExtractCursors 0 /ExtractBitmaps 0 /ExtractHTML 0 /ExtractManifests 0 /ExtractAnimatedIcons 0 /ExtractAnimatedCursors 0 /ExtractAVI 0 /ExtractTypeLib 0 /ExtractBinary 0 /ScanSubFolders 0 /FileExistMode 2 /OpenDestFolder 0
+
 # Create a table with UWP apps installed with their local native logo paths
 $AppxPackages = @(Get-AppxPackage -PackageTypeFilter Bundle -AllUsers)
 $PackagesIds = [Windows.Management.Deployment.PackageManager, Windows.Web, ContentType = WindowsRuntime]::new().FindPackages() | Select-Object -Property DisplayName, Logo -ExpandProperty Id
@@ -1155,20 +1118,6 @@ try
 catch {}
 $Error.Exception.Message
 
-# Runspace
-$RunspacePool = [runspacefactory]::CreateRunspacePool(1, 5)
-$PowerShell = [powershell]::Create()
-$PowerShell.RunspacePool = $RunspacePool
-$RunspacePool.Open()
-$PowerShell.AddScript({get-item 1})
-# $PowerShell.AddScript({param ($Text) Write-Output $Text})
-# $PowerShell.AddArgument("Hello world!")
-$Job = $PowerShell.BeginInvoke()
-$PowerShell.EndInvoke($Job)
-$RunspacePool.Close()
-$RunspacePool.Dispose()
-$RunspacePool.powershell.Streams.Error
-
 # https://www.outsidethebox.ms/22149/
 Install-Language -Language ru-RU
 Set-WinUILanguageOverride -Language ru-RU
@@ -1179,9 +1128,6 @@ Set-WinHomeLocation -GeoId 203 # https://go.microsoft.com/fwlink/?LinkID=242308
 Set-WinSystemLocale -SystemLocale ru-RU
 Copy-UserInternationalSettingsToSystem -WelcomeScreen $true -NewUser $true
 # Set-WinDefaultInputMethodOverride -InputTip "0409:00000409"
-
-# Extract strings from a library (.dll) via ResourcesExtract.exe
-& "D:\ResourcesExtract.exe" /Source "C:\Windows\System32\shell32.dll" /DestFolder "D:\Folder" /ExtractIcons 0 /ExtractCursors 0 /ExtractBitmaps 0 /ExtractHTML 0 /ExtractManifests 0 /ExtractAnimatedIcons 0 /ExtractAnimatedCursors 0 /ExtractAVI 0 /ExtractTypeLib 0 /ExtractBinary 0 /ScanSubFolders 0 /FileExistMode 2 /OpenDestFolder 0
 
 # Check if a variable assigned with "Set-StrictMode -Version Latest" set
 Test-Path -Path variable:MyVariable
@@ -1330,9 +1276,6 @@ Get-Variable -Name MyInvocation -Scope Script
 $ExecutionContext
 $PSCmdlet
 
-# Show all icons in notification area. Applicable for only Windows 11
-New-ItemProperty -Path "HKCU:\Control Panel\NotifyIconSettings" -Name IsPromoted2 -PropertyType DWord -Value 1 -Force
-
 # Publish a chocolatey package
 cd D:\folder_where_package_will_be_created
 choco new <package_name>
@@ -1396,7 +1339,7 @@ Start-Process -FilePath "intunemanagementextension://syncapp" -Wait
 
 # https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-movefileexa
 # Pending file delete after reboot
-$Script:Signature = @{
+$Signature = @{
 	Namespace        = "WinAPI"
 	Name             = "DeleteFiles"
 	Language         = "CSharp"
@@ -1436,7 +1379,6 @@ $Request.EnableSsl = $false
 $Response = $Request.GetResponse()
 $responseStream = $Response.GetResponseStream()
 $reader = New-Object System.IO.StreamReader($responseStream)
-
 # List directories and files
 $files = @()
 while (-not $reader.EndOfStream)
@@ -1444,6 +1386,8 @@ while (-not $reader.EndOfStream)
     $files += $reader.ReadLine()
 }
 return $files
+#
+& "$env:SystemRoot\System32\ftp.exe" IP_address
 
 # Connect via SSH from PowerShell
 & "$env:SystemRoot\System32\OpenSSH\ssh.exe" user@ip_address -p <port> -v
@@ -1460,5 +1404,3 @@ Remove-Item -Path "$env:USERPROFILE\.ssh" -Recurse -Force
 #
 & "$env:SystemRoot\System32\OpenSSH\sftp.exe" -P <port> user@ip_address
 put "D:\folder\1.txt" /home/<username>
-
-
