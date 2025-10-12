@@ -1271,8 +1271,10 @@ $LoginUserName = (Get-CimInstance -ClassName Win32_Process -Filter "name='explor
 $PSBoundParameters
 $MyInvocation.BoundParameters
 Get-PSCallStack
+(Get-PSCallStack).Position.Text
 $MyInvocation
 Get-Variable -Name MyInvocation -Scope Script
+(Get-Variable -Name MyInvocation -Scope Script).Value.PSCommandPath
 $ExecutionContext
 $PSCmdlet
 
@@ -1404,3 +1406,4 @@ Remove-Item -Path "$env:USERPROFILE\.ssh" -Recurse -Force
 #
 & "$env:SystemRoot\System32\OpenSSH\sftp.exe" -P <port> user@ip_address
 put "D:\folder\1.txt" /home/<username>
+
