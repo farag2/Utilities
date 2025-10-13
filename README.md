@@ -24,24 +24,6 @@
 * <https://www.eventsentry.com/blog/2018/01/powershell-pw3rh311-detecting-preventing-powershell-attacks.html>
 </details>
   
-# GitHub Actions
-
-<details>
-  <summary>List</summary>
-  
-* <https://help.github.com/en/actions/getting-started-with-github-actions>
-* <http://hermit.no/github-actions-including-how-to-build-net-framework-projects/>
-* <https://medium.com/@two06/building-tooling-with-github-actions-59401648e61d>
-* <https://toastit.dev/2018/12/19/powershell-flavoured-github-actions/>
-* <https://dynamicsuser.net/nav/b/demiliani/posts/ci-cd-for-net-with-githhub-actions?pi2732=3>
-* <https://blog.ipswitch.com/how-to-build-your-first-github-actions-workflow>
-* <https://medium.com/@abhijithbr/who-wants-to-fool-an-ai-anti-virus-9837877dac29>
-* <https://stefanstranger.github.io/2020/02/28/PlayingWithGitHubActions/>
-* <https://demiliani.com/2019/11/14/ci-cd-for-net-with-githhub-actions/>
-* <https://abelsquidhead.com/index.php/2019/09/07/writing-my-first-custom-github-action/>
-* <https://rustycrate.ru/обучение/2017/08/20/rust-appveyor.html>
-</details>
-  
 # Windows ISOs
 
 * <https://massgrave.dev/genuine-installation-media>
@@ -53,3 +35,7 @@
 # AI
 
 * <https://docs.google.com/spreadsheets/d/1akzr5psN0Qa2EvAwzwTW5aF0TX63ftVwN9F7lLA6QiI>
+
+# Settings and Control panel URI
+* <https://www.elevenforum.com/t/create-shortcuts-to-open-control-panel-items-in-windows-11.528/>
+* <https://www.elevenforum.com/t/create-shortcuts-to-open-pages-in-settings-in-windows-11.522/>
