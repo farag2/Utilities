@@ -26,11 +26,21 @@ Invoke-WebRequest @Parameters
 & "$env:SystemRoot\System32\tar.exe" -xvf "$DownloadsFolder\Acrobat_DC_Web_x64_WWMUI.zip" -C $DownloadsFolder --exclude "WindowsInstaller-KB893803-v2-x86.exe" --exclude "VCRT_x64"
 
 # Get the latest Adobe Acrobat Pro DC patch version (lang=mui)
+# Blocked for Russia
 $Parameters = @{
 	Uri = "https://rdc.adobe.io/reader/products?lang=mui&site=enterprise&os=Windows%2011&api_key=dc-get-adobereader-cdn"
 	UseBasicParsing = $true
 }
-$Version = ((Invoke-RestMethod @Parameters).products.reader | Where-Object -FilterScript {$_.displayName -match "64bit"}).version.Replace(".", "")
+try
+{
+    $Version = ((Invoke-RestMethod @Parameters).products.reader | Where-Object -FilterScript {$_.displayName -match "64bit"}).version.Replace(".", "")
+}
+catch
+{
+    Write-Warning -Message "Cannot reach https://rdc.adobe.io/reader/products?lang=mui&site=enterprise&os=Windows%2011&api_key=dc-get-adobereader-cdn"
+    Write-Warning -Message '$Version will be null'
+    $Version = 0
+}
 
 # If latest version is greater than one from archive
 if ((Get-Item -Path "$DownloadsFolder\Adobe Acrobat\AcrobatDCx64Upd*.msp").FullName -notmatch $Version)
