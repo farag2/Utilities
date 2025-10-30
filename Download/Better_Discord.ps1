@@ -32,10 +32,6 @@ $Parameters = @{
 Invoke-RestMethod @Parameters
 
 $Plugins = @(
-	# https://github.com/rauenzi/BDPluginLibrary/blob/master/release/0PluginLibrary.plugin.js
-	# Needed for YABDP4Nitro
-	"https://raw.githubusercontent.com/rauenzi/BDPluginLibrary/master/release/0PluginLibrary.plugin.js",
-
 	# https://github.com/riolubruh/YABDP4Nitro/blob/main/YABDP4Nitro.plugin.js
 	"https://raw.githubusercontent.com/riolubruh/YABDP4Nitro/main/YABDP4Nitro.plugin.js"
 )
