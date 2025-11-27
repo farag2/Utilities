@@ -41,7 +41,7 @@ foreach ($UserID in $UserIDs)
 					Model            = $_.Model
 					"s/n"            = $_.SerialNumber
 					hostname         = $_.DisplayName
-					Build            = $_.OperatingSystemVersion
+					Build            = [System.Version]$_.OperatingSystemVersion
 					"Last Sync Time" = $_.OnPremisesLastSyncDateTime
 				} | Format-Table -AutoSize
 			}
@@ -64,7 +64,7 @@ foreach ($UserID in $UserIDs)
 			Model          = $Device.Model
 			"s/n"          = $Device.SerialNumber
 			hostname       = $Device.DeviceName
-			Build          = $Device.OSVersion
+			Build          = [System.Version]$Device.OSVersion
 			"Sync Time"    = $Device.LastSyncDateTime
 			"Free Storage" = [math]::Round($Device.FreeStorageSpaceInBytes/1GB,2)
 		} | Select-Object -Property * | Export-Csv -Path "D:\folder\2.csv" -Encoding UTF8 -NoTypeInformation -Delimiter ';' -Append -Force
