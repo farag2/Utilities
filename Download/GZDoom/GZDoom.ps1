@@ -9,24 +9,24 @@ if ($Host.Version.Major -eq 5)
 
 # https://github.com/ZDoom/gzdoom
 $Parameters = @{
-	Uri             = "https://api.github.com/repos/coelckers/gzdoom/releases/latest"
+	Uri             = "https://api.github.com/repos/UZDoom/UZDoom/releases/latest"
 	UseBasicParsing = $true
 	Verbose         = $true
 }
-$URL = ((Invoke-RestMethod @Parameters).assets | Where-Object -FilterScript {$_.name -match "windows.zip"}).browser_download_url
+$URL = ((Invoke-RestMethod @Parameters).assets | Where-Object -FilterScript {$_.name -match "windows"}).browser_download_url
 
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
 	Uri             = $URL
-	OutFile         = "$DownloadsFolder\GZDoom.zip"
+	OutFile         = "$DownloadsFolder\UZDoom.zip"
 	UseBasicParsing = $true
 	Verbose         = $true
 }
 Invoke-WebRequest @Parameters
 
 $Parameters = @{
-	Path            = "$DownloadsFolder\GZDoom.zip"
-	DestinationPath = "$DownloadsFolder\GZDoom"
+	Path            = "$DownloadsFolder\UZDoom.zip"
+	DestinationPath = "$DownloadsFolder\UZDoom"
 	Force           = $true
 	Verbose         = $true
 }
@@ -50,11 +50,11 @@ $Parameters = @{
 }
 Invoke-WebRequest @Parameters
 
-# https://www.moddb.com/mods/brutal-doom/downloads/brutal-doom-v22-beta-test-3
+# https://www.moddb.com/mods/brutal-doom/news/test-4-is-out
 # Expand archive manualy
 $Parameters = @{
 	Uri             = "https://www.moddb.com/downloads/start/265147"
-	UseBasicParsing = $false # Disabled
+	UseBasicParsing = $true
 	Verbose         = $true
 }
 $Request = Invoke-Webrequest @Parameters
@@ -75,10 +75,3 @@ $Parameters = @{
 	Verbose         = $true
 }
 Invoke-Webrequest @Parameters
-
-$Parameters = @(
-	"$DownloadsFolder\GZDoom.zip",
-	"$DownloadsFolder\GZDoom\fm_banks",
-	"$DownloadsFolder\GZDoom\licenses.zip"
-)
-Remove-Item -Path $Parameters -Recurse -Force
