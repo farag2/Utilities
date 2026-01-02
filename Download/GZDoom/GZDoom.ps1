@@ -7,7 +7,7 @@ if ($Host.Version.Major -eq 5)
 	$Script:ProgressPreference = "SilentlyContinue"
 }
 
-# https://github.com/ZDoom/gzdoom
+# https://github.com/UZDoom/UZDoom
 $Parameters = @{
 	Uri             = "https://api.github.com/repos/UZDoom/UZDoom/releases/latest"
 	UseBasicParsing = $true
