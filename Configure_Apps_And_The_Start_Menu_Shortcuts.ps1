@@ -13,13 +13,7 @@ if (Test-Path -Path $env:ProgramFiles\AIMP)
 		"$env:ProgramFiles\AIMP\history.txt",
 		"$env:ProgramFiles\AIMP\AIMP.url",
 		"$env:ProgramFiles\AIMP\license.rtf",
-		"$env:ProgramFiles\AIMP\Help",
-		"$env:ProgramFiles\AIMP\Skins",
-		"$env:ProgramFiles\AIMP\Plugins\aimp_AnalogMeter",
-		"$env:ProgramFiles\AIMP\Plugins\aimp_infobar",
-		"$env:ProgramFiles\AIMP\Plugins\aimp_lastfm",
-		"$env:ProgramFiles\AIMP\Plugins\aimp_scheduler",
-		"$env:ProgramFiles\AIMP\Plugins\Aorta"
+		"$env:ProgramFiles\AIMP\Help"
 	)
 	Remove-Item -Path $Remove -Recurse -Force -ErrorAction Ignore
 
@@ -174,7 +168,8 @@ if (Test-Path -Path "$env:ProgramFiles\MPC-BE")
 	$Parameters = @{
 		Uri     = "https://raw.githubusercontent.com/farag2/Utilities/master/MPC-BE/mpc-be64.ini"
 		OutFile = "$env:ProgramFiles\MPC-BE\mpc-be64.ini"
-		Verbose = $true
+		UseBasicParsing = $true
+		Verbose         = $true
 	}
 	Invoke-WebRequest @Parameters
 }
@@ -182,17 +177,6 @@ if (Test-Path -Path "$env:ProgramFiles\MPC-BE")
 # Notepad++
 if (Test-Path -Path "$env:ProgramFiles\Notepad++")
 {
-	<#
-	if (-not (Test-Path -Path "$env:APPDATA\Notepad++\config.xml"))
-	{
-		Start-Process -FilePath "$env:ProgramFiles\Notepad++\notepad++.exe"
-		Write-Verbose -Message "`"$env:ProgramFiles\Notepad++\notepad++.exe`" doesn't exist. Re-run the script" -Verbose
-		break
-	}
-
-	Stop-Process -Name notepad++ -Force -ErrorAction Ignore
-	#>
-
 	$Remove = @(
 		"$env:ProgramFiles\Notepad++\change.log",
 		"$env:ProgramFiles\Notepad++\LICENSE",
@@ -296,9 +280,10 @@ if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 	# https://github.com/witalihirsch/qBitTorrent-fluent-theme
  	# https://github.com/jagannatharjun/qbt-theme
 	$Parameters = @{
-		Uri     = "https://github.com/witalihirsch/qBitTorrent-fluent-theme/raw/refs/heads/main/Builds/fluent-dark-no-mica.qbtheme"
-		OutFile = "$env:APPDATA\qBittorrent\defaulticons-fluent-dark-no-mica.qbtheme"
-		Verbose = $true
+		Uri             = "https://github.com/witalihirsch/qBitTorrent-fluent-theme/raw/refs/heads/main/Builds/fluent-dark-no-mica.qbtheme"
+		OutFile         = "$env:APPDATA\qBittorrent\defaulticons-fluent-dark-no-mica.qbtheme"
+		UseBasicParsing = $true
+		Verbose         = $true
 	}
 	Invoke-WebRequest @Parameters
 
@@ -375,3 +360,6 @@ if (Test-Path -Path "$env:ProgramFiles\WinRAR")
 
 	Remove-Item -Path "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\WinRAR" -Recurse -Force -ErrorAction Ignore
 }
+
+New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows Security Health\State" -Name AccountProtection_MicrosoftAccount_Disconnected -PropertyType DWord -Value 1 -Force
+New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows Security Health\State" -Name AppAndBrowser_EdgeSmartScreenOff -PropertyType DWord -Value 0 -Force
