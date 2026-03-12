@@ -1407,3 +1407,5 @@ Remove-Item -Path "$env:USERPROFILE\.ssh" -Recurse -Force
 & "$env:SystemRoot\System32\OpenSSH\sftp.exe" -P <port> user@ip_address
 put "D:\folder\1.txt" /home/<username>
 
+# https://cheburcheck.ru
+& $env:SystemRoot\system32\curl.exe -k <blocked_web_resource> --resolve <site_from_whitelist>:443:<IP_address_of_the_same_blocked_site>
