@@ -99,7 +99,7 @@ $Body = @"
 "@
 
 $Headers = @{
-	# Double quote x-soap-action x-soap-action
+	# Double quote x-soap-action value
 	"x-soap-action"          = '"http://schemas.sitels.ru/FORIS/IL/JsonApi/IResourceOperations%ChangeUserPhysicalResourceBulk"'
 	# If only one MSISDN
 	"X-MTS-MSISDN"           = "7XXXXXXXXXX"
