@@ -30,7 +30,7 @@ if (Test-Path -Path $env:ProgramFiles\AIMP)
 	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 	$Parameters = @{
-		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/AIMP.ini"
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Apps/AIMP/AIMP.ini"
 		OutFile         = "$env:APPDATA\AIMP\AIMP.ini"
 		UseBasicParsing = $true
 		Verbose         = $true
@@ -38,7 +38,7 @@ if (Test-Path -Path $env:ProgramFiles\AIMP)
 	Invoke-WebRequest @Parameters
 
 	$Parameters = @{
-		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/AIMPac.ini"
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Apps/AIMP/AIMPac.ini"
 		OutFile         = "$env:APPDATA\AIMP\AIMPac.ini"
 		UseBasicParsing = $true
 		Verbose         = $true
@@ -49,7 +49,7 @@ if (Test-Path -Path $env:ProgramFiles\AIMP)
 	$ID = Get-Content -Path "$env:APPDATA\AIMP\Skins\Default.ini" | Select-Object -Index 1
 
 	$Parameters = @{
-		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/AIMP/Default.ini"
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Apps/AIMP/Default.ini"
 		OutFile         = "$env:APPDATA\AIMP\Skins\Default.ini"
 		UseBasicParsing = $true
 		Verbose         = $true
@@ -166,7 +166,7 @@ if (Test-Path -Path "$env:ProgramFiles\MPC-BE")
 	Remove-Item -Path $Remove -Recurse -Force -ErrorAction Ignore
 
 	$Parameters = @{
-		Uri     = "https://raw.githubusercontent.com/farag2/Utilities/master/MPC-BE/mpc-be64.ini"
+		Uri     = "https://raw.githubusercontent.com/farag2/Utilities/master/Apps/MPC-BE/mpc-be64.ini"
 		OutFile = "$env:ProgramFiles\MPC-BE\mpc-be64.ini"
 		UseBasicParsing = $true
 		Verbose         = $true
@@ -270,7 +270,7 @@ if (Test-Path -Path "$env:ProgramFiles\qBittorrent")
 
 	# https://github.com/farag2/Utilities/blob/master/qBittorrent/qBittorrent.ini
 	$Parameters = @{
-		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/qBittorrent/qBittorrent.ini"
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Apps/qBittorrent/qBittorrent.ini"
 		OutFile         = "$env:APPDATA\qBittorrent\qBittorrent.ini"
 		UseBasicParsing = $true
 		Verbose         = $true
@@ -345,7 +345,7 @@ if (Test-Path -Path "$env:ProgramFiles\WinRAR")
 	Remove-Item -Path $Remove -Recurse -Force -ErrorAction Ignore
 
 	$Parameters = @{
-		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/WinRAR/WinRAR.ini"
+		Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Apps/WinRAR/WinRAR.ini"
 		OutFile         = "$env:ProgramFiles\WinRAR\WinRAR.ini"
 		UseBasicParsing = $true
 		Verbose         = $true
