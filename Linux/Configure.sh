@@ -28,6 +28,7 @@ net.ipv4.tcp_congestion_control=bbr
 sudo nano /etc/ssh/sshd_config
 
 # Disable port on firewall
+# ss -ntpl
 ufw enable && ufw allow <portn_number>/tcp
 
 # Disable root account. Needed another user with sudo access level
