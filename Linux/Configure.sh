@@ -14,10 +14,9 @@ passwd
 # /var/backups
 # /var/logs
 
-# Disable ICMP ping response
 # /etc/sysctl.conf
+# Disable ICMP ping response
 net.ipv4.icmp_echo_ignore_all = 1
-
 # Enable BBR
 net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
