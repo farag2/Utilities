@@ -14,7 +14,8 @@ passwd
 # /var/backups
 # /var/logs
 
-# /etc/sysctl.conf
+# Configure sysctl.conf
+sudo nano /etc/sysctl.conf
 # Disable ICMP ping response
 net.ipv4.icmp_echo_ignore_all = 1
 # Enable BBR
