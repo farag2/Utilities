@@ -93,6 +93,8 @@ chmod 700 ~/.ssh
 & "$env:SystemRoot\System32\OpenSSH\ssh-keygen.exe" -t ed25519
 # Copy id_ed25519 to /home/<user>/.ssh folder
 & "$env:SystemRoot\System32\OpenSSH\scp.exe" -P 6601 "$env:USERPROFILE\.ssh\id_ed25519.pub" user@ip_address:~/.ssh/authorized_keys
+# List folders on server
+ls .ssh
 
 sudo nano /etc/ssh/sshd_config
 PubkeyAuthentication yes
