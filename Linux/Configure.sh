@@ -59,7 +59,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.
 sudo crontab -u root -l
 
 # Edit crons
-crontab -e
+sudo crontab -e
 # Reboots every Sunday at 00 am
 # Run the echo "Failed" command only if script fails
 0 0 * * 7 NEEDRESTART_SUSPEND=1 apt update -y && apt full-upgrade -y && apt autoremove -y && apt autoclean -y && reboot && echo "$(date): Success" >> /home/cron.log || echo "$(date): Failed" >> /home/cron_fail.log
@@ -99,7 +99,7 @@ sudo nano /etc/ssh/sshd_config
 PubkeyAuthentication yes
 # Where SSH key to expect
 AuthorizedKeysFile .ssh/authorized_keys
-systemctl restart ssh
+sudo systemctl restart ssh
 
 # Configure ssh-agent service
 Set-Service -Name ssh-agent -StartupType Automatic
