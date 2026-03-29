@@ -96,8 +96,10 @@ chmod 700 ~/.ssh
 # List folders on server
 ls .ssh
 
-sudo nano /etc/ssh/sshd_config
 # Disable authorization via password
+# ls /etc/ssh/sshd_config.d
+sudo nano /etc/ssh/sshd_config.d/*.conf
+sudo nano /etc/ssh/sshd_config
 PasswordAuthentication no
 PubkeyAuthentication yes
 # Where SSH key to expect
