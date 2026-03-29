@@ -105,6 +105,7 @@ systemctl restart sshd
 # Configure ssh-agent service
 Set-Service -Name ssh-agent -StartupType Automatic
 Start-Service -Name ssh-agent
+& "$env:SystemRoot\System32\OpenSSH\ssh-add.exe" $env:USERPROFILE\.ssh\<ssh-file-without-pub-ext>
 
 # id_ed25519 won't be accepted if it is placed in a public folder
 & "$env:SystemRoot\System32\OpenSSH\ssh.exe" user@ip_address -p <port> -i "$env:USERPROFILE\.ssh\id_ed25519" -v
