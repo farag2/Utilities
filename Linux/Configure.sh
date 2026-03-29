@@ -97,6 +97,8 @@ chmod 700 ~/.ssh
 ls .ssh
 
 sudo nano /etc/ssh/sshd_config
+# Disable authorization via password
+PasswordAuthentication no
 PubkeyAuthentication yes
 # Where SSH key to expect
 AuthorizedKeysFile .ssh/authorized_keys
@@ -110,6 +112,6 @@ Start-Service -Name ssh-agent
 # id_ed25519 won't be accepted if it is placed in a public folder
 & "$env:SystemRoot\System32\OpenSSH\ssh.exe" user@ip_address -p <port> -i "$env:USERPROFILE\.ssh\<ssh-file-without-pub-ext>" -v
 
-# Disable authorization via password
-sudo nano /etc/ssh/sshd_config
-PasswordAuthentication no
+# Scan IP address for domains
+# https://github.com/XTLS/RealiTLScanner
+.\RealiTLScanner-windows-64.exe -addr <ip-address> -thread 10 -timeout 5 -out D:\file.csv -v
