@@ -90,9 +90,9 @@ mkdir -p ~/.ssh
 chmod 700 ~/.ssh
 
 # Generate an SSH keys and save them to "$env:USERPROFILE\.ssh"
-& "$env:SystemRoot\System32\OpenSSH\ssh-keygen.exe" -t ed25519
+& "$env:SystemRoot\System32\OpenSSH\ssh-keygen.exe" -t ed25519 -f "friendly-name"
 # Copy id_ed25519 to /home/<user>/.ssh folder
-& "$env:SystemRoot\System32\OpenSSH\scp.exe" -P 6601 "$env:USERPROFILE\.ssh\id_ed25519.pub" user@ip_address:~/.ssh/authorized_keys
+& "$env:SystemRoot\System32\OpenSSH\scp.exe" -P 6601 "$env:USERPROFILE\.ssh\<friendlyname>.pub" user@ip_address:~/.ssh/authorized_keys
 # List folders on server
 ls .ssh
 
@@ -108,7 +108,7 @@ Start-Service -Name ssh-agent
 & "$env:SystemRoot\System32\OpenSSH\ssh-add.exe" $env:USERPROFILE\.ssh\<ssh-file-without-pub-ext>
 
 # id_ed25519 won't be accepted if it is placed in a public folder
-& "$env:SystemRoot\System32\OpenSSH\ssh.exe" user@ip_address -p <port> -i "$env:USERPROFILE\.ssh\id_ed25519" -v
+& "$env:SystemRoot\System32\OpenSSH\ssh.exe" user@ip_address -p <port> -i "$env:USERPROFILE\.ssh\<ssh-file-without-pub-ext>" -v
 
 # Disable authorization via password
 sudo nano /etc/ssh/sshd_config
