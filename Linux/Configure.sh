@@ -99,7 +99,7 @@ sudo nano /etc/ssh/sshd_config
 PubkeyAuthentication yes
 # Where SSH key to expect
 AuthorizedKeysFile .ssh/authorized_keys
-systemctl restart sshd
+systemctl restart ssh
 
 # Configure ssh-agent service
 Set-Service -Name ssh-agent -StartupType Automatic
