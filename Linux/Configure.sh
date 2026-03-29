@@ -101,7 +101,11 @@ PubkeyAuthentication yes
 # Where SSH key to expect
 AuthorizedKeysFile .ssh/authorized_keys
 systemctl restart sshd
-# Authorize on server
+
+# Configure ssh-agent service
+Set-Service -Name ssh-agent -StartupType Automatic
+Start-Service -Name ssh-agent
+
 # id_ed25519 won't be accepted if it is placed in a public folder
 & "$env:SystemRoot\System32\OpenSSH\ssh.exe" user@ip_address -p <port> -i "$env:USERPROFILE\.ssh\id_ed25519" -v
 
