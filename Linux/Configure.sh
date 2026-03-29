@@ -69,7 +69,6 @@ crontab -e
 
 # Connect via SSH from PowerShell
 & "$env:SystemRoot\System32\OpenSSH\ssh.exe" user@ip_address -p <port> -v
-Remove-Item -Path "$env:USERPROFILE\.ssh" -Recurse -Force
 
 # Download file from remote server
 # -P <port> must be the first
