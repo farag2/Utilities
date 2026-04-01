@@ -36,8 +36,9 @@ function ConvertTo-BodyWithEncoding
 
 # We cannot invoke an expression with non-latin words to avoid "??????"
 # New-ItemProperty -LiteralPath Registry::HKEY_CLASSES_ROOT\*\shell\Paint.NET -Name "(Default)" -PropertyType String -Value "Открыть с помощью Paint.NET" -Force
+# https://github.com/farag2/Utilities/blob/master/Apps/Paint.NET_context_menu.ps1
 $Parameters = @{
-	Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Paint.NET_context_menu.ps1"
+	Uri             = "https://raw.githubusercontent.com/farag2/Utilities/refs/heads/master/Apps/Paint.NET_context_menu.ps1"
 	UseBasicParsing = $true
 	Verbose         = $true
 }
