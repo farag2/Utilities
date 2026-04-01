@@ -274,28 +274,3 @@ $Parameters = @{
 	ExcelToExportFile = "D:\\1.csv"
 }
 Rename-YandexDiskFiles @Parameters
-
-
-
-# https://seller.ozon.ru/app/settings/api-keys
-$Headers = @{
-	"Client-Id"    = ""
-	"Api-Key"      = ""
-	"Content-Type" = "application/json"
-}
-$Body = @{
-	filter = @{
-		visibility = "ALL" # ALL, VISIBLE, INVISIBLE, EMPTY_STOCK
-	}
-	last_id = ""
-	limit = 1000
-}
-$Parameters = @{
-	Uri     = "https://api-seller.ozon.ru/v3/product/list"
-	Headers = $Headers
-	Method  = "Post"
-	# We need to explicitly convert the body to JSON
-	Body    = $Body | ConvertTo-Json
-}
-$Response = Invoke-RestMethod @Parameters
-$Response.result.items
