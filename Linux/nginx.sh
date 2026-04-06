@@ -1,19 +1,15 @@
-# https://freedirector.io/dashboard
-# https://forwarddomain.net
-
 # Enable permanent redirection
-sudo nano /etc/nginx/sites-available/<subdomain>
+sudo nano /etc/nginx/sites-available/<subdomain.domain.com>
 
-# /etc/nginx/sites-available/<subdomain> file
 server {
     listen 80;
-    server_name <subdomain>;
+    server_name <subdomain.domain.com>;
 
     # 301 Permanent Redirect
-    return 301 <new_domain>;
+    return 301 <new_link>;
 }
 
-sudo ln -s /etc/nginx/sites-available/<subdomain> /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/<subdomain.domain.com> /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 
 # In ISPmanager
@@ -23,4 +19,4 @@ Value: <VPS IP>
 TTL: 3600
 
 # Test configuration
-curl -I <subdomain>
+curl -I <subdomain.domain.com>
