@@ -30,12 +30,7 @@ $Parameters = @{
 	UseBasicParsing = $true
 }
 Invoke-RestMethod @Parameters
+test-path "$env:TEMP\UnattendOOBE.xml"
+pause
 
-foreach ($Letter in (Get-Volume).DriveLetter)
-{
-	if (Test-Path -Path "$($Letter):\Windows\System32\Sysprep\sysprep.exe")
-	{
-		& "$($Letter):\Windows\System32\Sysprep\sysprep.exe" /reboot /oobe /unattend:"$env:TEMP\UnattendOOBE.xml"
-		break
-	}
-}
+& "C:\Windows\System32\Sysprep\sysprep.exe" /reboot /oobe /unattend:"$env:TEMP\UnattendOOBE.xml"
