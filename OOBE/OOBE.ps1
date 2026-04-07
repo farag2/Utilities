@@ -30,7 +30,5 @@ $Parameters = @{
 	UseBasicParsing = $true
 }
 Invoke-RestMethod @Parameters
-test-path "$env:TEMP\UnattendOOBE.xml"
-pause
 
 & "C:\Windows\System32\Sysprep\sysprep.exe" /reboot /oobe /unattend:"$env:TEMP\UnattendOOBE.xml"
