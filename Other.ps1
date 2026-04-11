@@ -1409,3 +1409,28 @@ put "D:\folder\1.txt" /home/<username>
 
 # https://cheburcheck.ru
 & $env:SystemRoot\system32\curl.exe -k <blocked_web_resource> --resolve <site_from_whitelist>:443:<IP_address_of_the_same_blocked_site>
+
+# Add proxy
+New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name AutoConfigURL -PropertyType String -Value "link to pac" -Force
+
+$Signature = @{
+	Namespace          = "WinAPI"
+	Name               = "wininet"
+	Language           = "CSharp"
+	CompilerParameters = $CompilerParameters
+	MemberDefinition   = @"
+[DllImport("wininet.dll", SetLastError = true, CharSet=CharSet.Auto)]
+public static extern bool InternetSetOption(IntPtr hInternet, int dwOption, IntPtr lpBuffer, int dwBufferLength);
+"@
+}
+if (-not ("WinAPI.wininet" -as [type]))
+{
+	Add-Type @Signature
+}
+
+# Apply changed proxy settings
+# https://learn.microsoft.com/en-us/windows/win32/wininet/option-flags
+$INTERNET_OPTION_SETTINGS_CHANGED = 39
+$INTERNET_OPTION_REFRESH          = 37
+[WinAPI.wininet]::InternetSetOption(0, $INTERNET_OPTION_SETTINGS_CHANGED, 0, 0)
+[WinAPI.wininet]::InternetSetOption(0, $INTERNET_OPTION_REFRESH, 0, 0)
