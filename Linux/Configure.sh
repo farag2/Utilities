@@ -126,3 +126,6 @@ sudo -i
 # Install certificate
 # Switch back to <user>
 su <user>
+
+# Test server
+https://github.com/saveksme/multitest/
