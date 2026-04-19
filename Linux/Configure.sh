@@ -119,3 +119,10 @@ Start-Service -Name ssh-agent
 # Scan IP address for domains
 # https://github.com/XTLS/RealiTLScanner
 .\RealiTLScanner-windows-64.exe -addr <ip-address> -thread 10 -timeout 5 -out D:\file.csv -v
+
+# Install certificate
+# Switch to root
+sudo -i
+# Install certificate
+# Switch back to <user>
+su <user>
