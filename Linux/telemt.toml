@@ -1,0 +1,43 @@
+[general]
+use_middle_proxy = false
+fast_mode = true
+
+[general.modes]
+classic = false
+secure = false
+tls = true
+
+[server]
+port = 443
+listen_addr_ipv4 = "0.0.0.0"
+listen_addr_ipv6 = "::"
+
+[[server.listeners]]
+ip = "0.0.0.0"
+
+[server.api]
+enabled = true
+listen = "127.0.0.1:9091"
+whitelist = ["127.0.0.1/32"]
+read_only = true
+
+[censorship]
+tls_domain = "domain"
+mask = true
+mask_host = "127.0.0.1"
+mask_port = 8443
+fake_cert_len = 2048
+tls_emulation = true
+unknown_sni_action = "mask"
+
+[general.links]
+show = "*"
+public_host = "domain"
+public_port = 443
+
+[[upstreams]]
+type = "direct"
+enabled = true
+
+[access.users]
+# format: "username" = "32_hex_chars_secret"
