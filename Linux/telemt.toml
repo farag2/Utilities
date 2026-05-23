@@ -1,5 +1,5 @@
 [general]
-use_middle_proxy = false
+use_middle_proxy = true
 fast_mode = true
 
 [general.modes]
@@ -24,11 +24,11 @@ read_only = true
 [censorship]
 tls_domain = "domain"
 mask = true
-mask_host = "127.0.0.1"
+mask_host = "domain"
 mask_port = 8443
 fake_cert_len = 2048
 tls_emulation = true
-unknown_sni_action = "mask"
+mask_proxy_protocol = 1
 
 [general.links]
 show = "*"
