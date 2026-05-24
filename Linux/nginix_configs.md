@@ -7,6 +7,10 @@
 server {
     listen 80;
     server_name <domain>;
+
+    # 301 Permanent Redirect
+    return 301 <new_link>;
+    server_name <domain>;
 }
 ```
 
