@@ -6,14 +6,11 @@
 # Enable permanent redirection
 server {
     listen 80;
-    server_name <subdomain.domain.com>;
-
-    # 301 Permanent Redirect
-    return 301 <new_link>;
+    server_name <domain>;
 }
 ```
 
-`sudo nano  /etc/nginx/sites-available/<domain>.conf`
+`sudo nano /etc/nginx/sites-available/<domain>.conf`
 
 ```
 server {
