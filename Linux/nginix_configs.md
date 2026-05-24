@@ -1,4 +1,4 @@
-<https://github.com/telemt/telemt/issues/617#issuecomment-4286171352>
+Redirect
 
 `sudo nano /etc/nginx/sites-available/<domain>`
 
@@ -13,6 +13,8 @@ server {
     server_name <domain>;
 }
 ```
+
+<https://github.com/telemt/telemt/issues/617#issuecomment-4286171352>
 
 `sudo nano /etc/nginx/sites-available/<domain>.conf`
 
