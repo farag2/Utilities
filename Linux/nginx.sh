@@ -41,3 +41,5 @@ curl -I <domain>
 
 # Enable nginix config
 sudo ln -s /etc/nginx/sites-available/<domain>.conf /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/<domain>.conf /etc/nginx/sites-enabled/<domain>.conf
+
