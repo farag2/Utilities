@@ -13,8 +13,8 @@ sudo apt install certbot python3-certbot-nginx -y
 sudo certbot certonly -d <domain>
 
 # Create a temp page
-sudo mkdir -p /var/www/<domain>/html
-echo "<domain>" | sudo tee /var/www/<domain>/html/index.html
+sudo mkdir -p /var/www/<domain>
+echo "<domain>" | sudo tee /var/www/<domain>/index.html
 
 # Telemt service
 sudo systemctl start telemt
