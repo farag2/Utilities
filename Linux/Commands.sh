@@ -5,9 +5,6 @@ apt --fix-missing install
 # Upgrade
 do-release-upgrade
 
-# Install curl
-apt install curl -y
-
 # Change pasword
 passwd
 
