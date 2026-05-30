@@ -19,8 +19,11 @@ server {
 `sudo nano /etc/nginx/sites-available/<domain>.conf`
 
 ```
+# latest nginx
+
 server {
-    listen 127.0.0.1:8443 ssl http2;
+    listen 127.0.0.1:8443 ssl;
+    http2 on;
     server_name <domain>;
 
     ssl_certificate     /etc/letsencrypt/live/<domain>/fullchain.pem;
