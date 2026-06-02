@@ -45,9 +45,6 @@ PermitRootLogin=no
 # Restart
 sudo systemctl restart ssh
 
-# Check Internet speed connection
-wget -qO- bench.sh | bash
-
 # https://github.com/XTLS/Xray-core
 # https://github.com/MHSanaei/3x-ui
 bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
@@ -123,6 +120,3 @@ sudo -i
 # Install certificate
 # Switch back to <user>
 su <user>
-
-# Test server
-https://github.com/saveksme/multitest/
