@@ -3,6 +3,7 @@ apt --fix-broken install
 apt --fix-missing install
 
 # Upgrade
+apt-get dist-upgrade
 do-release-upgrade
 
 # Change pasword
