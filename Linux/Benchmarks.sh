@@ -13,7 +13,7 @@ bash <(wget -qO- https://github.com/itdoginfo/russian-iperf3-servers/raw/main/sp
 
 # Yet-Another-Bench-Script
 # https://github.com/masonr/yet-another-bench-script
-curl -sL yabs.sh | -s -- -4
+curl -sL https://yabs.sh | bash
 
 # Check VPS properties
 # https://bench.sh
