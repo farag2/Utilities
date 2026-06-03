@@ -15,7 +15,7 @@ bash <(wget -qO- https://github.com/itdoginfo/russian-iperf3-servers/raw/main/sp
 # https://github.com/masonr/yet-another-bench-script
 curl -sL yabs.sh | -s -- -4
 
-# Check Internet speed connection
+# Check VPS properties
 # https://bench.sh
 wget -qO- bench.sh | bash
 
