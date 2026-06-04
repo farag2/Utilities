@@ -1,3 +1,9 @@
+# ISPmanager
+Name: domain
+Type: A
+Value: <VPS IP>
+TTL: 3600
+
 apt update -y && apt full-upgrade -y && apt autoremove -y && apt autoclean -y
 apt --fix-broken install
 apt --fix-missing install
