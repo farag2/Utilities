@@ -24,6 +24,16 @@ net.ipv4.tcp_congestion_control=bbr
 # Check if port number is not used in other cases
 # Port=port_number
 sudo nano /etc/ssh/sshd_config
+sudo systemctl restart sshd
+
+# DNS-over-TLS
+# sudo nano /etc/systemd/resolved.conf
+# resolvectl status
+# resolvectl dns
+DNS=1.1.1.1 8.8.8.8
+FallbackDNS=9.9.9.9
+DNSOverTLS=yes
+# sudo systemctl restart systemd-resolved
 
 # Disable port on firewall
 # ss -ntpl
@@ -111,13 +121,13 @@ Start-Service -Name ssh-agent
 # id_ed25519 won't be accepted if it is placed in a public folder
 & "$env:SystemRoot\System32\OpenSSH\ssh.exe" user@ip_address -p <port> -i "$env:USERPROFILE\.ssh\<ssh-file-without-pub-ext>" -v
 
-# Scan IP address for domains
-# https://github.com/XTLS/RealiTLScanner
-.\RealiTLScanner-windows-64.exe -addr <ip-address> -thread 10 -timeout 5 -out D:\file.csv -v
+# Uninstall nginx
+sudo systemctl stop nginx
+sudo service nginx stop
+sudo apt-get purge nginx nginx-common nginx-full nginx-core -y
+sudo apt-get autoremove
+sudo rm -rf /etc/nginx /var/log/nginx /var/lib/nginx
 
-# Install certificate
-# Switch to root
-sudo -i
-# Install certificate
-# Switch back to <user>
-su <user>
+# Uninstall acme
+acme.sh --uninstall
+rm -r  ~/.acme.sh
