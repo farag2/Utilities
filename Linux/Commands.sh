@@ -123,13 +123,6 @@ Start-Service -Name ssh-agent
 # id_ed25519 won't be accepted if it is placed in a public folder
 & "$env:SystemRoot\System32\OpenSSH\ssh.exe" user@ip_address -p <port> -i "$env:USERPROFILE\.ssh\<ssh-file-without-pub-ext>" -v
 
-# Uninstall nginx
-sudo systemctl stop nginx
-sudo service nginx stop
-sudo apt-get purge nginx nginx-common nginx-full nginx-core -y
-sudo apt-get autoremove
-sudo rm -rf /etc/nginx /var/log/nginx /var/lib/nginx
-
 # Uninstall acme
 acme.sh --uninstall
 rm -r  ~/.acme.sh
