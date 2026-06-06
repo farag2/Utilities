@@ -27,3 +27,10 @@ rm -rf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 # For nginx version greater than 1.25
 sudo ln -fs /etc/nginx/conf.d/<domain>
+
+# Uninstall nginx
+sudo systemctl stop nginx
+sudo service nginx stop
+sudo apt-get purge nginx nginx-common nginx-full nginx-core -y
+sudo apt-get autoremove
+sudo rm -rf /etc/nginx /var/log/nginx /var/lib/nginx
