@@ -76,6 +76,10 @@ server {
 
     root  /var/www/<domain>;
     index index.html;
+
+    access_log /var/log/nginx/<domain>.access.log;
+    error_log  /var/log/nginx/<domain>.error.log;
+
     location / { try_files $uri $uri/ =404; }
 }
 ```
