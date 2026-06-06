@@ -62,10 +62,6 @@ PermitRootLogin=no
 # Restart
 sudo systemctl restart ssh
 
-# https://github.com/XTLS/Xray-core
-# https://github.com/MHSanaei/3x-ui
-bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
-
 # cron
 # List cron jobs
 # sudo crontab -u <user> -l
