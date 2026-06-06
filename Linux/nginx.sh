@@ -23,5 +23,6 @@ ls -l /etc/nginx/sites-enabled
 
 # Enable nginix config
 sudo ln -fs /etc/nginx/sites-available/<domain> /etc/nginx/sites-enabled/
+# For nginx version greater than 1.25
 sudo ln -fs /etc/nginx/conf.d/<domain>
 rm -rf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
