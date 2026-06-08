@@ -1,6 +1,9 @@
 # Check telemt journal
 sudo journalctl -u telemt -f
 
+# Config
+sudo nano /etc/telemt/telemt.toml
+
 # Check telemt status
 sudo telemt /etc/telemt/telemt.toml
 
