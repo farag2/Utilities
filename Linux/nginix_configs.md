@@ -3,13 +3,16 @@
 `sudo nano /etc/nginx/sites-available/<domain>`
 
 ```
-# Enable permanent redirection
+map $host $redirect_target {
+    sub.domain.com     <URL>
+    sub.domain.com     <URL>
+}
+
 server {
     listen 80;
-    server_name <domain>;
+    server_name sub.domain.com sub.domain.com;
 
-    # 301 Permanent Redirect
-    return 301 <new_link>;
+    return 301 $redirect_target;
 }
 ```
 
