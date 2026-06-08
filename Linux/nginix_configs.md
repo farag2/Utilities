@@ -48,10 +48,9 @@ server {
 }
 
 server {
-    listen 127.0.0.1:8080;
+    listen      80;
     server_name <domain>;
 
-    # local HTTP → HTTPS redirect if needed for tools
     return 301 https://<domain>$request_uri;
 }
 ```
@@ -68,8 +67,8 @@ server {
 }
 
 server {
-    # for nginx lower than 1.25
-    listen 127.0.0.1:8443 ssl http2;
+    listen 127.0.0.1:8443 ssl;
+    http2 on;
     server_name <domain>;
 
     # Issuing within x-ui
