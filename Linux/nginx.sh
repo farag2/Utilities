@@ -3,7 +3,7 @@ sudo apt install nginx libnginx-mod-stream -y
 
 # Issue cert
 sudo apt install certbot python3-certbot-nginx -y
-sudo certbot certonly -d <domain>
+certbot certonly --standalone --agree-tos -d <domain> -m <mail>
 
 # Create a temp page
 sudo mkdir -p /var/www/<domain>
