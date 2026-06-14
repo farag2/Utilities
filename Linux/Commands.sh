@@ -28,18 +28,12 @@ net.ipv4.tcp_congestion_control=bbr
 
 # Change SSH port
 # Check if port number is not used in other cases
-# For Ubuntu > 26.04
 # systemctl status ssh.socket
 # ss -tlnp | grep :22
-sudo systemctl edit ssh.socket
-[Socket]
-ListenStream=
-ListenStream=6601
-sudo systemctl daemon-reload
-sudo systemctl restart ssh.socket
-# For Ubuntu < 26.04
 # Port=port_number
 sudo nano /etc/ssh/sshd_config
+sudo systemctl daemon-reload
+sudo systemctl restart ssh.socket
 sudo systemctl restart sshd
 
 # DNS-over-TLS
