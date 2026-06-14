@@ -39,7 +39,7 @@ sudo nano /etc/systemd/resolved.conf
 DNS=1.1.1.1 8.8.8.8
 FallbackDNS=9.9.9.9
 DNSOverTLS=yes
-# sudo systemctl restart systemd-resolved
+sudo systemctl restart systemd-resolved
 
 # Disable port on firewall
 # ss -ntpl
