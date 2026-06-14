@@ -35,8 +35,8 @@ sudo systemctl edit ssh.socket
 [Socket]
 ListenStream=
 ListenStream=6601
-systemctl daemon-reload
-systemctl restart ssh.socket
+sudo systemctl daemon-reload
+sudo systemctl restart ssh.socket
 # For Ubuntu < 26.04
 # Port=port_number
 sudo nano /etc/ssh/sshd_config
