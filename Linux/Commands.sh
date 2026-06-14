@@ -122,7 +122,3 @@ Start-Service -Name ssh-agent
 
 # id_ed25519 won't be accepted if it is placed in a public folder
 & "$env:SystemRoot\System32\OpenSSH\ssh.exe" user@ip_address -p <port> -i "$env:USERPROFILE\.ssh\<ssh-file-without-pub-ext>" -v
-
-# Uninstall acme
-acme.sh --uninstall
-rm -r  ~/.acme.sh
