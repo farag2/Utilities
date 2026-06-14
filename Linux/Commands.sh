@@ -32,6 +32,18 @@ net.ipv4.tcp_congestion_control=bbr
 # ss -tlnp | grep :22
 # Port=port_number
 sudo nano /etc/ssh/sshd_config
+# Disable Root SSH Login
+PermitRootLogin=no
+# Disable authorization via password
+# Set only if you configured authentication via ssh key
+# ls /etc/ssh/sshd_config.d
+sudo nano /etc/ssh/sshd_config.d/*.conf
+sudo nano /etc/ssh/sshd_config
+PasswordAuthentication no
+PubkeyAuthentication yes
+# Where SSH key to expect
+AuthorizedKeysFile .ssh/authorized_keys
+#
 sudo systemctl daemon-reload
 sudo systemctl restart ssh.socket
 sudo systemctl restart sshd
@@ -59,12 +71,6 @@ su <username>
 sudo whoami
 # Lock the root password
 sudo passwd -l root
-
-# Disable Root SSH Login
-sudo nano /etc/ssh/sshd_config
-PermitRootLogin=no
-# Restart
-sudo systemctl restart ssh
 
 # cron
 # List cron jobs
@@ -108,16 +114,6 @@ chmod 700 ~/.ssh
 & "$env:SystemRoot\System32\OpenSSH\scp.exe" -P 6601 "$env:USERPROFILE\.ssh\<friendlyname>.pub" user@ip_address:~/.ssh/authorized_keys
 # List folders on server
 ls .ssh
-
-# Disable authorization via password
-# ls /etc/ssh/sshd_config.d
-sudo nano /etc/ssh/sshd_config.d/*.conf
-sudo nano /etc/ssh/sshd_config
-PasswordAuthentication no
-PubkeyAuthentication yes
-# Where SSH key to expect
-AuthorizedKeysFile .ssh/authorized_keys
-sudo systemctl restart ssh
 
 # Configure ssh-agent service
 Set-Service -Name ssh-agent -StartupType Automatic
