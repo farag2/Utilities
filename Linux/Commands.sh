@@ -72,17 +72,15 @@ sudo whoami
 # Lock the root password
 sudo passwd -l root
 
-# cron
-# List cron jobs
-# sudo crontab -u <user> -l
-sudo crontab -l
-
 # Edit crons
 # sudo nano crontab -u <user> -e
-sudo nano crontab -e
+sudo crontab -e
 # Reboots every Sunday at 00 am
-# Run the echo "Failed" command only if script fails
-0 0 * * 7 NEEDRESTART_SUSPEND=1 apt update -y && apt full-upgrade -y && apt autoremove -y && apt autoclean -y && reboot && echo "$(date): Success" >> /home/cron.log || echo "$(date): Failed" >> /home/cron_fail.log
+0 0 * * 7 NEEDRESTART_SUSPEND=1 apt update -y && apt full-upgrade -y && apt autoremove -y && apt autoclean -y && echo "$(date): Success" >> /home/cron.log && reboot || echo "$(date): Failed" >> /home/cron_fail.log
+
+# List cron jobs
+sudo crontab -u <user> -l
+sudo crontab -l
 
 # System jobs
 /var/spool/cron/crontabs
