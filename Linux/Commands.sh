@@ -33,7 +33,7 @@ sudo nano /etc/ssh/sshd_config
 sudo systemctl restart sshd
 
 # DNS-over-TLS
-# sudo nano /etc/systemd/resolved.conf
+sudo nano /etc/systemd/resolved.conf
 # resolvectl status
 # resolvectl dns
 DNS=1.1.1.1 8.8.8.8
