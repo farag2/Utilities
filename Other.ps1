@@ -749,11 +749,10 @@ Get-SystemPreferredUILanguage
 Uninstall-Language
 
 # Bypass the Internet account creation in Windows 11
-# Shift+F10
-OOBE\BYPASSNRO
-#
-reg add HKLM\Software\Microsoft\Windows\CurrentVersion\OOBE /v BypassNRO /t REG_DWORD /d 1 /f
-shutdown.exe /r /t 1
+# https://github.com/farag2/Utilities/tree/master/OOBE
+reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE /v HideOnlineAccountScreens /t REG_DWORD /d 1 /f
+reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE /v HideWirelessSetupInOOBE /t REG_DWORD /d 1 /f
+shutdown /r /t 0
 # 
 start ms-cxh:localonly
 start ms-cxh://setaddlocalonly
