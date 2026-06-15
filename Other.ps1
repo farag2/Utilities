@@ -1117,7 +1117,7 @@ try
 catch {}
 $Error.Exception.Message
 
-# https://www.outsidethebox.ms/22149/
+# Windows localization
 Install-Language -Language ru-RU
 Set-WinUILanguageOverride -Language ru-RU
 $List = Get-WinUserLanguageList
@@ -1127,6 +1127,10 @@ Set-WinHomeLocation -GeoId 203 # https://go.microsoft.com/fwlink/?LinkID=242308
 Set-WinSystemLocale -SystemLocale ru-RU
 Copy-UserInternationalSettingsToSystem -WelcomeScreen $true -NewUser $true
 # Set-WinDefaultInputMethodOverride -InputTip "0409:00000409"
+
+# Windows 29610 license's management
+Get-OSLicenseInfo
+Set-OSLicenseInfo
 
 # Check if a variable assigned with "Set-StrictMode -Version Latest" set
 Test-Path -Path variable:MyVariable
