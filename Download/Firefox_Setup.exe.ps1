@@ -1,4 +1,5 @@
-# Downloading Firefox Setup.exe
+# Download Firefox Setup.exe
+
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 if ($Host.Version.Major -eq 5)
@@ -10,25 +11,29 @@ if ($Host.Version.Major -eq 5)
 
 # Mozilla shortens some locale codes to 2 or 3 letters, so we cannot use (Get-WinSystemLocale).Name for every language
 $Languages = @(
-	"ach", "af", "an", "ar", "ast",
-	"az", "be", "bg", "bn", "br",
-	"bs", "ca", "cak", "cs", "cy",
-	"da", "de", "dsb", "el", "en-CA",
-	"en-GB", "en-US", "eo", "es-AR", "es-CL",
-	"es-ES", "es-MX", "et", "eu", "fa",
-	"ff", "fi", "fr", "fy-NL", "ga-IE",
-	"gd", "gl", "gn", "gu-IN", "he",
-	"hi-IN", "hr", "hsb", "hu", "hy-AM",
-	"ia", "id", "is", "it", "ja",
-	"ka", "kab", "kk", "km", "kn",
-	"ko", "lij", "lt", "lv", "mk",
-	"mr", "ms", "my", "nb-NO", "ne-NP",
-	"nl", "nn-NO", "oc", "pa-IN", "pl",
-	"pt-BR", "pt-PT", "rm", "ro", "ru",
-	"si", "sk", "sl", "son", "sq",
-	"sr", "sv-SE", "ta", "te", "th",
-	"tr", "uk", "ur", "uz", "vi",
-	"xh", "zh-CN", "zh-TW"
+	"en-US", "en-GB", "en-CA", "es-ES",
+	"es-AR", "es-CL", "es-MX", "sv-SE",
+	"pt-BR", "pt-PT", "de", "fr", "it",
+	"ja", "nl", "zh-TW", "ach",
+	"af", "sq", "ar", "an",
+	"hy-AM", "ast", "az", "eu",
+	"be", "bs", "br", "bg",
+	"my", "ca", "hr", "cs",
+	"da", "eo", "et", "fi",
+	"fy-NL", "ff", "gd", "gl",
+	"ka", "el", "gn", "gu-IN",
+	"he", "hi-IN", "hu", "is",
+	"id", "ia", "ga-IE", "kab",
+	"kn", "cak", "kk", "km",
+	"ko", "lv", "lij", "lt",
+	"dsb", "mk", "ms", "mr",
+	"ne-NP", "nb-NO", "nn-NO", "oc",
+	"fa", "pl", "pa-IN", "ro",
+	"rm", "ru", "sr", "si",
+	"sk", "sl", "son", "ta",
+	"te", "th", "tr", "uk",
+	"hsb", "ur", "uz", "vi",
+	"cy", "xh"
 )
 if ((Get-WinSystemLocale).Name -in $Languages)
 {
@@ -48,7 +53,9 @@ $LatestStableVersion = (Invoke-RestMethod @Parameters).LATEST_FIREFOX_VERSION
 
 $DownloadsFolder = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "{374DE290-123F-4565-9164-39C4925E467B}"
 $Parameters = @{
-	Uri             = "https://ftp.mozilla.org/pub/firefox/releases/$LatestStableVersion/win64-EME-free/$Language/Firefox%20Setup%20$LatestStableVersion.exe"
+	Uri             = "https://download-installer.cdn.mozilla.net/pub/firefox/releases/$LatestStableVersion/win32/$Language/Firefox%20Setup%20$LatestStableVersion.exe"
+	# Uri           = "https://download.mozilla.org/?product=firefox-latest-ssl&os=win&lang=$Language"
+	# Uri           = "https://ftp.mozilla.org/pub/firefox/releases/$LatestStableVersion/win64-EME-free/$Language/Firefox%20Setup%20$LatestStableVersion.exe"
 	OutFile         = "$DownloadsFolder\Firefox Setup $LatestStableVersion.exe"
 	UseBasicParsing = $true
 	Verbose         = $true
