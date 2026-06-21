@@ -73,10 +73,10 @@ sudo whoami
 sudo passwd -l root
 
 # Edit crons
-# sudo nano crontab -u <user> -e
+sudo crontab -u <user> -e
 sudo crontab -e
 # Reboots every Sunday at 00 am
-0 0 * * 7 NEEDRESTART_SUSPEND=1 apt update -y && apt full-upgrade -y && apt autoremove -y && apt autoclean -y && echo "$(date): Success" >> /home/cron.log && reboot || echo "$(date): Failed" >> /home/cron_fail.log
+0 0 * * 7 export DEBIAN_FRONTEND=noninteractive NEEDRESTART_SUSPEND=1; { apt-get update -y && apt-get full-upgrade -y && apt-get autoremove -y && apt-get autoclean -y && echo "$(date): Success" >> /home/cron.log && /sbin/reboot; } || echo "$(date): Failed $?" >> /home/cron_fail.log
 
 # List cron jobs
 sudo crontab -u <user> -l
