@@ -21,10 +21,11 @@ passwd
 # Configure sysctl.conf
 sudo nano /etc/sysctl.conf
 # Disable ICMP ping response
-net.ipv4.icmp_echo_ignore_all = 1
+net.ipv4.icmp_echo_ignore_all=1
 # Enable BBR
 net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
+sudo sysctl -p
 
 # Change SSH port
 # Check if port number is not used in other cases
