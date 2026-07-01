@@ -25,7 +25,11 @@ net.ipv4.icmp_echo_ignore_all=1
 # Enable BBR
 net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
+# Read all sysctl settings
+sudo sysctl --system
+# Apply changes
 sudo sysctl -p
+sudo sysctl -p /etc/sysctl.conf
 
 # Change SSH port
 # Check if port number is not used in other cases
