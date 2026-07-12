@@ -13,4 +13,4 @@ sudo systemctl restart telemt
 sudo systemctl enable telemt
 sudo systemctl status telemt
 
-# https://github.com/Mekotofeuka/MTPROTO_FIX_By_MEKO/blob/main/main.sh
+# https://github.com/Mekotofeuka/MTPROTO_FIX_By_MEKO
