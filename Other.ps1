@@ -1437,3 +1437,15 @@ $INTERNET_OPTION_SETTINGS_CHANGED = 39
 $INTERNET_OPTION_REFRESH          = 37
 [WinAPI.wininet]::InternetSetOption(0, $INTERNET_OPTION_SETTINGS_CHANGED, 0, 0)
 [WinAPI.wininet]::InternetSetOption(0, $INTERNET_OPTION_REFRESH, 0, 0)
+
+# Enable "Network Discovery" and "File and Printers Sharing" for workgroup networks
+$FirewallRules = @(
+	# File and printer sharing
+	"@FirewallAPI.dll,-32752",
+
+	# Network discovery
+	"@FirewallAPI.dll,-28502"
+	)
+Set-NetFirewallRule -Group $FirewallRules -Profile Private -Enabled True
+Set-NetFirewallRule -Profile Private -Name FPS-SMB-In-TCP -Enabled True
+Set-NetConnectionProfile -NetworkCategory Private
