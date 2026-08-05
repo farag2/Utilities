@@ -1445,7 +1445,10 @@ $FirewallRules = @(
 
 	# Network discovery
 	"@FirewallAPI.dll,-28502"
-	)
+)
 Set-NetFirewallRule -Group $FirewallRules -Profile Private -Enabled True
 Set-NetFirewallRule -Profile Private -Name FPS-SMB-In-TCP -Enabled True
 Set-NetConnectionProfile -NetworkCategory Private
+
+# Create a 1MB (in KB) binary file
+fsutil file createnew D:\folder\test.bin 1048576
