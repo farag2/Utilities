@@ -32,40 +32,8 @@ $Parameters = @{
 }
 Expand-Archive @Parameters
 
-# https://github.com/farag2/Utilities/tree/master/Download/GZDoom
-$Parameters = @{
-	Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Download/GZDoom/gzdoom_portable.ini"
-	OutFile         = "$DownloadsFolder\GZDoom\gzdoom.ini"
-	UseBasicParsing = $true
-	Verbose         = $true
-}
-Invoke-WebRequest @Parameters
-
-# https://github.com/farag2/Utilities/tree/master/Download/GZDoom
-$Parameters = @{
-	Uri             = "https://raw.githubusercontent.com/farag2/Utilities/master/Download/GZDoom/_bd.cmd"
-	OutFile         = "$DownloadsFolder\GZDoom\_bd.cmd"
-	UseBasicParsing = $true
-	Verbose         = $true
-}
-Invoke-WebRequest @Parameters
-
-# https://www.moddb.com/mods/brutal-doom/news/test-4-is-out
-# Expand archive manualy
-$Parameters = @{
-	Uri             = "https://www.moddb.com/downloads/start/265147"
-	UseBasicParsing = $true
-	Verbose         = $true
-}
-$Request = Invoke-Webrequest @Parameters
-$URL = $Request.ParsedHtml.getElementsByTagName("a") | ForEach-Object -Process {$_.pathname} | Where-Object -FilterScript {$_ -match "mirror"}
-$Parameters = @{
-	Uri             = "https://www.moddb.com/$URL"
-	OutFile         = "$DownloadsFolder\db.zip"
-	UseBasicParsing = $true
-	Verbose         = $true
-}
-Invoke-Webrequest @Parameters
+# https://www.moddb.com/mods/brutal-doom/downloads/brutal-doom-v22-beta-test
+Start-Process -FilePath https://www.moddb.com/mods/brutal-doom/downloads/brutal-doom-v22-beta-test
 
 # https://github.com/farag2/Utilities/tree/master/Download/GZDoom
 $Parameters = @{
