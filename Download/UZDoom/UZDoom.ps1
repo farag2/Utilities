@@ -40,7 +40,7 @@ Start-Process -FilePath https://www.moddb.com/mods/brutal-doom/downloads/brutal-
 # https://github.com/farag2/Utilities/tree/master/Download/GZDoom
 $Parameters = @{
 	Uri             = "https://github.com/farag2/Utilities/raw/refs/heads/master/Download/UZDoom/doom2.wad"
-	OutFile         = "$DownloadsFolder\GZDoom\doom2.wad"
+	OutFile         = "$DownloadsFolder\UZDoom\doom2.wad"
 	UseBasicParsing = $true
 	Verbose         = $true
 }
