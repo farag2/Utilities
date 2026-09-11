@@ -1,17 +1,6 @@
 # Check for UWP apps updates
 Get-CimInstance -Namespace root/CIMV2/mdm/dmmap -ClassName MDM_EnterpriseModernAppManagement_AppManagement01 | Invoke-CimMethod -MethodName UpdateScanMethod
 
-# Add domains to hosts
-$hosts = "$env:SystemRoot\System32\drivers\etc\hosts"
-$Domains = @("site.com", "site2.com")
-foreach ($Domain in $Domains)
-{
-	if (-not (Get-Content -Path $hosts -Force | Select-String -SimpleMatch "0.0.0.0 `t $Domain"))
-	{
-		Add-Content -Path $hosts -Value "0.0.0.0 `t $Domain" -Force
-	}
-}
-
 # Split the name from the path
 Split-Path -Path file.ext -Leaf
 # Split the path from the name
@@ -118,29 +107,6 @@ $Log = Get-LogProperties -Name Application
 $Log.Enabled = $true
 Set-LogProperties -LogDetails $logsource
 # & wevtutil.exe set-log Application /e
-
-# Get string hash
-function Get-StringHash
-{
-	[CmdletBinding()]
-	param
-	(
-		[string]
-		$String,
-
-		[ValidateSet("MACTripleDES", "MD5", "RIPEMD160", "SHA1", "SHA256", "SHA384", "SHA512")]
-		[string]
-		$Hash
-	)
-
-	$HashResalt = [System.Security.Cryptography.HashAlgorithm]::Create($Hash).ComputeHash([System.Text.Encoding]::UTF8.GetBytes($String))
-	[System.BitConverter]::ToString($HashResalt).Replace('-', '')
-}
-Get-StringHash -String 2 -HashName SHA1
-
-# Encode using Base64 and vice versa
-[Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("SecretMessage"))
-[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("U2VjcmV0TWVzc2FnZQ=="))
 
 # Expand the window with "Task manager" title but others to minimize
 $Win32ShowWindowAsync = @{
@@ -271,30 +237,8 @@ Get-ChildItem -Path D:\folder | ForEach-Object -Process {
 	$i++
 }
 
-# Capitalize the first letters
-$String = "аа аа аа"
-(Get-Culture).TextInfo.ToTitleCase($String.ToLower())
-
-# Count chars in a string
-("string" | Measure-Object -Character).Characters
-
-# Replace a word in a file name in a folder
-Get-ChildItem -Path "D:\folder" | Rename-Item -NewName {$_.Name.Replace("abc","cba")}
-
-# Replace an extension name in a folder
-$Path = "D:\folder"
-Get-ChildItem -Path $Path | Rename-Item -NewName {$_.FullName.Replace(".txt1",".txt")}
-
 # Add REG_NONE
 New-ItemProperty -Path HKCU:\Software -Name Name -PropertyType None -Value ([byte[]]@()) -Force
-
-# Binary
-"50,33,01".Split(",") | ForEach-Object -Process {"0x$_"}
-#
-$int = 0x6054b50
-$bytes = [System.BitConverter]::GetBytes($int)
-$int = [System.BitConverter]::ToInt32($bytes, 0)
-'0x{0:x}' -f $int
 
 # Find all uninstalled updates
 $UpdateSession = New-Object -ComObject Microsoft.Update.Session
@@ -360,11 +304,6 @@ if ($HistoryCount -gt 0)
 $FolderName = "D:\folder"
 (New-Object -ComObject "Shell.Application").Windows() | Where-Object {$_.Document.Folder.Self.Path -eq $FolderName} | ForEach-Object -Process {$_.Quit()}
 
-# StartsWith/EndsWith
-$String = "1234"
-$String.StartsWith("1")
-$String.EndsWith("4")
-
 # Context menu verbs
 $Target = Get-Item -Path "D:\folder\file.lnk"
 $Shell = New-Object -ComObject Shell.Application
@@ -372,14 +311,6 @@ $Folder = $Shell.NameSpace($Target.DirectoryName)
 $file = $Folder.ParseName($Target.Name)
 $Verb = $File.Verbs() | Where-Object -FilterScript {$_.Name -like "Закрепить на начальном &экране"}
 $Verb.DoIt()
-
-# Convert hash table into objects
-$hash = @{
-	Name   = "Tobias"
-	Age    = 66
-	Status = "Online"
-}
-New-Object -TypeName PSObject -Property $hash
 
 # Remove unremovable registry key
 $parent = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ps1', $true)
@@ -434,15 +365,6 @@ Test-Function
 # Find all notepad.exe processes, convert into an array and kill all
 @(Get-Process -Name Notepad).ForEach({Stop-Process -InputObject $_})
 
-# Compare hashes from .cat files
-$HT = @{
-	CatalogFilePath = "D:\file.cat"
-	Path            = "D:\folder"
-	Detailed        = $true
-	FilesToSkip     = "file.xml"
-}
-Test-FileCatalog @HT
-
 # Reset local user password via WinPE
 # In WinPE
 MOVE C:\Windows\system32\utilman.exe C:\Windows\system32\utilman.exe.bak
@@ -482,13 +404,6 @@ sfc /scannow /offbootdir=C:\ /offwindir=C:\Windows
 
 # WinSxS cleaning up
 DISM /Online /Cleanup-Image /StartComponentCleanup /ResetBase
-
-# Check if a file is saved in UTF-8 with BOM encoding
-$bytes = Get-Content -Path $file -Encoding Byte -Raw
-if (($bytes[0] -ne 239) -and ($bytes[1] -ne 187) -and ($bytes[2] -ne 191))
-{
-	Write-Warning -Message "The script wasn't saved in `"UTF-8 with BOM`" encoding"
-}
 
 # Waiting for a process
 do
@@ -558,15 +473,14 @@ do
 }
 while ($Prompt -ne "N")
 
-# Compare binary values
-((Get-ItemPropertyValue -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer -Name link) -join " ") -ne ([byte[]](00, 00, 00, 00) -join " ")
-
 # Get UEFI license key
 (Get-CimInstance -ClassName SoftwareLicensingService).OA3xOriginalProductKey
 
 # Activate Windows
-slmgr.vbs /skms <servername>
-slmgr.vbs /ato
+Get-OSLicenseInfo
+Set-OSLicenseInfo
+Invoke-OSLicense -ActivateOnline
+Invoke-OSLicense -InstallProductKey <key>
 
 # Get exception name
 $Error.Exception.GetType().FullName
@@ -617,13 +531,9 @@ Write-Verbose -Message "Total number of lines: $i" -Verbose
 function Convert-Error ([int]$ErrorCode)
 {
 	CertUtil -error $ErrorCode
-	"`n"
 	New-Object -TypeName System.ComponentModel.Win32Exception($ErrorCode)
 }
 Convert-Error -2147287037
-
-# Remove lines starting with "//" and blank spaces
-Get-Content -Path $settings | Where-Object -FilterScript {$_ -notmatch "//"} | Where-Object -FilterScript {$_.Trim(" `t")} | Set-Content -Path $settings -Force
 
 # Quote every item
 Get-Content -Path D:\file.txt -Force | ForEach-Object -Process {"'$_'"}
@@ -636,35 +546,6 @@ Get-Content -Path D:\file.txt -Force | ForEach-Object -Process {"'$_'"}
 	# Start-Sleep -Seconds 3
 	Start-Process -FilePath "$env:ProgramFiles\Windows Defender\MpCmdRun.exe" -ArgumentList @("-Restore -FilePath `"$_`"") -Wait
 }
-
-# Insert an XML node
-[xml]$XML1 = @"
-<toast duration="$ToastDuration" scenario="reminder">
-    <visual>
-        <binding template="ToastGeneric">
-            <group>
-                <subgroup>
-                    <text hint-style="body" hint-wrap="true" >$EventText</text>
-                </subgroup>
-            </group>
-        </binding>
-    </visual>
-</toast>
-"@
-
-[xml]$XML2 = @"
-<toast>
-    <actions>
-        <input id="SnoozeTimer" type="selection" title="Select a Snooze Interval" defaultInput="1">
-            <selection id="1" content="1 Minute"/>
-        </input>
-        <action activationType="system" arguments="snooze" hint-inputId="SnoozeTimer" content="$SnoozeTitle" id="test-snooze"/>
-    </actions>
-</toast>
-"@
-
-$XML1.toast.AppendChild($XML1.ImportNode($XML2.toast.actions, $true))
-$XML1.Save("C:\1.xml")
 
 # Validate all .psd1 in all folders
 $Folder = Get-ChildItem -Path "D:\Desktop\Sophia Script" -Recurse -Include *.psd1
@@ -722,13 +603,8 @@ $Collection
 $Paths = Get-ChildItem -Path D:\Folder -Recurse -Directory -Force
 foreach ($Path in $Paths.FullName)
 {
-	$RecurseArgument = ('/S:{0}' -f $Path)
-	& compact.exe /U $RecurseArgument
+	& compact.exe /U ('/S:{0}' -f $Path)
 }
-
-# Disable NTFS compression for the parent subfolder
-$ParentFolder = Split-Path -Path $Paths.FullName -Parent
-& compact.exe /U $ParentFolder 
 
 # Isolate IP addresses only
 $Array = @('Handshake', 'Success', 'Status', 200, '192.30.253.113', 'OK', 0xF, "2001:4860:4860::8888")
@@ -738,9 +614,7 @@ $Array | Where-Object -FilterScript {-not ($_ -as [Double]) -and ($_ -as [IPAddr
 # Reboot required about execution
 wsreset -i
 
-# Since Windows 22H2 22557 build
 # https://oofhours.com/2022/04/27/language-pack-handling-in-windows-11-continues-to-evolve/
-# https://en.wikipedia.org/wiki/IETF_language_tag
 # LanguagePackManagement module
 Install-Language -Language en-US
 Get-InstalledLanguage
@@ -765,63 +639,24 @@ Get-CimInstance -ClassName Win32_OSRecoveryConfiguration | Set-CIMInstance -Argu
 copy /b D:\firmware.rfu \\nt_server\MFU
 
 # Create a table with WSL installed distros
-[System.Console]::OutputEncoding = [System.Text.Encoding]::Unicode
-# https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json
-# wsl --list --online relies on Internet connection too, so it's much convenient to parse DistributionInfo.json, rather than parse a cmd output
 $Parameters = @{
-	Uri             = "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json"
+	Uri             = "https://raw.githubusercontent.com/microsoft/WSL/main/distributions/DistributionInfo.json"
 	UseBasicParsing = $true
+	TimeoutSec      = 5
 	Verbose         = $true
 }
-$Distros = (Invoke-RestMethod @Parameters).Distributions | ForEach-Object -Process {
-	[PSCustomObject]@{
-		"Distro" = $_.FriendlyName
-		"Alias"  = $_.Name
+$Distributions = Invoke-RestMethod @Parameters
+
+foreach ($Family in $Distributions.ModernDistributions.PSObject.Properties)
+{
+	foreach ($Distribution in $Family.Value)
+	{
+		[PSCustomObject]@{
+			Distribution = $Distribution.FriendlyName
+			Alias        = $Distribution.Name
+		}
 	}
 }
-
-($Distros | Where-Object -FilterScript {$_.Distro -eq "Ubuntu"}).Alias
-# $Distros | ConvertTo-Json
-# $Distros | ForEach-Object -Process {(wsl --list --quiet) -contains $_.Alias}
-
-<#
-$Extensions = @{
-	"Ubuntu"                   = "Ubuntu"
-	"Debian GNU/Linux"         = "Debian"
-	"Kali Linux Rolling"       = "kali-linux"
-	"Linux Enterse Server v12" = "SLES-12SUSE"
-	"Linux Enterse Server v15" = "SLES-15SUSE"
-	"Ubuntu 18.04 LTS"         = "Ubuntu-18.04"
-	"Ubuntu 20.04 LTS"         = "Ubuntu-20.04"
-	"Ubuntu 22.04 LTS "        = "Ubuntu-22.04"
-	"Linux 8.5"                = "OracleLinux_8_5Oracle"
-	"Linux 7.9"                = "OracleLinux_7_9Oracle"
-}
-$Extensions.Keys | ForEach-Object -Process {(wsl --list --quiet) -contains $_}
-#
-[System.Console]::OutputEncoding = [System.Text.Encoding]::Unicode
-$wsl = wsl --list --online
-# Calculate the string number where the "FRIENDLY NAME" header begins to truncate all other unnecessary strings in the beginning
-$LineNumber = ($wsl | Select-String -Pattern "FRIENDLY NAME" -CaseSensitive).LineNumber
-# Remove first strings in output from the first to the $LineNumber
-$Distros = ($wsl).Replace("  ", "").Replace("* ", "")[($LineNumber)..(($wsl).Count)] | ForEach-Object -Process {
-	[PSCustomObject]@{
-		"Distro" = ($_ -split " ", 2 | Select-Object -Last 1).Trim()
-		"Alias"  = ($_ -split " ", 2 | Select-Object -First 1).Trim()
-	}
-}
-#>
-
-# Save PSCustomObject to a variable
-$ActiveDirectoryList = @()
-"Testvm1", "Testvm2", "Testvm3" | ForEach-Object -Process {
-	$Var = [PSCustomObject]@{
-		VMName   = $_
-		Location = 'EastUS'
-	}
-	$ActiveDirectoryList += $Var
-}
-$ActiveDirectoryList
 
 # Decode blob URL and download file
 # https://github.com/BtbN/FFmpeg-Builds/releases/latest
@@ -877,22 +712,6 @@ if (($Files | Test-Path) -contains $false)
 {
 	"Some files missing"
 }
-
-# Download Windows.winmd from Windows 10 SDK
-# https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/
-$Parameters = @{
-	Uri             = "https://software-download.microsoft.com/download/pr/19041.685.201201-2105.vb_release_svc_prod1_WindowsSDK.iso"
-	OutFile         = "$PSScriptRoot\WindowsSDK.iso"
-	UseBasicParsing = $true
-}
-Invoke-RestMethod @Parameters
-# Mount ISO
-$Mount = Mount-DiskImage -ImagePath "$PSScriptRoot\WindowsSDK.iso" -PassThru
-$DriveLetter = ($Mount | Get-Volume).DriveLetter
-# Install "Windows SDK for UWP Managed Apps" only
-Start-Process -FilePath ($DriveLetter + ":\" + "WinSDKSetup.exe") @("/features", "OptionId.UWPManaged", "/quiet", "/norestart") -Wait
-# Unmount ISO
-Dismount-DiskImage -ImagePath "$PSScriptRoot\WindowsSDK.iso"
 
 # Auto elevate script
 $IsAdmin = ((New-Object -TypeName System.Security.Principal.WindowsPrincipal([System.Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))
@@ -1069,53 +888,11 @@ for ($columnNumber = 0; $columnNumber -lt 500; ++$columnNumber)
 # Display all environment variables
 Get-ChildItem -Path env:
 
-# Retrive items from hashtable
-$Items = @{
-	"Parameter1" = "Value1"
-	"Parameter2" = "Value2"
-	"Parameter3" = @(
-		"Value3",
-		"Value4"
-	)
-}
-foreach ($Item in $Items.Keys)
-{
-	$Items[$Item]
-}
-
 # Export all hidden arguments for .MSI installer to a file
 & "D:\file.msi" /lp! "D:\arguments.txt"
 
-# Patch shortcut to make it run as Run as Administrator
-[byte[]]$bytes = Get-Content -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\shortcut.lnk" -Encoding Byte -Raw
-# PowerShell 7
-# [byte[]]$bytes = Get-Content -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\shortcut.lnk.lnk" -AsByteStream -Raw
-# Elevated
-$bytes[0x15] = $bytes[0x15] -bor 0x20
-# Non elevated
-# $bytes[0x15] = $bytes[0x15] -bxor 0x20
-Set-Content -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\shortcut.lnk.lnk" -Value $bytes -Encoding Byte -Force
-
 # Get Windows special folders list
 [System.Enum]::GetValues([Environment+SpecialFolder])
-
-# Check if all files does not exist, not only one of them
-$Files = @("D:\file1.txt", "D:\file2.txt", "D:\file3.txt")
-if (-not (($Files | Test-Path) -contains $true))
-{}
-
-# Count occurrences of specific character in a string 
-("//sp13/sites/1/2/3".ToCharArray() | Where-Object -FilterScript {$_ -eq "1"} | Measure-Object).Count
-
-# Job
-Get-Job | Remove-Job -Force
-$using:job = Start-Job -ScriptBlock {Get-Item 1} | Wait-Job
-try
-{
-	Receive-Job -Job $job -ErrorAction SilentlyContinue
-}
-catch {}
-$Error.Exception.Message
 
 # Windows localization
 Install-Language -Language ru-RU
@@ -1127,10 +904,6 @@ Set-WinHomeLocation -GeoId 203 # https://go.microsoft.com/fwlink/?LinkID=242308
 Set-WinSystemLocale -SystemLocale ru-RU
 Copy-UserInternationalSettingsToSystem -WelcomeScreen $true -NewUser $true
 # Set-WinDefaultInputMethodOverride -InputTip "0409:00000409"
-
-# Windows 29610 license's management
-Get-OSLicenseInfo
-Set-OSLicenseInfo
 
 # Check if a variable assigned with "Set-StrictMode -Version Latest" set
 Test-Path -Path variable:MyVariable
@@ -1187,10 +960,6 @@ ExtractZIPFolder @Parameters
 
 # Check Microsoft 365 for updates
 & "$env:CommonProgramFiles\microsoft shared\ClickToRun\OfficeC2RClient.exe" /update user
-
-# Convert to hex data
-$Hex = Get-Content -Path path\to\file.exe -Encoding Byte -Raw
-[System.BitConverter]::ToString($tHex)
 
 # Parse gitlab.com
 # https://gitlab.com/gitlab-org/gitlab
@@ -1370,45 +1139,6 @@ if (-not ("WinAPI.DeleteFiles" -as [type]))
 
 # Parse GitHub folder
 Invoke-RestMethod -Uri "https://api.github.com/repos/microsoft/winget-cli/contents/schemas/JSON/manifests"
-
-# List directories via FTP
-$Resource = ""
-$Port = ""
-$Login = ""
-$Password = ""
-$Request = [System.Net.FtpWebRequest]::Create("ftp://${Resource}:${Port}")
-$Request.Credentials = New-Object System.Net.NetworkCredential($Login, $Password)
-$Request.Method = [System.Net.WebRequestMethods+Ftp]::ListDirectory
-# Use $true for FTPS
-$Request.EnableSsl = $false
-$Response = $Request.GetResponse()
-$responseStream = $Response.GetResponseStream()
-$reader = New-Object System.IO.StreamReader($responseStream)
-# List directories and files
-$files = @()
-while (-not $reader.EndOfStream)
-{
-    $files += $reader.ReadLine()
-}
-return $files
-#
-& "$env:SystemRoot\System32\ftp.exe" IP_address
-
-# Connect via SSH from PowerShell
-& "$env:SystemRoot\System32\OpenSSH\ssh.exe" user@ip_address -p <port> -v
-Remove-Item -Path "$env:USERPROFILE\.ssh" -Recurse -Force
-
-# Download file from remote server
-# https://github.com/farag2/Utilities/blob/master/Linux/Configure.sh
-# -P <port> must be the first
-# get /home/cron.log D:\Downloads\cron.log
-& "$env:SystemRoot\System32\OpenSSH\sftp.exe" -P <port> user@ip_address:/home/file.txt D:\folder
-
-# Upload file to remote server
-& "$env:SystemRoot\System32\OpenSSH\scp.exe" -P <port> "D:\folder\1.txt" user@ip_address:/home/<username>
-#
-& "$env:SystemRoot\System32\OpenSSH\sftp.exe" -P <port> user@ip_address
-put "D:\folder\1.txt" /home/<username>
 
 # https://cheburcheck.ru
 & $env:SystemRoot\system32\curl.exe -k <blocked_web_resource> --resolve <site_from_whitelist>:443:<IP_address_of_the_same_blocked_site>
