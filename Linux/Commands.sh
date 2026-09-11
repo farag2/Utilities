@@ -125,3 +125,26 @@ Start-Service -Name ssh-agent
 
 # id_ed25519 won't be accepted if it is placed in a public folder
 & "$env:SystemRoot\System32\OpenSSH\ssh.exe" user@ip_address -p <port> -i "$env:USERPROFILE\.ssh\<ssh-file-without-pub-ext>" -v
+
+# List directories via FTP
+$Resource = ""
+$Port = ""
+$Login = ""
+$Password = ""
+$Request = [System.Net.FtpWebRequest]::Create("ftp://${Resource}:${Port}")
+$Request.Credentials = New-Object System.Net.NetworkCredential($Login, $Password)
+$Request.Method = [System.Net.WebRequestMethods+Ftp]::ListDirectory
+# Use $true for FTPS
+$Request.EnableSsl = $false
+$Response = $Request.GetResponse()
+$responseStream = $Response.GetResponseStream()
+$reader = New-Object System.IO.StreamReader($responseStream)
+# List directories and files
+$files = @()
+while (-not $reader.EndOfStream)
+{
+    $files += $reader.ReadLine()
+}
+return $files
+#
+& "$env:SystemRoot\System32\ftp.exe" IP_address
