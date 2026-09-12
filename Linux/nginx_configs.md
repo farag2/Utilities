@@ -26,15 +26,22 @@ server {
 # latest nginx
 
 server {
-    listen 127.0.0.1:8443 ssl;
-    http2 on;
+    listen      80;
     server_name <domain>;
 
-    # Issuing within certbot
+    location /.well-known/acme-challenge/ { root /var/www/<domain>; }
+    location / { return 301 https://$host$request_uri; }
+}
+
+server {
+    listen      127.0.0.1:8443 ssl;
+    http2       on;
+    server_name <domain>;
+
     ssl_certificate     /etc/letsencrypt/live/<domain>/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/<domain>/privkey.pem;
 
-    ssl_protocols TLSv1.3;
+    ssl_protocols              TLSv1.3;
 
     root /var/www/<domain>;
     index index.html;
@@ -45,13 +52,6 @@ server {
     location / {
         try_files $uri $uri/ =404;
     }
-}
-
-server {
-    listen      80;
-    server_name <domain>;
-
-    return 301 https://<domain>$request_uri;
 }
 ```
 
