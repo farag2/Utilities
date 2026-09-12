@@ -22,7 +22,11 @@ sudo systemctl list-units --type=service | grep -iE '<service_name>'
 # Update cert forcibly via certbot
 sudo nano /etc/letsencrypt/renewal/tg.sophia.team.conf
 [renewalparams]
-renew_hook = systemctl restart telemt.service
+renew_hook = systemctl restart <service_name>
+
+mkdir -p /var/www/<domain>/.well-known/acme-challenge
+echo test > /var/www/<domain>/.well-known/acme-challenge/probe
+curl -i http://<domain>/.well-known/acme-challenge/probe
 
 # Uninstall acme
 acme.sh --uninstall
