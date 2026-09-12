@@ -16,6 +16,14 @@ certbot certonly --standalone --agree-tos -d <domain> -m <mail>
 # Update cert forcibly
 /root/.acme.sh/acme.sh --renew -d <domain> --force --ecc
 
+# Get web hook name
+sudo systemctl list-units --type=service | grep -iE '<service_name>'
+
+# Update cert forcibly via certbot
+sudo nano /etc/letsencrypt/renewal/tg.sophia.team.conf
+[renewalparams]
+renew_hook = systemctl restart telemt.service
+
 # Uninstall acme
 acme.sh --uninstall
 rm -r  ~/.acme.sh
