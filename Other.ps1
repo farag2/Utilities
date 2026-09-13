@@ -1182,3 +1182,29 @@ Set-NetConnectionProfile -NetworkCategory Private
 
 # Create a 1MB (in KB) binary file
 fsutil file createnew D:\folder\test.bin 1048576
+
+# Create MSI packages list
+$Apps = (New-Object -ComObject WindowsInstaller.Installer).ProductsEx("", "", 7)
+foreach ($App in $Apps)
+{
+	try
+	{
+		$Name = $App.InstallProperty("ProductName")
+	}
+	catch
+	{
+		continue
+	}
+
+	try
+	{
+		$Package = $App.InstallProperty("LocalPackage")
+	}
+	catch {}
+
+	[PSCustomObject]@{
+		App     = $Name
+		Code    = $App.ProductCode()
+		Package = $Package
+	}
+}
