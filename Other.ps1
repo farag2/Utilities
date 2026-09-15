@@ -630,6 +630,8 @@ shutdown /r /t 0
 # 
 start ms-cxh:localonly
 start ms-cxh://setaddlocalonly
+#
+https://x.com/TheBobPony/status/2098825591285776775
 
 # Prevent Windows to restart automatically after a system failure
 # The parameter EnableAllvileges allows us to manipulate the properties of this WMI object if the current Powershell host runs as Administrator
