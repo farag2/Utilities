@@ -1210,3 +1210,8 @@ foreach ($App in $Apps)
 		Package = $Package
 	}
 }
+
+# Resource availability checkers
+https://tests.aizametki.ru/
+https://nerabotaetv.ru/
+https://cheburcheck.ru/
