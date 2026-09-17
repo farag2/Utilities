@@ -1215,3 +1215,4 @@ foreach ($App in $Apps)
 https://tests.aizametki.ru/
 https://nerabotaetv.ru/
 https://cheburcheck.ru/
+https://github.com/RunetMonitor/SONAR
