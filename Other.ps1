@@ -608,7 +608,7 @@ foreach ($Path in $Paths.FullName)
 
 # Isolate IP addresses only
 $Array = @('Handshake', 'Success', 'Status', 200, '192.30.253.113', 'OK', 0xF, "2001:4860:4860::8888")
-$Array | Where-Object -FilterScript {-not ($_ -as [Double]) -and ($_ -as [IPAddress])}
+$Array | Where-Object -FilterScript {-not ($_ -as [Double]) -and ($_ -as [System.Net.IPAddress])}
 
 # Download and install all Store related UWP packages. Even for LTSC
 # Reboot required about execution
