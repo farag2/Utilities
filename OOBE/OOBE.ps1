@@ -1,4 +1,4 @@
-# powershell -c "iwr https://raw.githubusercontent.com/farag2/Utilities/refs/heads/master/OOBE/OOBE.ps1 -useb | iex"
+# iwr https://raw.githubusercontent.com/farag2/Utilities/refs/heads/master/OOBE/OOBE.ps1 -useb | iex
 # https://schneegans.de/windows/unattend-generator/
 $Signature = @{
 	Namespace          = "WinAPI"
