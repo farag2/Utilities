@@ -850,7 +850,7 @@ Get-ChildItem -Path D:\Downloads\LanguagePack -Recurse -Force -Filter *.pri -Fil
 & "D:\ResourcesExtract.exe" /Source "C:\Windows\System32\shell32.dll" /DestFolder "D:\Folder" /ExtractIcons 0 /ExtractCursors 0 /ExtractBitmaps 0 /ExtractHTML 0 /ExtractManifests 0 /ExtractAnimatedIcons 0 /ExtractAnimatedCursors 0 /ExtractAVI 0 /ExtractTypeLib 0 /ExtractBinary 0 /ScanSubFolders 0 /FileExistMode 2 /OpenDestFolder 0
 
 # Create a table with UWP apps installed with their local native logo paths
-$AppxPackages = @(Get-AppxPackage -PackageTypeFilter Bundle -AllUsers)
+$AppxPackages = @(Get-AppxPackage -AllUsers)
 $PackagesIds = [Windows.Management.Deployment.PackageManager, Windows.Web, ContentType = WindowsRuntime]::new().FindPackages() | Select-Object -Property DisplayName, Logo -ExpandProperty Id
 foreach ($AppxPackage in $AppxPackages)
 {
