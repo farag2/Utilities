@@ -198,10 +198,10 @@ $MainWindowHandle | WindowState -State HIDE
 
 # Become a file owner
 takeown /F D:\file.exe
-icacls D:\file.exe /grant:r %username%:F
+icacls D:\file.exe /grant:r "${env:USERNAME}:F"
 # Become a folder owner
 takeown /F C:\HV\10 /R
-icacls C:\HV\10 /grant:r %username%:F /T
+icacls C:\HV\10 /grant:r "${env:USERNAME}:F" /T
 
 # Search for a file on all local drives and its' full path
 $file = "file.ext"
