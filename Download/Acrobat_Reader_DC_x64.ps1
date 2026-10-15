@@ -1,20 +1,21 @@
 # Download the latest Adobe Acrobat Reader DC x64
 # https://armmf.adobe.com/arm-manifests/mac/AcrobatDC/reader/current_version.txt
 
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-
-if ($Host.Version.Major -eq 5)
+if ($PSVersionTable.PSVersion.Major -eq 5)
 {
+	[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+
 	# Progress bar can significantly impact cmdlet performance
 	# https://github.com/PowerShell/PowerShell/issues/2138
-	$Script:ProgressPreference = "SilentlyContinue"
+	$ProgressPreference = "SilentlyContinue"
 }
 
 # Get the link to the latest Adobe Acrobat Reader DC x64 installer
 $TwoLetterISOLanguageName = (Get-WinSystemLocale).TwoLetterISOLanguageName
 $Parameters = @{
-	Uri = "https://rdc.adobe.io/reader/products?lang=$($TwoLetterISOLanguageName)&site=enterprise&os=Windows%2011&api_key=dc-get-adobereader-cdn"
+	Uri             = "https://rdc.adobe.io/reader/products?lang=$($TwoLetterISOLanguageName)&site=enterprise&os=Windows%2011&api_key=dc-get-adobereader-cdn"
 	UseBasicParsing = $true
+	Verbose         = $true
 }
 $displayName = (Invoke-RestMethod @Parameters).products.reader.displayName
 $Version = (Invoke-RestMethod @Parameters).products.reader.version.Replace(".", "")
@@ -22,6 +23,7 @@ $Version = (Invoke-RestMethod @Parameters).products.reader.version.Replace(".", 
 $Parameters = @{
 	Uri             = "https://rdc.adobe.io/reader/downloadUrl?name=$($displayName)&os=Windows%2011&site=enterprise&lang=$($TwoLetterISOLanguageName)&api_key=dc-get-adobereader-cdn"
 	UseBasicParsing = $true
+	Verbose         = $true
 }
 $downloadURL = (Invoke-RestMethod @Parameters).downloadURL
 $saveName = (Invoke-RestMethod @Parameters).saveName
@@ -32,6 +34,7 @@ if ($downloadURL -match "reader")
 	$Parameters = @{
 		Uri = "https://rdc.adobe.io/reader/products?lang=en&site=enterprise&os=Windows%2011&api_key=dc-get-adobereader-cdn"
 		UseBasicParsing = $true
+		Verbose         = $true
 	}
 	$Version = (Invoke-RestMethod @Parameters).products.reader.version.Replace(".", "")
 
@@ -46,8 +49,9 @@ $Parameters = @{
 	Uri             = $downloadURL
 	OutFile         = "$DownloadsFolder\$saveName"
 	UseBasicParsing = $true
+	Verbose         = $true
 }
-Invoke-RestMethod @Parameters
+Invoke-WebRequest @Parameters
 
 # Extract to the "AcroRdrDCx64" folder
 $Arguments = @(
@@ -68,6 +72,7 @@ Remove-Item -Path $Items -Recurse -Force -ErrorAction Ignore
 $Parameters = @{
 	Uri = "https://rdc.adobe.io/reader/products?lang=mui&site=enterprise&os=Windows%2011&api_key=dc-get-adobereader-cdn"
 	UseBasicParsing = $true
+	Verbose         = $true
 }
 $Version = ((Invoke-RestMethod @Parameters).products.reader | Where-Object -FilterScript {$_.displayName -match "64bit"}).version.Replace(".", "")
 
@@ -91,11 +96,11 @@ $PatchFile = Split-Path -Path (Get-Item -Path "$DownloadsFolder\AcroRdrDCx64\Acr
 $CmdLine = @(
 	"ENABLE_CHROMEEXT=0",
 	"DISABLE_BROWSER_INTEGRATION=YES",
-	"DISABLE_DISTILLER=YES",
+	# "DISABLE_DISTILLER=YES",
 	"REMOVE_PREVIOUS=YES",
 	"IGNOREVCRT64=1",
 	"EULA_ACCEPT=YES",
-	"DISABLE_PDFMAKER=YES",
+	# "DISABLE_PDFMAKER=YES",
 	"DISABLEDESKTOPSHORTCUT=2",
 	# Install updates automatically
 	"UPDATE_MODE=3"
