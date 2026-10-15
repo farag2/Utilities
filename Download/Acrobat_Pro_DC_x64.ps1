@@ -3,13 +3,13 @@
 # HKLM:\SOFTWARE\Classes\Installer\Products\68AB67CA3301FFFF7706CB5110E47A00\SourceList\Net
 # %ProgramFiles%\Common Files\Adobe\Acrobat\Setup Files\{AC76BA86-1033-FFFF-7760-BC15014EA700}
 
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-
-if ($Host.Version.Major -eq 5)
+if ($PSVersionTable.PSVersion.Major -eq 5)
 {
+	[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+
 	# Progress bar can significantly impact cmdlet performance
 	# https://github.com/PowerShell/PowerShell/issues/2138
-	$Script:ProgressPreference = "SilentlyContinue"
+	$ProgressPreference = "SilentlyContinue"
 }
 
 # https://helpx.adobe.com/enterprise/using/deploying-acrobat.html
@@ -28,8 +28,9 @@ Invoke-WebRequest @Parameters
 # Get the latest Adobe Acrobat Pro DC patch version (lang=mui)
 # Blocked for Russia
 $Parameters = @{
-	Uri = "https://rdc.adobe.io/reader/products?lang=mui&site=enterprise&os=Windows%2011&api_key=dc-get-adobereader-cdn"
+	Uri             = "https://rdc.adobe.io/reader/products?lang=mui&site=enterprise&os=Windows%2011&api_key=dc-get-adobereader-cdn"
 	UseBasicParsing = $true
+	Verbose         = $true
 }
 try
 {
@@ -39,7 +40,7 @@ catch
 {
     Write-Warning -Message "Cannot reach https://rdc.adobe.io/reader/products?lang=mui&site=enterprise&os=Windows%2011&api_key=dc-get-adobereader-cdn"
     Write-Warning -Message '$Version will be null'
-    $Version = 0
+    $Version = $null
 }
 
 # If latest version is greater than one from archive
