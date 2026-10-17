@@ -1,4 +1,4 @@
-# enter Powershell and run
+# Shift + F10 and enter Powershell
 # iwr https://raw.githubusercontent.com/farag2/Utilities/refs/heads/master/OOBE/OOBE.ps1 -useb | iex
 # https://schneegans.de/windows/unattend-generator/
 $Parameters = @{
