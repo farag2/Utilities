@@ -2,7 +2,7 @@
 # https://id.yandex.ru/personal/data-access
 # https://github.com/rclone/rclone/releases/latest
 
-function YandexDiskRescue
+function Download-YandexFiles
 {
 	[CmdletBinding()]
 	param
