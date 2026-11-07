@@ -1140,9 +1140,6 @@ if (-not ("WinAPI.DeleteFiles" -as [type]))
 # Parse GitHub folder
 Invoke-RestMethod -Uri "https://api.github.com/repos/microsoft/winget-cli/contents/schemas/JSON/manifests"
 
-# https://cheburcheck.ru
-& $env:SystemRoot\system32\curl.exe -k <blocked_web_resource> --resolve <site_from_whitelist>:443:<IP_address_of_the_same_blocked_site>
-
 # Add proxy
 New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name AutoConfigURL -PropertyType String -Value "link to pac" -Force
 
