@@ -96,8 +96,8 @@ server {
     index index.html;
     location / { try_files $uri $uri/ =404; }
 
-    location /sanctuary/ {
-        proxy_pass https://127.0.0.1:6600;
+    location /<secret link name to 3X-Ui panel>/ {
+        proxy_pass https://127.0.0.1:<panel port>;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -105,8 +105,17 @@ server {
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
     }
+
+    location /<secret link name subscriptions>/ {
+        proxy_pass https://127.0.0.1:<sub port>;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
 }
 ```
 
 # 3X-UI panel listen IP
+# 3X-UI subscriptions listen IP
 127.0.0.1
