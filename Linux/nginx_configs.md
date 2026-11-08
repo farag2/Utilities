@@ -63,6 +63,14 @@ map $host $redirect_target {
     <domain> URL;
 }
 
+map $http_user_agent $sub_client_ok {
+    default        0;
+    ~Throne        1;
+    ~v2rayNG       1;
+    ~TeapodStream  1;
+    ~Exclave       1;
+}
+
 server {
     listen 80;
     server_name <domain> <domain>;
@@ -107,6 +115,9 @@ server {
     }
 
     location /<secret link name subscriptions>/ {
+        if ($sub_client_ok = 0) {
+            return 404;
+        }
         proxy_pass https://127.0.0.1:<sub port>;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
