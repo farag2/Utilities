@@ -2,10 +2,9 @@
 sudo apt install nginx libnginx-mod-stream -y
 
 # Hide nginx version
-sudo nano /etc/nginx/nginx.conf
+sudo nano /etc/nginx/conf.d/security.conf
 server_tokens off;
-sudo nginx -t
-sudo systemctl restart nginx
+sudo nginx -t && sudo systemctl reload nginx
 
 # Issue cert
 sudo apt install certbot python3-certbot-nginx -y
