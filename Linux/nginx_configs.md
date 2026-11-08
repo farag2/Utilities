@@ -107,3 +107,6 @@ server {
     }
 }
 ```
+
+# 3X-UI panel listen IP
+127.0.0.1
