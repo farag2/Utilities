@@ -133,3 +133,6 @@ server {
 
 # 3X-UI Reverse Proxy URI
 <domain/<secret panel URL>/
+
+# Check connected clients' user-agent 
+sudo grep '/<secret link name subscriptions>/' /var/log/nginx/access.log | awk -F'"' '{print $6}' | sort | uniq -c | sort -rn
