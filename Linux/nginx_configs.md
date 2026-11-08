@@ -119,3 +119,6 @@ server {
 # 3X-UI panel listen IP
 # 3X-UI subscriptions listen IP
 127.0.0.1
+
+# 3X-UI Reverse Proxy URI
+<domain/<secret panel URL>/
