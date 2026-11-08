@@ -127,12 +127,56 @@ server {
 }
 ```
 
-# 3X-UI panel listen IP
-# 3X-UI subscriptions listen IP
+## 3X-UI panel listen IP
+## 3X-UI subscriptions listen IP
 127.0.0.1
 
-# 3X-UI Reverse Proxy URI
+## 3X-UI Reverse Proxy URI
 <domain/<secret panel URL>/
 
-# Check connected clients' user-agent 
+## Subscription Service
+## JSON subscription
+On
+
+## 3X-UI subscriptions listen IP
+127.0.0.1
+
+## Listen Port
+<sub port>
+
+## JSON URI Path
+/<panel port>-json/
+
+## Xray JSON User-Agent regex
+# Filter adding sub in VPN clients by user agents
+`(?i)^(v2rayNG|TeapodStream|Exclave)/`
+
+## JSON subscription routing profile
+
+```json
+{
+  "Name": "Sanctuary",
+  "GlobalProxy": "true",
+  "RemoteDNSType": "DoH",
+  "RemoteDNSDomain": "https://cloudflare-dns.com/dns-query",
+  "RemoteDNSIP": "1.1.1.1",
+  "DomesticDNSType": "DoU",
+  "DomesticDNSDomain": "",
+  "DomesticDNSIP": "8.8.8.8",
+  "DnsHosts": {
+    "cloudflare-dns.com": "1.1.1.1"
+  },
+  "DirectSites": ["geosite:category-ru", "domain:ru", "domain:su", "domain:xn--p1ai"],
+  "DirectIp": ["geoip:private", "geoip:ru"],
+  "ProxySites": [],
+  "ProxyIp": [],
+  "BlockSites": [],
+  "BlockIp": [],
+  "DomainStrategy": "IPOnDemand",
+  "FakeDNS": "false"
+}
+```
+
+## Check connected clients' user-agent 
 sudo grep '/<secret link name subscriptions>/' /var/log/nginx/access.log | awk -F'"' '{print $6}' | sort | uniq -c | sort -rn
+
