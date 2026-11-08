@@ -87,7 +87,7 @@ sudo ss -tnp | grep ':853'
 
 # Open ports on firewall
 # Allow the SSH port BEFORE enabling ufw, or you will lose access
-# ss -ntpl
+# See https://github.com/farag2/Utilities/blob/master/Linux/nginx_configs.md
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw allow <ssh_port>/tcp comment 'SSH'
@@ -95,6 +95,7 @@ sudo ufw allow 443/tcp comment 'Xray VLESS REALITY'
 sudo ufw allow 80/tcp comment 'nginx HTTP, acme.sh'
 sudo ufw --force enable
 sudo ufw status verbose
+ss -ntpl
 
 # Edit crons
 # See https://github.com/farag2/Utilities/blob/master/Linux/weekly-upgrade.sh
