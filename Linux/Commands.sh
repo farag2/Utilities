@@ -94,8 +94,7 @@ sudo ufw allow <ssh_port>/tcp comment 'SSH'
 sudo ufw allow 443/tcp comment 'Xray VLESS REALITY'
 sudo ufw allow 80/tcp comment 'nginx HTTP, acme.sh'
 sudo ufw allow <3x-ui_subs_port>/tcp comment '3x-ui subscriptions'
-sudo ufw allow <3x-ui_panel_port>/tcp comment '3x-ui panel'
-sudo ufw enable
+sudo ufw --force enable
 sudo ufw status verbose
 
 # Edit crons
