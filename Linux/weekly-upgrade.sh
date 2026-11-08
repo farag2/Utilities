@@ -38,12 +38,35 @@ run()
     fi
 }
 
+# Xray geo databases used by 3x-ui; reboot below restarts Xray with the new files
+GEO_DIR=/usr/local/x-ui/bin
+LOYALSOLDIER=https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download
+RUNETFREEDOM=https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download
+
+# Download one geo file; on error log it and keep the old file (does not stop the script)
+update_geo()
+{
+    local file="$GEO_DIR/$1"
+    if curl -fsSL --retry 3 --max-time 300 -o "$file.new" "$2" >> "$APT_LOG" 2>&1 && [ -s "$file.new" ]
+    then
+        mv -f "$file.new" "$file"
+    else
+        rm -f "$file.new"
+        echo "$(date): Failed: geo update $1" >> "$FAIL_LOG"
+    fi
+}
+
 : > "$APT_LOG"
 
 run apt-get "${APT_OPTS[@]}" update
 run apt-get "${APT_OPTS[@]}" "${DPKG_OPTS[@]}" full-upgrade -y
 run apt-get "${APT_OPTS[@]}" autoremove -y
 run apt-get "${APT_OPTS[@]}" autoclean -y
+
+update_geo geoip.dat     "$LOYALSOLDIER/geoip.dat"
+update_geo geosite.dat   "$LOYALSOLDIER/geosite.dat"
+update_geo geoip_RU.dat  "$RUNETFREEDOM/geoip.dat"
+update_geo geosite_RU.dat "$RUNETFREEDOM/geosite.dat"
 
 echo "$(date): Success" >> "$LOG"
 systemctl reboot
