@@ -35,16 +35,19 @@ sudo nano /etc/sysctl.d/99-custom.conf
 # Disable ICMP ping response
 net.ipv4.icmp_echo_ignore_all = 1
 net.ipv6.icmp.echo_ignore_all = 1
+# Disable IPv6
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
 # Enable BBR
 # 3X-UI already configures BBR. No need to create configuration
-net.core.default_qdisc = fq
-net.ipv4.tcp_congestion_control = bbr
+#net.core.default_qdisc = fq
+#net.ipv4.tcp_congestion_control = bbr
 # Apply all settings the same way as at boot
 sudo sysctl --system
 # Show which files and values are applied at boot
 systemd-analyze cat-config sysctl.d
 # Check current values
-sysctl net.ipv4.tcp_congestion_control net.ipv4.icmp_echo_ignore_all net.ipv6.icmp.echo_ignore_all
+sysctl net.ipv4.icmp_echo_ignore_all net.ipv6.icmp.echo_ignore_all net.ipv6.conf.all.disable_ipv6 net.ipv6.conf.default.disable_ipv6
 
 # Find other configs in /etc/ssh/sshd_config.d to remove records from there
 # Check if port number is not used in other cases
