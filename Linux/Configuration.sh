@@ -22,7 +22,7 @@ passwd
 # /var/log
 
 # Create a sudo user
-sudo adduser <username>
+sudo adduser --comment "" <username>
 # Add the user to the sudo group
 sudo usermod -aG sudo <username>
 # Switch to new account
