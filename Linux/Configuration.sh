@@ -173,10 +173,12 @@ put "D:\folder\1.txt" /home/<username>
 # sudo apt install openssh-server -y
 # apt list --installed | grep openssh
 
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
 # Generate SSH keys and save them to "$env:USERPROFILE\.ssh"
 & "$env:SystemRoot\System32\OpenSSH\ssh-keygen.exe" -t ed25519 -f "$env:USERPROFILE\.ssh\<name>" -C "<name>"
 # Copy ONLY the public key (.pub) to the server
-& "$env:SystemRoot\System32\OpenSSH\scp.exe" -P 6601 "$env:USERPROFILE\.ssh\<friendlyname>.pub" user@ip_address:~/.ssh/authorized_keys
+& "$env:SystemRoot\System32\OpenSSH\scp.exe" -P <port> "$env:USERPROFILE\.ssh\<friendlyname>.pub" user@ip_address:~/.ssh/authorized_keys
 # List folders on server
 ls -la ~/.ssh
 
