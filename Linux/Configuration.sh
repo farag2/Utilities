@@ -175,6 +175,8 @@ put "D:\folder\1.txt" /home/<username>
 
 mkdir -p ~/.ssh
 chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+
 # Generate SSH keys and save them to "$env:USERPROFILE\.ssh"
 & "$env:SystemRoot\System32\OpenSSH\ssh-keygen.exe" -t ed25519 -f "$env:USERPROFILE\.ssh\<name>" -C "<name>"
 # Copy ONLY the public key (.pub) to the server
