@@ -1213,6 +1213,7 @@ https://github.com/RunetMonitor/SONAR
 https://wiki.zapret.moe/DPI/tspu-inspectors-checkers-2026
 https://platform.censys.io/home
 https://check-host.net/check-tcp
+https://one.one.one.one/purge-cache/
 
 # Get domain properties
 $Parameters = @{
